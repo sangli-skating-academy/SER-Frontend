@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faSkating,
   faHome,
   faCalendarAlt,
   faImages,
@@ -60,11 +59,12 @@ const Header = () => {
             <div className="flex items-center">
               {/* Logo */}
               <Link to="/" className="flex items-center space-x-2 group">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300 animate-spin-slow">
-                  <FontAwesomeIcon icon={faSkating} className="text-2xl" />
+                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 animate-spin-slow">
+                  {/* <FontAwesomeIcon icon={faSkating} className="text-2xl" /> */}
+                  <img src="/logo.png" alt="Sai Skating Academy" />
                 </div>
                 <span className="text-2xl font-montserrat text-dark hidden md:inline tracking-tight group-hover:text-primary transition-colors duration-300 animate-gradient-x">
-                  SportClub
+                  Sai Skating
                 </span>
               </Link>
             </div>
@@ -210,7 +210,9 @@ const Header = () => {
                 to="/events"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 active:text-pink-500 transition-colors py-2 animate-fade-in drop-shadow-lg ${
-                  location.pathname === "/events" ? "text-pink-400 font-bold" : ""
+                  location.pathname === "/events"
+                    ? "text-pink-400 font-bold"
+                    : ""
                 }`}
               >
                 <FontAwesomeIcon icon={faCalendarAlt} /> Events
@@ -219,7 +221,9 @@ const Header = () => {
                 to="/gallery"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 active:text-pink-500 transition-colors py-2 animate-fade-in drop-shadow-lg ${
-                  location.pathname === "/gallery" ? "text-pink-400 font-bold" : ""
+                  location.pathname === "/gallery"
+                    ? "text-pink-400 font-bold"
+                    : ""
                 }`}
               >
                 <FontAwesomeIcon icon={faImages} /> Gallery
@@ -228,7 +232,9 @@ const Header = () => {
                 to="/about"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 active:text-pink-500 transition-colors py-2 animate-fade-in drop-shadow-lg ${
-                  location.pathname === "/about" ? "text-pink-400 font-bold" : ""
+                  location.pathname === "/about"
+                    ? "text-pink-400 font-bold"
+                    : ""
                 }`}
               >
                 <FontAwesomeIcon icon={faInfoCircle} /> About Us
@@ -237,7 +243,9 @@ const Header = () => {
                 to="/contact"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 active:text-pink-500 transition-colors py-2 animate-fade-in drop-shadow-lg ${
-                  location.pathname === "/contact" ? "text-pink-400 font-bold" : ""
+                  location.pathname === "/contact"
+                    ? "text-pink-400 font-bold"
+                    : ""
                 }`}
               >
                 <FontAwesomeIcon icon={faEnvelope} /> Contact

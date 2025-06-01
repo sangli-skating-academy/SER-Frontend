@@ -22,7 +22,7 @@ const Hero = () => {
         {/* Glassmorphism Overlay */}
         <div className="absolute inset-0 bg-white/10 backdrop-blur-2xl z-0 border border-white/30 shadow-2xl" />
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl flex flex-col items-center sm:items-start animate-fade-in-up">
+          <div className="max-w-9xl flex flex-col items-center sm:items-start animate-fade-in-up">
             <div className="flex items-center gap-4 mb-4 sm:justify-start justify-center w-full">
               <span className="inline-flex items-center justify-center w-13 h-13 rounded-full bg-gradient-to-tr from-blue-500 to-blue-300 shadow-lg animate-bounce-slow">
                 <FontAwesomeIcon
@@ -36,8 +36,10 @@ const Hero = () => {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold font-montserrat mb-4 tracking-tight animate-gradient-x bg-gradient-to-r from-blue-400 via-blue-400 to-pink-400 bg-clip-text text-transparent drop-shadow-xl sm:text-left text-center w-full">
               Join the{" "}
-              <span className="text-blue-600 drop-shadow-lg">Skating</span>{" "}
-              Academy
+              <span className="text-blue-600 drop-shadow-lg">
+                Sangli Miraj Kupwad Roller Skating Association, Sangli
+              </span>{" "}
+              Sai Skating Academy
             </h1>
             <p className="text-lg md:text-xl mb-8 max-w-2xl text-gray-700 animate-fade-in delay-200 sm:text-left text-center w-full">
               Register for exciting skating events across all categories, age
