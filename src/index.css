@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+body {
+  font-family: system-ui;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --background: 220 100% 99%; /* light blue background */
+  --foreground: 220 60% 18%; /* deep blue text */
+  --muted: 210 40% 96%; /* pale blue muted */
+  --muted-foreground: 220 20% 40%; /* muted blue text */
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 60% 18%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 60% 18%;
+  --border: 220 40% 90%; /* light blue border */
+  --input: 220 40% 90%;
+  --primary: 207 90% 54%; /* bright blue */
+  --primary-foreground: 211 100% 99%;
+  --secondary: 330 80% 90%; /* light pink secondary */
+  --secondary-foreground: 330 60% 30%; /* pink text */
+  --accent: 200 80% 90%; /* accent light blue */
+  --accent-foreground: 207 90% 54%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 60 9.1% 97.8%;
+  --ring: 207 90% 54%;
+  --radius: 0.5rem;
+}
+.dark {
+  --background: 220 40% 10%; /* deep blue background */
+  --foreground: 0 0% 98%;
+  --muted: 220 30% 18%; /* muted dark blue */
+  --muted-foreground: 220 10% 70%;
+  --popover: 220 40% 10%;
+  --popover-foreground: 0 0% 98%;
+  --card: 220 40% 10%;
+  --card-foreground: 0 0% 98%;
+  --border: 220 30% 18%;
+  --input: 220 30% 18%;
+  --primary: 207 90% 54%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 330 40% 30%; /* dark pink secondary */
+  --secondary-foreground: 0 0% 98%;
+  --accent: 200 40% 30%; /* accent dark blue */
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 207 90% 54%;
+  --radius: 0.5rem;
+}
