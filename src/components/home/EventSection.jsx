@@ -187,7 +187,7 @@ const EventsSection = () => {
                               variant="outline"
                               className="px-3 py-2 border-primary text-primary rounded-full hover:bg-primary hover:text-blue-400 transition-colors text-sm font-medium animate-fade-in"
                             >
-                              <Link href={`/events/${event.id}`}>
+                              <Link to={`/events/${event.id}`}>
                                 View Details
                               </Link>
                             </Button>
