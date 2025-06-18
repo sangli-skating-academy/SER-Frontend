@@ -2,7 +2,10 @@ import React, { forwardRef } from "react";
 import { cn } from "../../lib/utils";
 
 // Card container
-const Card = forwardRef(function Card({ className = "", children, ...props }, ref) {
+const Card = forwardRef(function Card(
+  { className = "", children, ...props },
+  ref
+) {
   return (
     <div
       ref={ref}
@@ -18,7 +21,10 @@ const Card = forwardRef(function Card({ className = "", children, ...props }, re
 });
 
 // Card header with animated icon slot
-const CardHeader = forwardRef(function CardHeader({ className = "", icon, children, ...props }, ref) {
+const CardHeader = forwardRef(function CardHeader(
+  { className = "", icon, children, ...props },
+  ref
+) {
   return (
     <div
       ref={ref}
@@ -36,12 +42,15 @@ const CardHeader = forwardRef(function CardHeader({ className = "", icon, childr
 });
 
 // Card title with gradient text and animation
-const CardTitle = forwardRef(function CardTitle({ className = "", children, ...props }, ref) {
+const CardTitle = forwardRef(function CardTitle(
+  { className = "", children, ...props },
+  ref
+) {
   return (
     <div
       ref={ref}
       className={cn(
-        "text-2xl font-extrabold leading-none tracking-tight bg-gradient-to-r from-blue-500 via-blue-300 to-pink-400 bg-clip-text text-transparent animate-gradient-x drop-shadow-lg",
+        "text-2xl font-extrabold leading-none tracking-tight bg-gradient-to-r from-blue-500 via-blue-400 to-blue-300 bg-clip-text text-transparent animate-gradient-x drop-shadow-lg",
         className
       )}
       {...props}
@@ -52,7 +61,10 @@ const CardTitle = forwardRef(function CardTitle({ className = "", children, ...p
 });
 
 // Card description
-const CardDescription = forwardRef(function CardDescription({ className = "", children, ...props }, ref) {
+const CardDescription = forwardRef(function CardDescription(
+  { className = "", children, ...props },
+  ref
+) {
   return (
     <div
       ref={ref}
@@ -65,20 +77,14 @@ const CardDescription = forwardRef(function CardDescription({ className = "", ch
 });
 
 // Card content
-const CardContent = forwardRef(function CardContent({ className = "", children, ...props }, ref) {
-  return (
-    <div ref={ref} className={cn("p-6 pt-0 animate-fade-in", className)} {...props}>
-      {children}
-    </div>
-  );
-});
-
-// Card footer
-const CardFooter = forwardRef(function CardFooter({ className = "", children, ...props }, ref) {
+const CardContent = forwardRef(function CardContent(
+  { className = "", children, ...props },
+  ref
+) {
   return (
     <div
       ref={ref}
-      className={cn("flex items-center p-6 pt-0 border-t border-blue-100 bg-gradient-to-r from-blue-50/60 to-pink-50/60 animate-fade-in", className)}
+      className={cn("p-6 pt-0 animate-fade-in", className)}
       {...props}
     >
       {children}
@@ -86,4 +92,30 @@ const CardFooter = forwardRef(function CardFooter({ className = "", children, ..
   );
 });
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+// Card footer
+const CardFooter = forwardRef(function CardFooter(
+  { className = "", children, ...props },
+  ref
+) {
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "flex items-center p-6 pt-0 border-t border-blue-100 bg-gradient-to-r from-blue-50/60 to-pink-50/60 animate-fade-in",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
+
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+};
