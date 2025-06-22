@@ -46,6 +46,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useAuth from "../hooks/useAuth";
 import { apiFetch } from "../services/api";
+import LoginModal from "../components/auth/LoginModal";
 
 const EventDetailPage = () => {
   const { id } = useParams();
@@ -57,6 +58,7 @@ const EventDetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -510,7 +512,9 @@ const EventDetailPage = () => {
                         className="w-5 h-5 text-pink-600"
                       />
                     </span>
-                    <CardTitle className="text-lg">Venue Facilities</CardTitle>
+                    <CardTitle className="text-lg text-pink-600">
+                      Venue Facilities
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3 text-gray-700">
@@ -633,7 +637,15 @@ const EventDetailPage = () => {
                 </div>
               </div>
               <div className="pt-4 space-y-3">
-                {user && user.role === "player" && isRegistered ? (
+                {!user || user.role !== "player" ? (
+                  <Button
+                    size="lg"
+                    className="w-full border-1 bg-yellow-400 text-white hover:bg-yellow-500"
+                    onClick={() => setIsLoginModalOpen(true)}
+                  >
+                    Login first to register for event
+                  </Button>
+                ) : user && isRegistered ? (
                   <Button
                     size="lg"
                     className="w-full border-1 bg-blue-500 text-white cursor-not-allowed"
@@ -706,6 +718,9 @@ const EventDetailPage = () => {
         </div>
       </main>
       <Footer />
+      {isLoginModalOpen && (
+        <LoginModal onClose={() => setIsLoginModalOpen(false)} />
+      )}
     </div>
   );
 };

@@ -25,7 +25,6 @@ import {
 import Skeleton from "../components/ui/skeleton";
 // import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { AnimatePresence } from "framer-motion";
-import LoginModal from "../components/auth/LoginModal";
 import {
   faCalendarAlt,
   faMapMarkerAlt,
@@ -66,7 +65,6 @@ const RegistrationPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Event Registration | SCERS";
@@ -152,7 +150,6 @@ const RegistrationPage = () => {
         description: "Please login to register.",
         variant: "destructive",
       });
-      setIsLoginModalOpen(true);
       setSubmitting(false);
       return;
     }
@@ -665,9 +662,6 @@ const RegistrationPage = () => {
         </div>
       </main>
       <Footer />
-      {isLoginModalOpen && (
-        <LoginModal onClose={() => setIsLoginModalOpen(false)} />
-      )}
     </div>
   );
 };
