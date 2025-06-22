@@ -57,16 +57,12 @@ const galleryImages = [
     year: "2023",
   },
 ];
-const galleryVideos = [
-  // ...existing mock data...
-];
 
 export default function GalleryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
   const [filteredImages, setFilteredImages] = useState(galleryImages);
-  const [filteredVideos, setFilteredVideos] = useState(galleryVideos);
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
@@ -88,22 +84,6 @@ export default function GalleryPage() {
       filtered = filtered.filter((image) => image.year === yearFilter);
     }
     setFilteredImages(filtered);
-
-    let filteredVids = galleryVideos;
-    if (searchTerm) {
-      filteredVids = filteredVids.filter((video) =>
-        video.alt.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    if (categoryFilter !== "all") {
-      filteredVids = filteredVids.filter(
-        (video) => video.category === categoryFilter
-      );
-    }
-    if (yearFilter !== "all") {
-      filteredVids = filteredVids.filter((video) => video.year === yearFilter);
-    }
-    setFilteredVideos(filteredVids);
   };
 
   const openLightbox = (image) => {
@@ -216,18 +196,12 @@ export default function GalleryPage() {
           </div>
 
           <Tabs defaultValue="photos">
-            <TabsList className="grid w-full grid-cols-2 mb-8 bg-blue-100/60 rounded-lg overflow-hidden">
+            <TabsList className="grid w-full grid-cols-1 mb-8 bg-blue-100/60 rounded-lg overflow-hidden">
               <TabsTrigger
                 value="photos"
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-lg font-semibold transition-all duration-200"
               >
                 Photos
-              </TabsTrigger>
-              <TabsTrigger
-                value="videos"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-lg font-semibold transition-all duration-200"
-              >
-                Videos
               </TabsTrigger>
             </TabsList>
 
@@ -277,70 +251,6 @@ export default function GalleryPage() {
                 </motion.div>
               )}
             </TabsContent>
-
-            <TabsContent value="videos">
-              {filteredVideos.length === 0 ? (
-                <div className="text-center py-12">
-                  <h3 className="text-xl font-semibold mb-2">
-                    No videos found
-                  </h3>
-                  <p className="text-gray-500">
-                    Try adjusting your filters or search term
-                  </p>
-                </div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
-                >
-                  {filteredVideos.map((video) => (
-                    <motion.div
-                      key={video.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="relative overflow-hidden rounded-lg aspect-video group shadow-lg hover:shadow-2xl transition-shadow"
-                    >
-                      <img
-                        src={video.src || "/placeholder.svg"}
-                        alt={video.alt}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="h-16 w-16 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center">
-                          <div className="h-14 w-14 rounded-full bg-blue-600 flex items-center justify-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              className="w-6 h-6 text-white ml-1"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-100 flex items-end p-4">
-                        <div>
-                          <span className="text-white font-medium block">
-                            {video.alt}
-                          </span>
-                          <span className="text-gray-300 text-sm">
-                            {video.category} • {video.year}
-                          </span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
-            </TabsContent>
           </Tabs>
 
           {/* Lightbox */}
@@ -350,18 +260,22 @@ export default function GalleryPage() {
               onClick={closeLightbox}
             >
               <div className="relative max-w-4xl w-full">
-                <button
-                  className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2 hover:bg-pink-500 transition-colors"
-                  onClick={closeLightbox}
-                >
-                  <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
-                </button>
-                <img
-                  src={selectedImage.src || "/placeholder.svg"}
-                  alt={selectedImage.alt}
-                  className="w-full h-auto max-h-[80vh] object-contain rounded-xl shadow-xl"
-                  onClick={(e) => e.stopPropagation()}
-                />
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {/* Lightbox Image */}
+                  <img
+                    src={selectedImage.src || "/placeholder.svg"}
+                    alt={selectedImage.alt}
+                    className="max-h-[80vh] max-w-full rounded-lg shadow-xl"
+                    style={{ objectFit: "contain" }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <button
+                    className="absolute top-1 right-11 text-white bg-black/60 rounded-full p-2 hover:bg-pink-500 transition-colors shadow-lg focus:outline-none z-20"
+                    onClick={closeLightbox}
+                  >
+                    <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+                  </button>
+                </div>
                 <div className="bg-black/50 p-4 text-white mt-2 rounded-b-xl">
                   <h3 className="text-xl font-medium">{selectedImage.alt}</h3>
                   <p className="text-gray-300">

@@ -697,8 +697,8 @@ const EventDetailPage = () => {
                       />
                     </span>
                     <span className="text-muted-foreground flex-1">Email</span>
-                    <span className="font-medium">
-                      sangliskatingacademy@gmail.com
+                    <span className="font-medium break-all text-sm sm:text-base">
+                      saiskatingacademy@gmail.com
                     </span>
                   </div>
                   <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-50">
