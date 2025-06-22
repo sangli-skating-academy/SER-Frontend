@@ -16,7 +16,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="space-y-4 animate-fade-in-up">
             <h3 className="text-2xl font-extrabold bg-gradient-to-r from-blue-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-gradient-x">
-              SCERS
+              Sai Skating Academy
             </h3>
             <p className="text-gray-300">
               The ultimate platform for skating competition registrations and

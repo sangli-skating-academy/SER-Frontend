@@ -37,8 +37,9 @@ const Hero = () => {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold font-montserrat mb-4 tracking-tight animate-gradient-x bg-gradient-to-r from-blue-400 via-blue-400 to-pink-400 bg-clip-text text-transparent drop-shadow-xl sm:text-left text-center w-full">
               Join the{" "}
               <span className="text-blue-600 drop-shadow-lg">
-                Sangli Miraj Kupwad Roller Skating Association, Sangli
+                Sangli Miraj Kupwad Roller Skating Association,
               </span>{" "}
+              <br></br>
               Sai Skating Academy
             </h1>
             <p className="text-lg md:text-xl mb-8 max-w-2xl text-gray-700 animate-fade-in delay-200 sm:text-left text-center w-full">

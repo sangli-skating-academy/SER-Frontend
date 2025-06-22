@@ -122,18 +122,25 @@ const Header = () => {
               </Link>
             </nav>
             <div className="flex items-center space-x-4">
+              {/* Dashboard button always visible (desktop and mobile) */}
+              {user && (
+                <Link
+                  to="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  style={{ minWidth: 110 }}
+                >
+                  <Button
+                    variant="outline"
+                    className="px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in"
+                  >
+                    <FontAwesomeIcon icon={faUserCircle} /> Dashboard
+                  </Button>
+                </Link>
+              )}
               {user ? (
                 <>
                   {/* Desktop only: Dashboard and Logout side by side */}
                   <div className="hidden md:flex flex-row gap-4">
-                    <Link href="/#dashboard">
-                      <Button
-                        variant="outline"
-                        className="px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in"
-                      >
-                        <FontAwesomeIcon icon={faUserCircle} /> Dashboard
-                      </Button>
-                    </Link>
                     <Button
                       variant="ghost"
                       className="px-4 py-2 text-gray-600 hover:text-primary flex items-center gap-2 hover:text-red-400 hover:scale-105 border-1 transition-colors duration-200 animate-fade-in"

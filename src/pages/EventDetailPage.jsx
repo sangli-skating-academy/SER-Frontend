@@ -44,14 +44,19 @@ import {
   faWifi,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import useAuth from "../hooks/useAuth";
+import { apiFetch } from "../services/api";
 
 const EventDetailPage = () => {
   const { id } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { auth } = useAuth();
+  const user = auth?.user;
   const [event, setEvent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -59,7 +64,15 @@ const EventDetailPage = () => {
       .then(setEvent)
       .catch(() => setEvent(null))
       .finally(() => setIsLoading(false));
-  }, [id]);
+    // Check registration if user is player
+    if (user && user.role === "player") {
+      apiFetch(`/api/registrations/user/${user.id}`)
+        .then((regs) => {
+          setIsRegistered(regs.some((r) => r.event_id === Number(id)));
+        })
+        .catch(() => setIsRegistered(false));
+    }
+  }, [id, user]);
 
   const handleShare = () => {
     if (navigator.share) {
@@ -620,10 +633,20 @@ const EventDetailPage = () => {
                 </div>
               </div>
               <div className="pt-4 space-y-3">
-                <Button size="lg" className="w-full border-1" asChild>
-                  <FontAwesomeIcon icon={faArrowRight} className="mr-2" />
-                  <Link to={`/register/${event.id}`}>Register Now</Link>
-                </Button>
+                {user && user.role === "player" && isRegistered ? (
+                  <Button
+                    size="lg"
+                    className="w-full border-1 bg-blue-500 text-white cursor-not-allowed"
+                    disabled
+                  >
+                    Registered
+                  </Button>
+                ) : (
+                  <Button size="lg" className="w-full border-1" asChild>
+                    <FontAwesomeIcon icon={faArrowRight} className="mr-2" />
+                    <Link to={`/register/${event.id}`}>Register Now</Link>
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   className="w-full cursor-pointer border-1"
@@ -662,7 +685,9 @@ const EventDetailPage = () => {
                       />
                     </span>
                     <span className="text-muted-foreground flex-1">Email</span>
-                    <span className="font-medium">scers@sportsclub.com</span>
+                    <span className="font-medium">
+                      sangliskatingacademy@gmail.com
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-50">
                     <span className="rounded-full bg-green-100 p-2">
