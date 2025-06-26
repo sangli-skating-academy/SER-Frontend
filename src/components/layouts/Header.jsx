@@ -128,10 +128,19 @@ const Header = () => {
                   to="/dashboard"
                   onClick={() => setIsMobileMenuOpen(false)}
                   style={{ minWidth: 110 }}
+                  className={
+                    location.pathname === "/dashboard"
+                      ? "text-pink-400 font-bold"
+                      : ""
+                  }
                 >
                   <Button
                     variant="outline"
-                    className="px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in"
+                    className={`px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in "${
+                      location.pathname === "/dashboard"
+                        ? "border-blue-400 bg-blue-50 text-blue-500"
+                        : ""
+                    }`}
                   >
                     <FontAwesomeIcon icon={faUserCircle} /> Dashboard
                   </Button>
@@ -273,9 +282,13 @@ const Header = () => {
             {user && (
               <div className="w-full flex flex-col items-center mt-8 md:hidden">
                 <Link
-                  to="/#dashboard"
+                  to="/dashboard"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-3 mb-3 text-primary font-semibold hover:text-pink-500 border-1 rounded-md transition-colors py-2 animate-fade-in drop-shadow-lg"
+                  className={`w-full flex items-center justify-center gap-3 mb-3 font-semibold border-1 rounded-md transition-colors py-2 animate-fade-in drop-shadow-lg ${
+                    location.pathname === "/dashboard"
+                      ? "text-pink-400 font-bold bg-pink-50"
+                      : "text-primary hover:text-pink-500"
+                  }`}
                 >
                   <FontAwesomeIcon icon={faUserCircle} /> Dashboard
                 </Link>

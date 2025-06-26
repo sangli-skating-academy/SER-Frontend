@@ -7,6 +7,7 @@ import RegistrationPage from "./pages/RegistrationPage";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/layouts/ScrollToTop";
 import EventDetailPage from "./pages/EventDetailPage";
+import DashboardPage from "./pages/DashboardPage";
 
 function App() {
   return (
@@ -19,8 +20,8 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
         <Route path="/register/:id?" element={<RegistrationPage />} />
-        {/* 
         <Route path="/dashboard" element={<DashboardPage />} />
+        {/* 
         <Route path="/admin" element={<AdminDashboardPage />} />
         /> */}
         <Route path="*" element={<NotFound />} />
