@@ -8,7 +8,9 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Fetch user info from backend using the httpOnly cookie
     fetch(
-      `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/users/me`,
+      `${
+        import.meta.env.VITE_API_URL || "http://localhost:3000"
+      }/api/users/login`,
       {
         credentials: "include",
       }
@@ -20,7 +22,9 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await fetch(
-      `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/users/logout`,
+      `${
+        import.meta.env.VITE_API_URL || "http://localhost:3000"
+      }/api/users/logout`,
       {
         method: "POST",
         credentials: "include",
