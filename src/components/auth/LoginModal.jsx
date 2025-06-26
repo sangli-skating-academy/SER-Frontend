@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 import Button from "../ui/button";
 import Input from "../ui/input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +20,7 @@ const LoginModal = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("login");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  // const { login } = useAuth();
 
   // Reset loading and error state when modal is closed
   const handleClose = () => {
@@ -70,6 +70,7 @@ const LoginModal = ({ onClose }) => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include", // Ensure cookies are sent
           body: JSON.stringify({
             email: data.email,
             password: data.password,
@@ -82,8 +83,8 @@ const LoginModal = ({ onClose }) => {
         setIsLoading(false);
         return;
       }
-      const { token } = await res.json();
-      login(token);
+      // No need to extract token or call login(token) since auth is now cookie-based
+      window.location.reload(); // Reload to update auth state everywhere
       onClose();
     } catch {
       setError("Login failed. Please try again.");
@@ -113,6 +114,7 @@ const LoginModal = ({ onClose }) => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include", // Ensure cookies are sent
           body: JSON.stringify({
             username: data.username,
             full_name: data.fullName,
@@ -131,8 +133,8 @@ const LoginModal = ({ onClose }) => {
         setIsLoading(false);
         return;
       }
-      const { token } = await res.json();
-      login(token);
+      // No need to extract token or call login(token) since auth is now cookie-based
+      window.location.reload(); // Reload to update auth state everywhere
       onClose();
     } catch (error) {
       setError("Registration failed. Please try again.");

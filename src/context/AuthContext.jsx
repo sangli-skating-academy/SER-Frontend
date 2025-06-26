@@ -1,42 +1,36 @@
 import { createContext, useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import Cookies from "js-cookie";
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState({ token: null, user: null });
+  const [auth, setAuth] = useState({ user: null, loading: true });
 
   useEffect(() => {
-    const token = Cookies.get("auth_token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setAuth({ token, user: decoded });
-      } catch (err) {
-        console.error("Invalid token", err);
-        Cookies.remove("auth_token");
+    // Fetch user info from backend using the httpOnly cookie
+    fetch(
+      `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/users/me`,
+      {
+        credentials: "include",
       }
-    }
+    )
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setAuth({ user: data?.user || null, loading: false }))
+      .catch(() => setAuth({ user: null, loading: false }));
   }, []);
 
-  const login = (token) => {
-    const user = jwtDecode(token);
-    Cookies.set("auth_token", token, {
-      expires: 7, // days
-      secure: true,
-      sameSite: "strict",
-    });
-    setAuth({ token, user });
-  };
-
-  const logout = () => {
-    Cookies.remove("auth_token");
-    setAuth({ token: null, user: null });
+  const logout = async () => {
+    await fetch(
+      `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/users/logout`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+    setAuth({ user: null, loading: false });
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ auth, logout }}>
       {children}
     </AuthContext.Provider>
   );
