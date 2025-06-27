@@ -42,6 +42,7 @@ import {
   faUtensils,
   faFirstAid,
   faWifi,
+  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useAuth from "../hooks/useAuth";
@@ -648,10 +649,11 @@ const EventDetailPage = () => {
                 ) : user && isRegistered ? (
                   <Button
                     size="lg"
-                    className="w-full border-1 bg-blue-500 text-white cursor-not-allowed"
-                    disabled
+                    className="w-full border-1 bg-green-500 text-white hover:bg-green-600 transition-colors animate-fade-in-up"
+                    onClick={() => navigate("/dashboard")}
                   >
-                    Registered
+                    <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
+                    Pay
                   </Button>
                 ) : (
                   <Button size="lg" className="w-full border-1" asChild>

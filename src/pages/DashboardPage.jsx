@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useToast } from "../hooks/use-toasts";
 import useAuth from "../hooks/useAuth";
 import Header from "../components/layouts/Header";
@@ -47,6 +47,16 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedRegistration, setSelectedRegistration] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editDetails, setEditDetails] = useState({});
+  const [confirmModal, setConfirmModal] = useState({
+    open: false,
+    registrationId: null,
+  });
+  const cancelButtonRef = useRef();
 
   useEffect(() => {
     if (!user) {
@@ -90,28 +100,32 @@ const DashboardPage = () => {
     setIsPaymentModalOpen(true);
   };
 
-  const handleCancelRegistration = async (registrationId) => {
-    if (window.confirm("Are you sure you want to cancel this registration?")) {
-      try {
-        await apiFetch(`/api/registrations/${registrationId}/cancel`, {
-          method: "PATCH",
-        });
-        setRegistrations((registrations) =>
-          registrations.filter((r) => r.id !== registrationId)
-        );
-        toast({
-          title: "Registration Cancelled",
-          description: "Your registration has been cancelled successfully",
-          variant: "success",
-        });
-      } catch (error) {
-        toast({
-          title: "Error",
-          description:
-            error.message || "Failed to cancel registration. Please try again.",
-          variant: "destructive",
-        });
-      }
+  const handleCancelRegistration = (registrationId) => {
+    setConfirmModal({ open: true, registrationId });
+  };
+
+  const confirmCancelRegistration = async () => {
+    const registrationId = confirmModal.registrationId;
+    setConfirmModal({ open: false, registrationId: null });
+    try {
+      await apiFetch(`/api/registrations/${registrationId}`, {
+        method: "DELETE",
+      });
+      setRegistrations((registrations) =>
+        registrations.filter((r) => r.id !== registrationId)
+      );
+      toast({
+        title: "Registration Deleted",
+        description: "Your registration has been deleted successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error.message || "Failed to delete registration. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -119,6 +133,81 @@ const DashboardPage = () => {
     return (
       events.find((event) => event.id === eventId)?.title || "Unknown Event"
     );
+  };
+
+  const handleViewDetails = async (registration) => {
+    setSelectedRegistration(registration);
+    setDetailsLoading(true);
+    setIsDetailsModalOpen(true);
+    setEditMode(false);
+    try {
+      const details = await apiFetch(`/api/user-details/${registration.id}`);
+      setUserDetails(details);
+      setEditDetails(details);
+    } catch (err) {
+      setUserDetails(null);
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  const handleEditDetailsChange = (e) => {
+    setEditDetails({ ...editDetails, [e.target.name]: e.target.value });
+  };
+
+  const handleSaveDetails = async () => {
+    setDetailsLoading(true);
+    try {
+      let body, headers, method, url;
+      if (
+        editDetails.aadhaar_image &&
+        editDetails.aadhaar_image instanceof File
+      ) {
+        body = new FormData();
+        Object.entries(editDetails).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            body.append(key, value);
+          }
+        });
+        // Always include registration_id for POST
+        if (!userDetails?.id && selectedRegistration?.id) {
+          body.append("registration_id", selectedRegistration.id);
+        }
+        headers = undefined; // Let browser set multipart/form-data
+      } else {
+        body = JSON.stringify({
+          ...editDetails,
+          // Always include registration_id for POST
+          ...(userDetails?.id
+            ? {}
+            : { registration_id: selectedRegistration?.id }),
+        });
+        headers = { "Content-Type": "application/json" };
+      }
+      if (userDetails?.id) {
+        method = "PATCH";
+        url = `/api/user-details/${selectedRegistration.id}`;
+      } else {
+        method = "POST";
+        url = "/api/user-details";
+      }
+      const updated = await apiFetch(url, {
+        method,
+        headers,
+        body,
+      });
+      setUserDetails(updated);
+      setEditMode(false);
+      toast({ title: "Details Updated", variant: "success" });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    } finally {
+      setDetailsLoading(false);
+    }
   };
 
   if (!user) return null;
@@ -253,6 +342,19 @@ const DashboardPage = () => {
                                     Pay Now
                                   </Button>
                                 )}
+                                <Button
+                                  variant="outline"
+                                  onClick={() =>
+                                    handleViewDetails(registration)
+                                  }
+                                  className="border-blue-400 text-blue-400 hover:bg-blue-50 hover:text-blue-600 font-semibold px-4 py-2 rounded-lg shadow hover:shadow-lg cursor-pointer hover:scale-105 transition-transform animate-fade-in-up"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faUser}
+                                    className="mr-2"
+                                  />{" "}
+                                  View Details
+                                </Button>
                                 {registration.status !== "cancelled" && (
                                   <Button
                                     variant="outline"
@@ -260,6 +362,7 @@ const DashboardPage = () => {
                                       handleCancelRegistration(registration.id)
                                     }
                                     className="text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600 font-semibold px-4 py-2 rounded-lg shadow hover:shadow-lg cursor-pointer hover:scale-105 transition-transform animate-fade-in-up"
+                                    ref={cancelButtonRef}
                                   >
                                     <FontAwesomeIcon
                                       icon={faTimesCircle}
@@ -416,8 +519,14 @@ const DashboardPage = () => {
       <Footer />
       {/* Payment Modal placeholder for Razorpay integration */}
       {selectedRegistration && isPaymentModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in">
-          <div className="bg-white rounded-lg p-8 shadow-lg max-w-md w-full animate-fade-in-up">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in"
+          onClick={() => setIsPaymentModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-8 shadow-lg max-w-md w-full animate-fade-in-up"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h2 className="text-xl font-bold mb-4 text-blue-700 flex items-center gap-2">
               <FontAwesomeIcon icon={faCreditCard} className="text-pink-400" />
               Pay for {selectedRegistration.eventName}
@@ -443,6 +552,465 @@ const DashboardPage = () => {
               >
                 <FontAwesomeIcon icon={faCreditCard} className="mr-2" /> Pay
                 (Coming Soon)
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* User Details Modal */}
+      {selectedRegistration && isDetailsModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in"
+          onClick={() => setIsDetailsModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-4 sm:p-6 md:p-8 shadow-lg w-full max-w-md sm:max-w-lg md:max-w-2xl animate-fade-in-up overflow-y-auto max-h-[90vh] mx-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-4 text-blue-700 flex items-center gap-2">
+              <FontAwesomeIcon icon={faUser} className="text-pink-400" />
+              Registration Details
+            </h2>
+            {detailsLoading ? (
+              <div>Loading...</div>
+            ) : userDetails ? (
+              <div>
+                {editMode ? (
+                  <form className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className="text-blue-400"
+                          />{" "}
+                          First Name
+                        </label>
+                        <input
+                          name="first_name"
+                          value={editDetails.first_name || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className="text-blue-400"
+                          />{" "}
+                          Middle Name
+                        </label>
+                        <input
+                          name="middle_name"
+                          value={editDetails.middle_name || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className="text-blue-400"
+                          />{" "}
+                          Last Name
+                        </label>
+                        <input
+                          name="last_name"
+                          value={editDetails.last_name || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className="text-blue-400"
+                          />{" "}
+                          Coach Name
+                        </label>
+                        <input
+                          name="coach_name"
+                          value={editDetails.coach_name || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className="text-blue-400"
+                          />{" "}
+                          Club Name
+                        </label>
+                        <input
+                          name="club_name"
+                          value={editDetails.club_name || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faVenusMars}
+                            className="text-blue-400"
+                          />{" "}
+                          Gender
+                        </label>
+                        <select
+                          name="gender"
+                          value={editDetails.gender || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        >
+                          <option value="">Select</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faBirthdayCake}
+                            className="text-blue-400"
+                          />{" "}
+                          Date of Birth
+                        </label>
+                        <input
+                          type="date"
+                          name="date_of_birth"
+                          value={
+                            editDetails.date_of_birth
+                              ? editDetails.date_of_birth.slice(0, 10)
+                              : ""
+                          }
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faClipboardList}
+                            className="text-blue-400"
+                          />{" "}
+                          Age Group
+                        </label>
+                        <input
+                          name="age_group"
+                          value={editDetails.age_group || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faClipboardList}
+                            className="text-blue-400"
+                          />{" "}
+                          District
+                        </label>
+                        <input
+                          name="district"
+                          value={editDetails.district || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faClipboardList}
+                            className="text-blue-400"
+                          />{" "}
+                          Category
+                        </label>
+                        <select
+                          name="category"
+                          value={editDetails.category || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        >
+                          <option value="">Select</option>
+                          <option value="quad">Quad</option>
+                          <option value="inline">Inline</option>
+                          <option value="beginner">Beginner</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faClipboardList}
+                            className="text-blue-400"
+                          />{" "}
+                          Aadhaar Number
+                        </label>
+                        <input
+                          name="aadhaar_number"
+                          value={editDetails.aadhaar_number || ""}
+                          onChange={handleEditDetailsChange}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                      </div>
+                      <div>
+                        <label className="flex text-xs font-semibold text-gray-500 mb-1 items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faClipboardList}
+                            className="text-blue-400"
+                          />{" "}
+                          Aadhaar Image
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          name="aadhaar_image"
+                          onChange={(e) =>
+                            handleEditDetailsChange({
+                              target: {
+                                name: "aadhaar_image",
+                                value: e.target.files[0],
+                              },
+                            })
+                          }
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                        {editDetails.aadhaar_image &&
+                          typeof editDetails.aadhaar_image === "string" && (
+                            <div className="mt-1 text-xs text-gray-500">
+                              Current:{" "}
+                              <a
+                                href={editDetails.aadhaar_image}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 underline"
+                              >
+                                View
+                              </a>
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 justify-end mt-6">
+                      <Button
+                        variant="outline"
+                        className="text-red-700 border-gray-300 hover:bg-red-100"
+                        onClick={() => setEditMode(false)}
+                        type="button"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="bg-green-500 text-white hover:bg-green-600"
+                        onClick={handleSaveDetails}
+                        type="button"
+                        disabled={detailsLoading}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className="text-blue-400"
+                      />
+                      <b>First Name:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.first_name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className="text-blue-400"
+                      />
+                      <b>Middle Name:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.middle_name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className="text-blue-400"
+                      />
+                      <b>Last Name:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.last_name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className="text-blue-400"
+                      />
+                      <b>Coach Name:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.coach_name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className="text-blue-400"
+                      />
+                      <b>Club Name:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.club_name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faVenusMars}
+                        className="text-blue-400"
+                      />
+                      <b>Gender:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.gender || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faBirthdayCake}
+                        className="text-blue-400"
+                      />
+                      <b>Date of Birth:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.date_of_birth
+                          ? new Date(
+                              userDetails.date_of_birth
+                            ).toLocaleDateString()
+                          : "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faClipboardList}
+                        className="text-blue-400"
+                      />
+                      <b>Age Group:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.age_group || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faClipboardList}
+                        className="text-blue-400"
+                      />
+                      <b>District:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.district || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faClipboardList}
+                        className="text-blue-400"
+                      />
+                      <b>Category:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.category || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faClipboardList}
+                        className="text-blue-400"
+                      />
+                      <b>Aadhaar Number:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.aadhaar_number || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={faClipboardList}
+                        className="text-blue-400"
+                      />
+                      <b>Aadhaar Image:</b>{" "}
+                      <span className="ml-1">
+                        {userDetails.aadhaar_image ? (
+                          <a
+                            href={userDetails.aadhaar_image}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                          >
+                            View
+                          </a>
+                        ) : (
+                          "N/A"
+                        )}
+                      </span>
+                    </div>
+                    <div className="col-span-2 flex gap-2 justify-end mt-4">
+                      <Button
+                        variant="outline"
+                        className="text-blue-700 border-gray-300 hover:bg-blue-100"
+                        onClick={() => setIsDetailsModalOpen(false)}
+                      >
+                        Close
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="text-red-700 border-gray-300 hover:bg-red-100"
+                        onClick={() => setEditMode(true)}
+                      >
+                        Edit Details
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div>No details found.</div>
+            )}
+          </div>
+        </div>
+      )}
+      {/* Custom Confirmation Modal */}
+      {confirmModal.open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-fade-in"
+          onClick={() => setConfirmModal({ open: false, registrationId: null })}
+        >
+          <div
+            className="bg-white rounded-lg p-8 shadow-lg max-w-sm w-full animate-fade-in-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-4 text-red-700 flex items-center gap-2">
+              <FontAwesomeIcon icon={faTimesCircle} className="text-red-400" />
+              Confirm Cancellation
+            </h2>
+            <p className="mb-6 text-gray-700">
+              Are you sure you want to <b>delete</b> this registration? This
+              action cannot be undone.
+            </p>
+            <div className="flex gap-4 justify-end">
+              <Button
+                variant="outline"
+                className="text-gray-700 border-gray-300 hover:bg-gray-100"
+                onClick={() =>
+                  setConfirmModal({ open: false, registrationId: null })
+                }
+              >
+                No, Keep
+              </Button>
+              <Button
+                className="bg-gradient-to-r from-red-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform"
+                onClick={confirmCancelRegistration}
+              >
+                Yes, Delete
               </Button>
             </div>
           </div>

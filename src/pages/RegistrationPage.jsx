@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchEventById } from "../services/eventApi";
 import { apiFetch } from "../services/api";
 import useAuth from "../hooks/useAuth";
@@ -65,6 +65,7 @@ const RegistrationPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Event Registration | SCERS";
@@ -100,6 +101,15 @@ const RegistrationPage = () => {
       setError("No event selected");
     }
   }, [id]);
+
+  useEffect(() => {
+    if (success) {
+      const timeout = setTimeout(() => {
+        navigate("/dashboard");
+      }, 1800);
+      return () => clearTimeout(timeout);
+    }
+  }, [success, navigate]);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -241,7 +251,7 @@ const RegistrationPage = () => {
         <main className="flex-grow py-10 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl mx-auto bg-green-100 text-green-700 p-6 rounded-lg text-center mt-10">
-              Registration successful! Check your dashboard for updates.
+              Registration successful! Redirecting to your dashboard...
             </div>
           </div>
         </main>
