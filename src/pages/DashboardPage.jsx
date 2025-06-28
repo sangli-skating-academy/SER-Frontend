@@ -57,6 +57,9 @@ const DashboardPage = () => {
     registrationId: null,
   });
   const cancelButtonRef = useRef();
+  const [profileEditMode, setProfileEditMode] = useState(false);
+  const [profileEdit, setProfileEdit] = useState({});
+  const [profileLoading, setProfileLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -68,7 +71,7 @@ const DashboardPage = () => {
       });
       return;
     }
-    document.title = "Dashboard | SCERS";
+    document.title = "Dashboard | SSAS";
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -207,6 +210,49 @@ const DashboardPage = () => {
       });
     } finally {
       setDetailsLoading(false);
+    }
+  };
+
+  // Edit Profile handlers
+  const handleProfileEditClick = () => {
+    setProfileEdit({
+      full_name: user.full_name || "",
+      username: user.username || "",
+      email: user.email || "",
+      phone: user.phone || "",
+      date_of_birth: user.date_of_birth ? user.date_of_birth.slice(0, 10) : "",
+      gender: user.gender || "",
+    });
+    setProfileEditMode(true);
+  };
+
+  const handleProfileEditChange = (e) => {
+    setProfileEdit({ ...profileEdit, [e.target.name]: e.target.value });
+  };
+
+  const handleProfileSave = async (e) => {
+    e && e.preventDefault(); // Prevent default form submission if called from form
+    setProfileLoading(true);
+    try {
+      const updated = await apiFetch("/api/users/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileEdit),
+      });
+      // Update auth context (if needed)
+      if (auth && auth.setUser) auth.setUser(updated);
+      // reload window
+      window.location.reload();
+      toast({ title: "Profile Updated", variant: "success" });
+      setProfileEditMode(false);
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProfileLoading(false);
     }
   };
 
@@ -424,90 +470,200 @@ const DashboardPage = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-8 mt-2">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="flex items-center gap-3">
-                          <FontAwesomeIcon
-                            icon={faEnvelope}
-                            className="text-blue-400 text-xl"
-                          />
-                          <div>
-                            <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
-                              Email
-                            </h3>
-                            <p className="font-medium text-gray-800">
-                              {user.email || "N/A"}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <FontAwesomeIcon
-                            icon={faPhone}
-                            className="text-blue-400 text-xl"
-                          />
-                          <div>
-                            <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
-                              Phone
-                            </h3>
-                            <p className="font-medium text-gray-800">
-                              {user.phone || "N/A"}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <FontAwesomeIcon
-                            icon={faBirthdayCake}
-                            className="text-blue-400 text-xl"
-                          />
-                          <div>
-                            <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
-                              Date of Birth
-                            </h3>
-                            <p className="font-medium text-gray-800">
-                              {user.date_of_birth
-                                ? new Date(
-                                    user.date_of_birth
-                                  ).toLocaleDateString()
-                                : "N/A"}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <FontAwesomeIcon
-                            icon={faVenusMars}
-                            className="text-blue-400 text-xl"
-                          />
-                          <div>
-                            <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
-                              Gender
-                            </h3>
-                            <p className="font-medium text-gray-800">
-                              {user.gender || "N/A"}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <FontAwesomeIcon
-                            icon={faUser}
-                            className="text-blue-400 text-xl"
-                          />
-                          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide mr-1">
-                            Role:
-                          </span>
-                          <Badge className="capitalize bg-blue-300 text-blue-900 px-3 py-1 text-sm animate-fade-in-up">
-                            {user.role || "N/A"}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex justify-center mt-6">
-                        <Button
-                          variant="default"
-                          className="bg-gradient-to-r from-blue-400 to-pink-400 hover:from-pink-400 hover:to-blue-400 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform animate-fade-in-up"
+                      {profileEditMode ? (
+                        <form
+                          className="space-y-4 max-w-xl mx-auto"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            handleProfileSave();
+                          }}
                         >
-                          <FontAwesomeIcon icon={faUser} className="mr-2" />{" "}
-                          Edit Profile
-                        </Button>
-                      </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 mb-1">
+                                Full Name
+                              </label>
+                              <input
+                                name="full_name"
+                                value={profileEdit.full_name}
+                                onChange={handleProfileEditChange}
+                                className="border rounded px-2 py-1 w-full"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 mb-1">
+                                Username
+                              </label>
+                              <input
+                                name="username"
+                                value={profileEdit.username}
+                                onChange={handleProfileEditChange}
+                                className="border rounded px-2 py-1 w-full"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 mb-1">
+                                Email
+                              </label>
+                              <input
+                                name="email"
+                                type="email"
+                                value={profileEdit.email}
+                                onChange={handleProfileEditChange}
+                                className="border rounded px-2 py-1 w-full"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 mb-1">
+                                Phone
+                              </label>
+                              <input
+                                name="phone"
+                                value={profileEdit.phone}
+                                onChange={handleProfileEditChange}
+                                className="border rounded px-2 py-1 w-full"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 mb-1">
+                                Date of Birth
+                              </label>
+                              <input
+                                name="date_of_birth"
+                                type="date"
+                                value={profileEdit.date_of_birth}
+                                onChange={handleProfileEditChange}
+                                className="border rounded px-2 py-1 w-full"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-gray-500 mb-1">
+                                Gender
+                              </label>
+                              <select
+                                name="gender"
+                                value={profileEdit.gender}
+                                onChange={handleProfileEditChange}
+                                className="border rounded px-2 py-1 w-full"
+                                required
+                              >
+                                <option value="">Select</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 justify-end mt-6">
+                            <Button
+                              variant="outline"
+                              onClick={() => setProfileEditMode(false)}
+                              type="button"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              type="submit"
+                              disabled={profileLoading}
+                              className="bg-green-500 text-white hover:bg-green-600"
+                            >
+                              Save
+                            </Button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="flex items-center gap-3">
+                            <FontAwesomeIcon
+                              icon={faEnvelope}
+                              className="text-blue-400 text-xl"
+                            />
+                            <div>
+                              <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
+                                Email
+                              </h3>
+                              <p className="font-medium text-gray-800">
+                                {user.email || "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <FontAwesomeIcon
+                              icon={faPhone}
+                              className="text-blue-400 text-xl"
+                            />
+                            <div>
+                              <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
+                                Phone
+                              </h3>
+                              <p className="font-medium text-gray-800">
+                                {user.phone || "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <FontAwesomeIcon
+                              icon={faBirthdayCake}
+                              className="text-blue-400 text-xl"
+                            />
+                            <div>
+                              <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
+                                Date of Birth
+                              </h3>
+                              <p className="font-medium text-gray-800">
+                                {user.date_of_birth
+                                  ? new Date(
+                                      user.date_of_birth
+                                    ).toLocaleDateString()
+                                  : "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <FontAwesomeIcon
+                              icon={faVenusMars}
+                              className="text-blue-400 text-xl"
+                            />
+                            <div>
+                              <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
+                                Gender
+                              </h3>
+                              <p className="font-medium text-gray-800">
+                                {user.gender || "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <FontAwesomeIcon
+                              icon={faUser}
+                              className="text-blue-400 text-xl"
+                            />
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide mr-1">
+                              Role:
+                            </span>
+                            <Badge className="capitalize bg-blue-300 text-blue-900 px-3 py-1 text-sm animate-fade-in-up">
+                              {user.role || "N/A"}
+                            </Badge>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {/* Add Edit Profile button below profile info, always visible */}
+                    <div className="flex justify-center mt-6">
+                      <Button
+                        variant="default"
+                        className="bg-gradient-to-r from-blue-400 to-pink-400 hover:from-pink-400 hover:to-blue-400 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:scale-105 transition-transform animate-fade-in-up"
+                        onClick={handleProfileEditClick}
+                        disabled={profileEditMode}
+                      >
+                        <FontAwesomeIcon icon={faUser} className="mr-2" />
+                        {profileEditMode ? "Editing..." : "Edit Profile"}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

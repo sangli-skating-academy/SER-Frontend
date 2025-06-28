@@ -68,7 +68,7 @@ const RegistrationPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Event Registration | SCERS";
+    document.title = "Event Registration | SSAS";
     const fetchEvent = async () => {
       setLoading(true);
       try {
@@ -383,6 +383,37 @@ const RegistrationPage = () => {
                       required
                       placeholder="YYYY-MM-DD"
                     />
+                    {!event.is_team_event && (
+                      <div>
+                        <label
+                          htmlFor="age_group"
+                          className="block text-sm font-semibold mb-1 text-black"
+                        >
+                          Age Group*
+                        </label>
+                        <Select
+                          name="age_group"
+                          value={form.age_group}
+                          onValueChange={(val) =>
+                            setForm((f) => ({ ...f, age_group: val }))
+                          }
+                          required
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select age group" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="under 8">Under 8</SelectItem>
+                            <SelectItem value="under 10">Under 10</SelectItem>
+                            <SelectItem value="under 12">Under 12</SelectItem>
+                            <SelectItem value="under 14">Under 14</SelectItem>
+                            <SelectItem value="under 16">Under 16</SelectItem>
+                            <SelectItem value="under 18">Under 18</SelectItem>
+                            <SelectItem value="18+">18+</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                     <div>
                       <label
                         htmlFor="gender"
