@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Button from "../ui/button";
-import Badge from "../ui/badge";
 import { Card, CardContent } from "../ui/card";
 import Skeleton from "../ui/skeleton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCalendarAlt,
-  faMapMarkerAlt,
-  faArrowRight,
-  faUser,
-  faUsers, // Add this for team icon
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { fetchEvents } from "../../services/eventApi";
+import EventCard from "../ui/EventCard";
 
 const EventsSection = () => {
   const [filter, setFilter] = useState("all");
@@ -111,90 +105,7 @@ const EventsSection = () => {
               <div className="flex gap-6 min-w-max md:min-w-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8">
                 {filteredEvents && filteredEvents.length > 0 ? (
                   filteredEvents.map((event) => (
-                    <Card
-                      key={event.id}
-                      className="w-72 md:w-auto rounded-xl overflow-hidden hover:shadow-2xl transition-shadow group animate-fade-in"
-                    >
-                      <div className="h-48 overflow-hidden relative">
-                        <img
-                          src={event.image_url}
-                          alt={event.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
-                        />
-                        {
-                          <div
-                            className={`absolute top-3 left-3 ${
-                              event.is_team_event
-                                ? "bg-orange-400"
-                                : "bg-blue-400"
-                            } text-dark font-bold px-3 py-1 rounded-full text-sm flex items-center gap-1`}
-                          >
-                            <FontAwesomeIcon
-                              icon={event.is_team_event ? faUsers : faUser}
-                              className="text-black"
-                            />
-                            {event.is_team_event ? "Team Event" : "Solo Event"}
-                          </div>
-                        }
-                      </div>
-                      <CardContent className="p-5">
-                        <div className="flex justify-between mb-3">
-                          <Badge className="bg-[#38b6ff27] text-[#13a8ff] px-3 py-1 rounded-full text-xs font-semibold animate-fade-in">
-                            {/* {event.category_id === 1
-                            ? "Inline Skating"
-                            : event.category_id === 2
-                            ? "Roller Skating"
-                            : "Other"} */}
-                            Gender:{event.gender}
-                          </Badge>
-                          <Badge
-                            variant=""
-                            className="bg-gray-100 px-4 py-2 rounded-full text-xs font-semibold animate-fade-in"
-                          >
-                            {event.age_group}
-                          </Badge>
-                        </div>
-                        <h3 className="font-bold text-xl mb-2 font-montserrat animate-gradient-x bg-gradient-to-r from-blue-500 via-blue-400 to-pink-400 bg-clip-text text-transparent">
-                          {event.title}
-                        </h3>
-                        <div className="flex items-center text-gray-600 mb-3 text-sm animate-fade-in">
-                          <FontAwesomeIcon
-                            icon={faCalendarAlt}
-                            className="mr-2 text-blue-400"
-                          />
-                          <span>
-                            {new Date(event.start_date).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex items-center text-gray-600 mb-5 text-sm animate-fade-in">
-                          <FontAwesomeIcon
-                            icon={faMapMarkerAlt}
-                            className="mr-2 text-pink-400"
-                          />
-                          <span>{event.location}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="font-bold text-primary text-lg animate-fade-in">
-                            Rs.
-                            {parseFloat(
-                              event.price_per_person * event.max_team_size
-                            ).toFixed(2)}
-                          </span>
-                          <div className="flex gap-2">
-                            <Button
-                              asChild
-                              variant="outline"
-                              className="px-3 py-2 border-primary text-primary rounded-full hover:bg-primary hover:text-blue-400 transition-colors text-sm font-medium animate-fade-in"
-                            >
-                              <Link to={`/events/${event.id}`}>
-                                View Details
-                              </Link>
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <EventCard key={event.id} event={event} />
                   ))
                 ) : (
                   <div className="w-full col-span-3 text-center py-8 animate-fade-in">

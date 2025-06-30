@@ -59,9 +59,12 @@ const Header = () => {
             <div className="flex items-center">
               {/* Logo */}
               <Link to="/" className="flex items-center space-x-2 group">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 animate-spin-slow">
-                  {/* <FontAwesomeIcon icon={faSkating} className="text-2xl" /> */}
-                  <img src="/logo.png" alt="Sai Skating Academy" />
+                <div className="w-12 h-12 rounded-full  flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 animate-spin-slow">
+                  <img
+                    src="/logo-header.png"
+                    alt="Sai Skating Academy"
+                    loading="lazy"
+                  />
                 </div>
                 <span className="text-2xl font-montserrat text-dark hidden md:inline tracking-tight group-hover:text-primary transition-colors duration-300 animate-gradient-x">
                   Sai Skating

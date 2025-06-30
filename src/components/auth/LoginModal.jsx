@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 // import useAuth from "../../hooks/useAuth";
 import Button from "../ui/button";
 import Input from "../ui/input";
@@ -35,12 +37,54 @@ const LoginModal = ({ onClose }) => {
     setError("");
   }, [activeTab]);
 
+  // Login form validation schema
+  const loginSchema = yup.object().shape({
+    email: yup.string().email("Invalid email").required("Email is required"),
+    password: yup
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+  });
+
+  // Register form validation schema
+  const registerSchema = yup.object().shape({
+    fullName: yup
+      .string()
+      .min(2, "Full name is too short")
+      .required("Full name is required"),
+    username: yup
+      .string()
+      .min(3, "Username must be at least 3 characters")
+      .required("Username is required"),
+    email: yup.string().email("Invalid email").required("Email is required"),
+    password: yup
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref("password"), null], "Passwords must match")
+      .required("Confirm your password"),
+    phone: yup.string().matches(/^\d{10}$/, "Phone must be exactly 10 digits"),
+    date_of_birth: yup.string().required("Date of birth is required"),
+    gender: yup
+      .string()
+      .oneOf(["male", "female", "other"], "Select a gender")
+      .required("Gender is required"),
+    role: yup
+      .string()
+      .oneOf(["player", "coach"], "Select a role")
+      .required("Role is required"),
+    terms: yup.bool().oneOf([true], "You must agree to the Terms & Conditions"),
+  });
+
   // Login form
   const loginForm = useForm({
     defaultValues: {
       email: "",
       password: "",
     },
+    resolver: yupResolver(loginSchema),
   });
 
   // Register form (updated to match RegisterModal)
@@ -57,6 +101,7 @@ const LoginModal = ({ onClose }) => {
       role: "player",
       terms: false,
     },
+    resolver: yupResolver(registerSchema),
   });
 
   const onLoginSubmit = async (data) => {
@@ -180,10 +225,7 @@ const LoginModal = ({ onClose }) => {
 
         {/* Title */}
         <div className="text-2xl sm:text-3xl font-extrabold text-center mb-2 text-blue-600 flex items-center justify-center gap-2">
-          <FontAwesomeIcon
-            icon={faUserShield}
-            className="animate-bounce text-blue-400"
-          />
+          <FontAwesomeIcon icon={faUserShield} className="text-blue-400" />
           {activeTab === "login" ? "Login" : "Sign Up"}
         </div>
 
@@ -227,31 +269,55 @@ const LoginModal = ({ onClose }) => {
             className="space-y-4 sm:space-y-5 animate-fade-in"
           >
             {/* Email */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faEnvelope}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 text-lg transition-colors group-focus-within:text-blue-600"
-              />
-              <Input
-                {...loginForm.register("email")}
-                type="email"
-                placeholder="Email Address"
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-              />
+            <div className="mb-2">
+              <label
+                htmlFor="login-email"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Email
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faEnvelope}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 text-lg transition-colors group-focus-within:text-blue-600 pointer-events-none"
+                />
+                <Input
+                  id="login-email"
+                  {...loginForm.register("email")}
+                  type="email"
+                  placeholder="Email Address"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {loginForm.formState.errors.email?.message || ""}
+              </span>
             </div>
 
             {/* Password */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faLock}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 text-lg transition-colors group-focus-within:text-blue-600"
-              />
-              <Input
-                {...loginForm.register("password")}
-                type="password"
-                placeholder="Password"
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-              />
+            <div className="mb-2">
+              <label
+                htmlFor="login-password"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Password
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faLock}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 text-lg transition-colors group-focus-within:text-blue-600 pointer-events-none"
+                />
+                <Input
+                  id="login-password"
+                  {...loginForm.register("password")}
+                  type="password"
+                  placeholder="Password"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {loginForm.formState.errors.password?.message || ""}
+              </span>
             </div>
 
             {/* Error Message */}
@@ -294,163 +360,271 @@ const LoginModal = ({ onClose }) => {
             className="space-y-4 sm:space-y-5 animate-fade-in"
           >
             {/* Full Name */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faUser}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors"
-              />
-              <input
-                {...registerForm.register("fullName")}
-                placeholder="Full Name"
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-              />
+            <div className="mb-2">
+              <label
+                htmlFor="register-fullName"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Full Name
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
+                />
+                <input
+                  id="register-fullName"
+                  {...registerForm.register("fullName")}
+                  placeholder="Full Name"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {registerForm.formState.errors.fullName?.message || ""}
+              </span>
             </div>
             {/* Username */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faUserTag}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors"
-              />
-              <input
-                {...registerForm.register("username")}
-                placeholder="Username"
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-              />
+            <div className="mb-2">
+              <label
+                htmlFor="register-username"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Username
+              </label>
+              <div className="relative group mb-2">
+                <FontAwesomeIcon
+                  icon={faUserTag}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
+                />
+                <input
+                  id="register-username"
+                  {...registerForm.register("username")}
+                  placeholder="Username"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {registerForm.formState.errors.username?.message || ""}
+              </span>
             </div>
             {/* Email */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faEnvelope}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors"
-              />
-              <input
-                {...registerForm.register("email")}
-                type="email"
-                placeholder="Email Address"
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-              />
+            <div className="mb-2">
+              <label
+                htmlFor="register-email"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Email
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faEnvelope}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
+                />
+                <input
+                  id="register-email"
+                  {...registerForm.register("email")}
+                  type="email"
+                  placeholder="Email Address"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {registerForm.formState.errors.email?.message || ""}
+              </span>
             </div>
             {/* Password */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faLock}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors"
-              />
-              <input
-                {...registerForm.register("password")}
-                type="password"
-                placeholder="Password"
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-              />
+            <div className="mb-2">
+              <label
+                htmlFor="register-password"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Password
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faLock}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
+                />
+                <input
+                  id="register-password"
+                  {...registerForm.register("password")}
+                  type="password"
+                  placeholder="Password"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {registerForm.formState.errors.password?.message || ""}
+              </span>
             </div>
             {/* Confirm Password */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faLock}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors"
-              />
-              <input
-                {...registerForm.register("confirmPassword")}
-                type="password"
-                placeholder="Confirm Password"
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-              />
+            <div className="mb-2">
+              <label
+                htmlFor="register-confirmPassword"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Confirm Password
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faLock}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
+                />
+                <input
+                  id="register-confirmPassword"
+                  {...registerForm.register("confirmPassword")}
+                  type="password"
+                  placeholder="Confirm Password"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {registerForm.formState.errors.confirmPassword?.message || ""}
+              </span>
             </div>
             {/* Phone Number */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faUser}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors"
-              />
-              <input
-                {...registerForm.register("phone")}
-                placeholder="Phone Number"
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-              />
+            <div className="mb-2">
+              <label
+                htmlFor="register-phone"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Phone Number
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
+                />
+                <input
+                  id="register-phone"
+                  {...registerForm.register("phone")}
+                  placeholder="Phone Number"
+                  maxLength={10}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {registerForm.formState.errors.phone?.message || ""}
+              </span>
             </div>
             {/* Date of Birth */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faUser}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors"
-              />
-              <input
-                {...registerForm.register("date_of_birth")}
-                type="date"
-                placeholder="Date of Birth"
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-              />
+            <div className="mb-2">
+              <label
+                htmlFor="register-date_of_birth"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Date of Birth
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
+                />
+                <input
+                  id="register-date_of_birth"
+                  {...registerForm.register("date_of_birth")}
+                  type="date"
+                  placeholder="Date of Birth"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {registerForm.formState.errors.date_of_birth?.message || ""}
+              </span>
             </div>
             {/* Gender Selection */}
-            <div className="relative group">
-              <FontAwesomeIcon
-                icon={faUser}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors"
-              />
-              <select
-                {...registerForm.register("gender")}
-                className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+            <div className="mb-2">
+              <label
+                htmlFor="register-gender"
+                className="block text-xs font-semibold text-gray-700 mb-1"
               >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
+                Gender
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
+                />
+                <select
+                  id="register-gender"
+                  {...registerForm.register("gender")}
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {registerForm.formState.errors.gender?.message || ""}
+              </span>
             </div>
             {/* Role Selection */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in w-full">
-              <label className="flex items-center space-x-2 cursor-pointer hover:scale-105 transition-transform text-sm sm:text-base">
-                <input
-                  type="radio"
-                  name="role"
-                  value="player"
-                  checked={registerForm.watch("role") === "player"}
-                  onChange={() => registerForm.setValue("role", "player")}
-                  className="appearance-none w-4 h-4 rounded-full bg-white checked:bg-blue-500 transition-all duration-200"
-                />
-                <span className="relative -ml-5 mr-1">
-                  <span
-                    className={`block w-4 h-4 rounded-full ${
-                      registerForm.watch("role") === "player"
-                        ? "bg-blue-500"
-                        : "bg-white border border-blue-400"
-                    }`}
-                  ></span>
-                </span>
-                <FontAwesomeIcon
-                  icon={faUserFriends}
-                  className="text-blue-400"
-                />
-                <span>Parents/Students</span>
+            <div className="mb-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Role
               </label>
-              <label className="flex items-center space-x-2 cursor-pointer hover:scale-105 transition-transform text-sm sm:text-base">
-                <input
-                  type="radio"
-                  name="role"
-                  value="coach"
-                  checked={registerForm.watch("role") === "coach"}
-                  onChange={() => registerForm.setValue("role", "coach")}
-                  className="appearance-none w-4 h-4 rounded-full bg-white  transition-all duration-200"
-                />
-                <span className="relative -ml-5 mr-1">
-                  <span
-                    className={`block w-4 h-4 rounded-full ${
-                      registerForm.watch("role") === "coach"
-                        ? "bg-green-500"
-                        : "bg-white border border-green-400"
-                    }`}
-                  ></span>
-                </span>
-                <FontAwesomeIcon
-                  icon={faUserShield}
-                  className="text-green-500"
-                />
-                <span>Coach</span>
-              </label>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in w-full">
+                <label className="flex items-center space-x-2 cursor-pointer hover:scale-105 transition-transform text-sm sm:text-base">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="player"
+                    checked={registerForm.watch("role") === "player"}
+                    onChange={() => registerForm.setValue("role", "player")}
+                    className="appearance-none w-4 h-4 rounded-full bg-white transition-all duration-200"
+                  />
+                  <span className="relative -ml-5 mr-1">
+                    <span
+                      className={`block w-4 h-4 rounded-full ${
+                        registerForm.watch("role") === "player"
+                          ? "bg-blue-500"
+                          : "bg-white border border-blue-400"
+                      }`}
+                    ></span>
+                  </span>
+                  <FontAwesomeIcon
+                    icon={faUserFriends}
+                    className="text-blue-400"
+                  />
+                  <span>Parents/Students</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer hover:scale-105 transition-transform text-sm sm:text-base">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="coach"
+                    checked={registerForm.watch("role") === "coach"}
+                    onChange={() => registerForm.setValue("role", "coach")}
+                    className="appearance-none w-4 h-4 rounded-full bg-white  transition-all duration-200"
+                  />
+                  <span className="relative -ml-5 mr-1">
+                    <span
+                      className={`block w-4 h-4 rounded-full ${
+                        registerForm.watch("role") === "coach"
+                          ? "bg-green-500"
+                          : "bg-white border border-green-400"
+                      }`}
+                    ></span>
+                  </span>
+                  <FontAwesomeIcon
+                    icon={faUserShield}
+                    className="text-green-500"
+                  />
+                  <span>Coach</span>
+                </label>
+              </div>
+              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
+                {registerForm.formState.errors.role?.message || ""}
+              </span>
             </div>
             {/* Terms and Conditions */}
-            <div className="flex items-start space-x-2 mt-2 sm:mt-4 animate-fade-in">
+            <div className="flex items-start space-x-2 mt-2 sm:mt-4 animate-fade-in mb-2">
               <input
+                id="register-terms"
                 type="checkbox"
                 checked={registerForm.watch("terms")}
                 onChange={(e) =>
@@ -458,7 +632,10 @@ const LoginModal = ({ onClose }) => {
                 }
                 className="mt-1 accent-blue-600 focus:ring-2 focus:ring-blue-600 transition-all"
               />
-              <span className="text-xs sm:text-sm text-gray-600">
+              <label
+                htmlFor="register-terms"
+                className="text-xs sm:text-sm text-gray-600"
+              >
                 I agree to the{" "}
                 <a
                   href="#"
@@ -473,8 +650,11 @@ const LoginModal = ({ onClose }) => {
                 >
                   Privacy Policy
                 </a>
-              </span>
+              </label>
             </div>
+            <span className="block min-h-[1.2em] text-xs text-red-600 ml-2 mb-2">
+              {registerForm.formState.errors.terms?.message || ""}
+            </span>
             {/* Error Message */}
             {error && (
               <div className="text-red-600 text-center mb-2 animate-fade-in">
@@ -489,7 +669,7 @@ const LoginModal = ({ onClose }) => {
             >
               <FontAwesomeIcon
                 icon={faCheckCircle}
-                className={isLoading ? "animate-spin" : "animate-bounce"}
+                className={isLoading ? "animate-spin" : ""}
               />
               {isLoading ? "Creating Account..." : "Sign Up"}
             </Button>

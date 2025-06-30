@@ -34,6 +34,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Hash } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 const initialForm = {
   coach_name: "",
@@ -260,450 +261,477 @@ const RegistrationPage = () => {
     );
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-grow py-10 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8 text-center"
-          >
-            <h1 className="text-3xl md:text-4xl font-bold font-montserrat mb-3 flex items-center justify-center gap-2">
-              <span>Event Registration</span>
-              <span className="text-primary animate-bounce">
-                <i className="fas fa-skating"></i>
-              </span>
-            </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Register for{" "}
-              <span className="font-semibold text-primary">{event.title}</span>
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-3xl mx-auto"
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-center">
-                  {event.is_team_event
-                    ? "Team Registration"
-                    : "Individual Registration"}
-                </CardTitle>
-                {event && (
-                  <div className="p-4 bg-gray-50 rounded-lg mt-4">
-                    <h3 className="font-bold mb-2">{event.title}</h3>
-                    <p className="text-gray-600 mb-2">{event.description}</p>
-                    <div className="flex items-center flex-wrap gap-2 mb-2">
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                        <FontAwesomeIcon
-                          icon={faHashtag}
-                          className="text-blue-500 mr-1"
-                        />
-                        {event.age_group}
-                      </span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                        <FontAwesomeIcon
-                          icon={faHashtag}
-                          className="text-blue-500 mr-1"
-                        />
-                        {event.gender}
-                      </span>
+    <>
+      <Helmet>
+        <title>Event Registration | Sai Skating Academy</title>
+        <meta
+          name="description"
+          content="Register for skating events at Sai Skating Academy. Open to all age groups and skill levels."
+        />
+        <meta
+          property="og:title"
+          content="Event Registration | Sai Skating Academy"
+        />
+        <meta
+          property="og:description"
+          content="Register for skating events at Sai Skating Academy. Open to all age groups and skill levels."
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow py-10 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-8 text-center"
+            >
+              <h1 className="text-3xl md:text-4xl font-bold font-montserrat mb-3 flex items-center justify-center gap-2">
+                <span>Event Registration</span>
+                <span className="text-primary animate-bounce">
+                  <i className="fas fa-skating"></i>
+                </span>
+              </h1>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Register for{" "}
+                <span className="font-semibold text-primary">
+                  {event.title}
+                </span>
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="max-w-3xl mx-auto"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-center">
+                    {event.is_team_event
+                      ? "Team Registration"
+                      : "Individual Registration"}
+                  </CardTitle>
+                  {event && (
+                    <div className="p-4 bg-gray-50 rounded-lg mt-4">
+                      <h3 className="font-bold mb-2">{event.title}</h3>
+                      <p className="text-gray-600 mb-2">{event.description}</p>
+                      <div className="flex items-center flex-wrap gap-2 mb-2">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                          <FontAwesomeIcon
+                            icon={faHashtag}
+                            className="text-blue-500 mr-1"
+                          />
+                          {event.age_group}
+                        </span>
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                          <FontAwesomeIcon
+                            icon={faHashtag}
+                            className="text-blue-500 mr-1"
+                          />
+                          {event.gender}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <p>
+                          <FontAwesomeIcon
+                            icon={faCalendarAlt}
+                            className="w-5 h-5 mr-2"
+                          />
+                          {event.start_date
+                            ? new Date(event.start_date).toLocaleDateString()
+                            : ""}
+                        </p>
+                        <p>
+                          <FontAwesomeIcon
+                            icon={faMapMarkerAlt}
+                            className="w-5 h-5 mr-2"
+                          />
+                          {event.location}
+                        </p>
+                        <p className="font-bold text-blue-600 mt-2">
+                          Price: ₹{" "}
+                          {parseFloat(
+                            event.price_per_person * event.max_team_size
+                          ).toFixed(2)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      <p>
-                        <FontAwesomeIcon
-                          icon={faCalendarAlt}
-                          className="w-5 h-5 mr-2"
-                        />
-                        {event.start_date
-                          ? new Date(event.start_date).toLocaleDateString()
-                          : ""}
-                      </p>
-                      <p>
-                        <FontAwesomeIcon
-                          icon={faMapMarkerAlt}
-                          className="w-5 h-5 mr-2"
-                        />
-                        {event.location}
-                      </p>
-                      <p className="font-bold text-blue-600 mt-2">
-                        Price: ₹{" "}
-                        {parseFloat(
-                          event.price_per_person * event.max_team_size
-                        ).toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </CardHeader>
+                  )}
+                </CardHeader>
 
-              <CardContent>
-                <form
-                  onSubmit={handleSubmit}
-                  className="space-y-6"
-                  encType="multipart/form-data"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
-                    <Input
-                      label="First Name*"
-                      name="first_name"
-                      value={form.first_name}
-                      onChange={handleChange}
-                      required
-                      placeholder="Enter first name"
-                    />
-                    <Input
-                      label="Middle Name"
-                      name="middle_name"
-                      value={form.middle_name}
-                      onChange={handleChange}
-                      placeholder="Enter middle name (optional)"
-                    />
-                    <Input
-                      label="Last Name*"
-                      name="last_name"
-                      value={form.last_name}
-                      onChange={handleChange}
-                      required
-                      placeholder="Enter last name"
-                    />
-                    <Input
-                      label="Date of Birth*"
-                      name="dob"
-                      type="date"
-                      value={form.dob}
-                      onChange={handleChange}
-                      required
-                      placeholder="YYYY-MM-DD"
-                    />
-                    {!event.is_team_event && (
+                <CardContent>
+                  <form
+                    onSubmit={handleSubmit}
+                    className="space-y-6"
+                    encType="multipart/form-data"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                      <Input
+                        label="First Name*"
+                        name="first_name"
+                        value={form.first_name}
+                        onChange={handleChange}
+                        required
+                        placeholder="Enter first name"
+                      />
+                      <Input
+                        label="Middle Name"
+                        name="middle_name"
+                        value={form.middle_name}
+                        onChange={handleChange}
+                        placeholder="Enter middle name (optional)"
+                      />
+                      <Input
+                        label="Last Name*"
+                        name="last_name"
+                        value={form.last_name}
+                        onChange={handleChange}
+                        required
+                        placeholder="Enter last name"
+                      />
+                      <Input
+                        label="Date of Birth*"
+                        name="dob"
+                        type="date"
+                        value={form.dob}
+                        onChange={handleChange}
+                        required
+                        placeholder="YYYY-MM-DD"
+                      />
+                      {!event.is_team_event && (
+                        <div>
+                          <label
+                            htmlFor="age_group"
+                            className="block text-sm font-semibold mb-1 text-black"
+                          >
+                            Age Group*
+                          </label>
+                          <Select
+                            name="age_group"
+                            value={form.age_group}
+                            onValueChange={(val) =>
+                              setForm((f) => ({ ...f, age_group: val }))
+                            }
+                            required
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select age group" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="under 8">Under 8</SelectItem>
+                              <SelectItem value="under 10">Under 10</SelectItem>
+                              <SelectItem value="under 12">Under 12</SelectItem>
+                              <SelectItem value="under 14">Under 14</SelectItem>
+                              <SelectItem value="under 16">Under 16</SelectItem>
+                              <SelectItem value="under 18">Under 18</SelectItem>
+                              <SelectItem value="18+">18+</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
                       <div>
                         <label
-                          htmlFor="age_group"
+                          htmlFor="gender"
                           className="block text-sm font-semibold mb-1 text-black"
                         >
-                          Age Group*
+                          Gender*
                         </label>
                         <Select
-                          name="age_group"
-                          value={form.age_group}
+                          name="gender"
+                          value={form.gender}
                           onValueChange={(val) =>
-                            setForm((f) => ({ ...f, age_group: val }))
+                            setForm((f) => ({ ...f, gender: val }))
                           }
                           required
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select age group" />
+                            <SelectValue placeholder="Select gender" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="under 8">Under 8</SelectItem>
-                            <SelectItem value="under 10">Under 10</SelectItem>
-                            <SelectItem value="under 12">Under 12</SelectItem>
-                            <SelectItem value="under 14">Under 14</SelectItem>
-                            <SelectItem value="under 16">Under 16</SelectItem>
-                            <SelectItem value="under 18">Under 18</SelectItem>
-                            <SelectItem value="18+">18+</SelectItem>
+                            <SelectItem value="male">Male</SelectItem>
+                            <SelectItem value="female">Female</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                    )}
-                    <div>
-                      <label
-                        htmlFor="gender"
-                        className="block text-sm font-semibold mb-1 text-black"
-                      >
-                        Gender*
-                      </label>
-                      <Select
-                        name="gender"
-                        value={form.gender}
-                        onValueChange={(val) =>
-                          setForm((f) => ({ ...f, gender: val }))
-                        }
-                        required
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="male">Male</SelectItem>
-                          <SelectItem value="female">Female</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Input
-                      label="District*"
-                      name="district"
-                      value={form.district}
-                      onChange={handleChange}
-                      required
-                      placeholder="Enter district"
-                    />
-                    <div>
-                      <label
-                        htmlFor="category"
-                        className="block text-sm font-semibold mb-1 text-black"
-                      >
-                        Category*
-                      </label>
-                      <Select
-                        name="category"
-                        value={form.category}
-                        onValueChange={(val) =>
-                          setForm((f) => ({ ...f, category: val }))
-                        }
-                        required
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="quad">Quad</SelectItem>
-                          <SelectItem value="inline">Inline</SelectItem>
-                          <SelectItem value="beginner">Beginner</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="experience"
-                        className="block text-sm font-semibold mb-1 text-black"
-                      >
-                        Experience*
-                      </label>
-                      <Select
-                        name="experience"
-                        value={form.experience || "beginner"}
-                        onValueChange={(val) =>
-                          setForm((f) => ({ ...f, experience: val }))
-                        }
-                        required
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select experience" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="beginner">
-                            Beginner (0-1 years)
-                          </SelectItem>
-                          <SelectItem value="intermediate">
-                            Intermediate (1-3 years)
-                          </SelectItem>
-                          <SelectItem value="pro">Pro (3+ years)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Input
-                      label="Aadhaar Number*"
-                      name="aadhaar_number"
-                      value={form.aadhaar_number}
-                      onChange={handleChange}
-                      required
-                      placeholder="Enter Aadhaar number"
-                    />
-                    <div>
-                      <label className="block font-medium mb-1">
-                        Aadhaar Image*
-                      </label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAadhaarChange}
-                        required
-                        className="block w-full border-1 border-gray-300 rounded-md p-2 text-sm file:cursor-pointer file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                      />
-                      {aadhaarImage && (
-                        <img
-                          src={URL.createObjectURL(aadhaarImage)}
-                          alt="Aadhaar Preview"
-                          className="mt-2 h-20 rounded shadow"
-                        />
-                      )}
-                    </div>
-                  </div>
-                  <Input
-                    label="Coach Name"
-                    name="coach_name"
-                    value={form.coach_name}
-                    onChange={handleChange}
-                    placeholder="Enter coach name (optional)"
-                  />
-                  <Input
-                    label="Club Name"
-                    name="club_name"
-                    value={form.club_name}
-                    onChange={handleChange}
-                    placeholder="Enter club name (optional)"
-                  />
-                  {event.is_team_event && (
-                    <>
                       <Input
-                        label="Team Name*"
-                        name="team_name"
-                        value={form.team_name}
+                        label="District*"
+                        name="district"
+                        value={form.district}
                         onChange={handleChange}
                         required
-                        placeholder="Enter team name"
+                        placeholder="Enter district"
                       />
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-bold">Team Members</h3>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={addTeamMember}
-                            className="flex items-center"
-                          >
-                            <i className="fas fa-plus-circle mr-2"></i> Add
-                            Member
-                          </Button>
-                        </div>
-                        <AnimatePresence>
-                          {form.team_members.map((member, idx) => (
-                            <motion.div
-                              key={idx}
-                              initial={{ opacity: 0, x: 30 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: -30 }}
-                              transition={{ duration: 0.3 }}
-                              className="p-4 bg-gray-50 rounded-lg"
-                            >
-                              <div className="flex justify-between mb-3">
-                                <h4 className="font-medium">
-                                  Team Member {idx + 1}
-                                </h4>
-                                {idx > 0 && (
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-red-500 h-8 px-2"
-                                    onClick={() => removeTeamMember(idx)}
-                                  >
-                                    <i className="fas fa-times"></i>
-                                  </Button>
-                                )}
-                              </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <Input
-                                  label="Full Name*"
-                                  value={member.full_name}
-                                  onChange={(e) =>
-                                    handleTeamMemberChange(
-                                      idx,
-                                      "full_name",
-                                      e.target.value
-                                    )
-                                  }
-                                  required
-                                  placeholder="Enter member's full name"
-                                />
-                                <Input
-                                  label="Age*"
-                                  type="number"
-                                  min="5"
-                                  max="99"
-                                  value={member.age}
-                                  onChange={(e) =>
-                                    handleTeamMemberChange(
-                                      idx,
-                                      "age",
-                                      e.target.value
-                                    )
-                                  }
-                                  required
-                                  placeholder="Enter age"
-                                />
-                                <Select
-                                  value={member.gender}
-                                  onValueChange={(val) =>
-                                    handleTeamMemberChange(idx, "gender", val)
-                                  }
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select gender" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="male">Male</SelectItem>
-                                    <SelectItem value="female">
-                                      Female
-                                    </SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Select
-                                  value={member.experience}
-                                  onValueChange={(val) =>
-                                    handleTeamMemberChange(
-                                      idx,
-                                      "experience",
-                                      val
-                                    )
-                                  }
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select experience" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="beginner">
-                                      Beginner (0-1 years)
-                                    </SelectItem>
-                                    <SelectItem value="intermediate">
-                                      Intermediate (1-3 years)
-                                    </SelectItem>
-                                    <SelectItem value="advanced">
-                                      Advanced (3+ years)
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
+                      <div>
+                        <label
+                          htmlFor="category"
+                          className="block text-sm font-semibold mb-1 text-black"
+                        >
+                          Category*
+                        </label>
+                        <Select
+                          name="category"
+                          value={form.category}
+                          onValueChange={(val) =>
+                            setForm((f) => ({ ...f, category: val }))
+                          }
+                          required
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="quad">Quad</SelectItem>
+                            <SelectItem value="inline">Inline</SelectItem>
+                            <SelectItem value="beginner">Beginner</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
-                    </>
-                  )}
-                  <Button
-                    type="submit"
-                    className="w-full py-3 bg-primary text-blue-400 border-2 rounded-lg hover:bg-opacity-90 transition-colors font-medium text-center cursor-pointer hover:text-blue-600 hover:shadow-lg hover:scale-105 flex items-center justify-center gap-2 mt-4"
-                    disabled={submitting}
-                  >
-                    {submitting ? (
-                      <>
-                        <FontAwesomeIcon
-                          icon={faSpinner}
-                          spin
-                          className="mr-2"
+                      <div>
+                        <label
+                          htmlFor="experience"
+                          className="block text-sm font-semibold mb-1 text-black"
+                        >
+                          Experience*
+                        </label>
+                        <Select
+                          name="experience"
+                          value={form.experience || "beginner"}
+                          onValueChange={(val) =>
+                            setForm((f) => ({ ...f, experience: val }))
+                          }
+                          required
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select experience" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="beginner">
+                              Beginner (0-1 years)
+                            </SelectItem>
+                            <SelectItem value="intermediate">
+                              Intermediate (1-3 years)
+                            </SelectItem>
+                            <SelectItem value="pro">Pro (3+ years)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Input
+                        label="Aadhaar Number*"
+                        name="aadhaar_number"
+                        value={form.aadhaar_number}
+                        onChange={handleChange}
+                        required
+                        placeholder="Enter Aadhaar number"
+                      />
+                      <div>
+                        <label className="block font-medium mb-1">
+                          Aadhaar Image*
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAadhaarChange}
+                          required
+                          className="block w-full border-1 border-gray-300 rounded-md p-2 text-sm file:cursor-pointer file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                         />
-                        Submitting...
-                      </>
-                    ) : (
+                        {aadhaarImage && (
+                          <img
+                            src={URL.createObjectURL(aadhaarImage)}
+                            alt="Aadhaar Preview"
+                            className="mt-2 h-20 rounded shadow"
+                          />
+                        )}
+                      </div>
+                    </div>
+                    <Input
+                      label="Coach Name"
+                      name="coach_name"
+                      value={form.coach_name}
+                      onChange={handleChange}
+                      placeholder="Enter coach name (optional)"
+                    />
+                    <Input
+                      label="Club Name"
+                      name="club_name"
+                      value={form.club_name}
+                      onChange={handleChange}
+                      placeholder="Enter club name (optional)"
+                    />
+                    {event.is_team_event && (
                       <>
-                        <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />
-                        Submit Registration
+                        <Input
+                          label="Team Name*"
+                          name="team_name"
+                          value={form.team_name}
+                          onChange={handleChange}
+                          required
+                          placeholder="Enter team name"
+                        />
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-bold">Team Members</h3>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={addTeamMember}
+                              className="flex items-center"
+                            >
+                              <i className="fas fa-plus-circle mr-2"></i> Add
+                              Member
+                            </Button>
+                          </div>
+                          <AnimatePresence>
+                            {form.team_members.map((member, idx) => (
+                              <motion.div
+                                key={idx}
+                                initial={{ opacity: 0, x: 30 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -30 }}
+                                transition={{ duration: 0.3 }}
+                                className="p-4 bg-gray-50 rounded-lg"
+                              >
+                                <div className="flex justify-between mb-3">
+                                  <h4 className="font-medium">
+                                    Team Member {idx + 1}
+                                  </h4>
+                                  {idx > 0 && (
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-red-500 h-8 px-2"
+                                      onClick={() => removeTeamMember(idx)}
+                                    >
+                                      <i className="fas fa-times"></i>
+                                    </Button>
+                                  )}
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <Input
+                                    label="Full Name*"
+                                    value={member.full_name}
+                                    onChange={(e) =>
+                                      handleTeamMemberChange(
+                                        idx,
+                                        "full_name",
+                                        e.target.value
+                                      )
+                                    }
+                                    required
+                                    placeholder="Enter member's full name"
+                                  />
+                                  <Input
+                                    label="Age*"
+                                    type="number"
+                                    min="5"
+                                    max="99"
+                                    value={member.age}
+                                    onChange={(e) =>
+                                      handleTeamMemberChange(
+                                        idx,
+                                        "age",
+                                        e.target.value
+                                      )
+                                    }
+                                    required
+                                    placeholder="Enter age"
+                                  />
+                                  <Select
+                                    value={member.gender}
+                                    onValueChange={(val) =>
+                                      handleTeamMemberChange(idx, "gender", val)
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select gender" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="male">Male</SelectItem>
+                                      <SelectItem value="female">
+                                        Female
+                                      </SelectItem>
+                                      <SelectItem value="other">
+                                        Other
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Select
+                                    value={member.experience}
+                                    onValueChange={(val) =>
+                                      handleTeamMemberChange(
+                                        idx,
+                                        "experience",
+                                        val
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select experience" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="beginner">
+                                        Beginner (0-1 years)
+                                      </SelectItem>
+                                      <SelectItem value="intermediate">
+                                        Intermediate (1-3 years)
+                                      </SelectItem>
+                                      <SelectItem value="advanced">
+                                        Advanced (3+ years)
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </motion.div>
+                            ))}
+                          </AnimatePresence>
+                        </div>
                       </>
                     )}
-                  </Button>
-                  {error && (
-                    <div className="text-red-600 text-center mt-2">{error}</div>
-                  )}
-                </form>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+                    <Button
+                      type="submit"
+                      className="w-full py-3 bg-primary text-blue-400 border-2 rounded-lg hover:bg-opacity-90 transition-colors font-medium text-center cursor-pointer hover:text-blue-600 hover:shadow-lg hover:scale-105 flex items-center justify-center gap-2 mt-4"
+                      disabled={submitting}
+                    >
+                      {submitting ? (
+                        <>
+                          <FontAwesomeIcon
+                            icon={faSpinner}
+                            spin
+                            className="mr-2"
+                          />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <FontAwesomeIcon
+                            icon={faPaperPlane}
+                            className="mr-2"
+                          />
+                          Submit Registration
+                        </>
+                      )}
+                    </Button>
+                    {error && (
+                      <div className="text-red-600 text-center mt-2">
+                        {error}
+                      </div>
+                    )}
+                  </form>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 };
 

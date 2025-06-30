@@ -15,7 +15,7 @@ const Dialog = ({ open, onOpenChange, children }) => {
         onClick={handleModalClick}
       >
         {children}
-        <button
+        {/* <button
           className="absolute right-2 top-2 sm:right-4 sm:top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary"
           onClick={onOpenChange}
           aria-label="Close"
@@ -31,7 +31,7 @@ const Dialog = ({ open, onOpenChange, children }) => {
           >
             <path d="M4 4l8 8M12 4l-8 8" />
           </svg>
-        </button>
+        </button> */}
       </div>
     </div>
   );

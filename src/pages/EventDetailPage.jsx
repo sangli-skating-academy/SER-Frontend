@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Header from "../components/layouts/Header";
 import Footer from "../components/layouts/Footer";
 import {
@@ -133,597 +134,619 @@ const EventDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-pink-50 to-blue-50 animate-fade-in">
-      <Header />
-      {/* Hero Section */}
-      <div
-        className="relative bg-cover bg-center h-[45vh] flex items-end animate-fade-in-up"
-        style={{
-          backgroundImage: `url(${
-            event.image_url || "/images/default-event.jpg"
-          })`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="container mx-auto px-4 py-10 relative z-10">
-          <h1 className="text-3xl md:text-5xl font-bold mb-2 animate-gradient-x bg-gradient-to-r from-blue-400 via-blue-400 to-pink-400 bg-clip-text text-transparent">
-            {event.title}
-          </h1>
-          <div className="flex items-center text-white/90 mt-2 animate-fade-in">
-            <FontAwesomeIcon icon={faCalendarAlt} className="w-5 h-5 mr-2" />
-            <span>{formatDate(event.start_date)}</span>
-            <FontAwesomeIcon
-              icon={faMapMarkerAlt}
-              className="w-5 h-5 ml-6 mr-2"
-            />
-            <span>{event.location}</span>
+    <>
+      <Helmet>
+        <title>Event Details | Sai Skating Academy</title>
+        <meta
+          name="description"
+          content="View details for this skating event at Sai Skating Academy."
+        />
+        <meta
+          property="og:title"
+          content="Event Details | Sai Skating Academy"
+        />
+        <meta
+          property="og:description"
+          content="View details for this skating event at Sai Skating Academy."
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-pink-50 to-blue-50 animate-fade-in">
+        <Header />
+        {/* Hero Section */}
+        <div
+          className="relative bg-cover bg-center h-[45vh] flex items-end animate-fade-in-up"
+          style={{
+            backgroundImage: `url(${
+              event.image_url || "/images/default-event.jpg"
+            })`,
+          }}
+        >
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="container mx-auto px-4 py-10 relative z-10">
+            <h1 className="text-3xl md:text-5xl font-bold mb-2 animate-gradient-x bg-gradient-to-r from-blue-400 via-blue-400 to-pink-400 bg-clip-text text-transparent">
+              {event.title}
+            </h1>
+            <div className="flex items-center text-white/90 mt-2 animate-fade-in">
+              <FontAwesomeIcon icon={faCalendarAlt} className="w-5 h-5 mr-2" />
+              <span>{formatDate(event.start_date)}</span>
+              <FontAwesomeIcon
+                icon={faMapMarkerAlt}
+                className="w-5 h-5 ml-6 mr-2"
+              />
+              <span>{event.location}</span>
+            </div>
           </div>
         </div>
-      </div>
-      {/* Main Content */}
-      <main className="container mx-auto py-8 px-4 flex flex-col lg:flex-row gap-8 flex-grow">
-        {/* Main Tabs */}
-        <div
-          className="w-full lg:w-2/3 animate-fade-in-up"
-          data-aos="fade-up"
-          data-aos-delay="100"
-        >
-          <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="w-full justify-start border-b rounded-none mb-6 overflow-x-auto flex-nowrap">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="rules">Rules & Guidelines</TabsTrigger>
-              <TabsTrigger value="location">Location</TabsTrigger>
-            </TabsList>
-            <TabsContent value="overview">
-              <h2 className="text-2xl font-bold mb-4">Event Overview</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                {/* Competition */}
-                <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
-                  <CardHeader className="pb-2 flex flex-row items-center gap-3">
-                    <span className="rounded-full bg-blue-200 p-2">
-                      <FontAwesomeIcon
-                        icon={faMedal}
-                        className="w-6 h-6 text-blue-600"
-                      />
-                    </span>
-                    <CardTitle className="text-lg">Competition</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>
-                      Challenge yourself against fellow sports enthusiasts in a
-                      friendly but competitive environment.
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-                {/* Community */}
-                <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-100">
-                  <CardHeader className="pb-2 flex flex-row items-center gap-3">
-                    <span className="rounded-full bg-pink-200 p-2">
-                      <FontAwesomeIcon
-                        icon={faUsers}
-                        className="w-6 h-6 text-pink-600"
-                      />
-                    </span>
-                    <CardTitle className="text-lg text-pink-600">
-                      Community
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>
-                      Connect with others who share your passion and expand your
-                      network.
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-                {/* Professional Timing */}
-                <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up delay-200">
-                  <CardHeader className="pb-2 flex flex-row items-center gap-3">
-                    <span className="rounded-full bg-blue-100 p-2">
-                      <FontAwesomeIcon
-                        icon={faClock}
-                        className="w-6 h-6 text-blue-500"
-                      />
-                    </span>
-                    <CardTitle className="text-lg">
-                      Professional Timing
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>
-                      All performances are timed using professional equipment
-                      for accurate results.
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-                {/* Expert Coaches */}
-                <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-300">
-                  <CardHeader className="pb-2 flex flex-row items-center gap-3">
-                    <span className="rounded-full bg-pink-100 p-2">
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        className="w-6 h-6 text-pink-500"
-                      />
-                    </span>
-                    <CardTitle className="text-lg text-pink-500">
-                      Expert Coaches
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>
-                      Qualified coaches will be present to provide guidance and
-                      feedback.
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Event Highlights</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {[
-                  {
-                    icon: faMedal,
-                    color: "bg-yellow-100 text-yellow-600",
-                    text: "Professional equipment and facilities",
-                  },
-                  {
-                    icon: faMedal,
-                    color: "bg-green-100 text-green-600",
-                    text: "Medals and certificates for top performers",
-                  },
-                  {
-                    icon: faClock,
-                    color: "bg-blue-100 text-blue-600",
-                    text: "Refreshments available throughout the event",
-                  },
-                  {
-                    icon: faUsers,
-                    color: "bg-pink-100 text-pink-600",
-                    text: "Photo opportunities and professional event photography",
-                  },
-                  {
-                    icon: faInfoCircle,
-                    color: "bg-purple-100 text-purple-600",
-                    text: "Networking opportunities with coaches and other participants",
-                  },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 bg-white/80 rounded-lg shadow p-4 animate-fade-in-up"
-                  >
-                    <span className={`rounded-full p-2 ${item.color}`}>
-                      <FontAwesomeIcon icon={item.icon} className="w-5 h-5" />
-                    </span>
-                    <span className="text-base font-medium text-gray-700">
-                      {item.text}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-            <TabsContent value="rules">
-              <div className="space-y-8">
-                {/* General Rules */}
-                <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
-                  <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                    <span className="rounded-full bg-blue-200 p-2">
-                      <FontAwesomeIcon
-                        icon={faScroll}
-                        className="w-6 h-6 text-blue-600"
-                      />
-                    </span>
-                    <CardTitle className="text-lg">General Rules</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-none space-y-3 mt-2">
-                      {[
-                        "All participants must arrive 30 minutes before the scheduled start time",
-                        "Participants must bring valid ID matching their registration information",
-                        "Appropriate sports attire and gear are required",
-                        "Unsportsmanlike behavior will result in disqualification",
-                        "The decisions of the judges and referees are final",
-                      ].map((rule, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="mt-1 text-blue-400">
-                            <FontAwesomeIcon icon={faInfoCircle} />
+        {/* Main Content */}
+        <main className="container mx-auto py-8 px-4 flex flex-col lg:flex-row gap-8 flex-grow">
+          {/* Main Tabs */}
+          <div
+            className="w-full lg:w-2/3 animate-fade-in-up"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="w-full justify-start border-b rounded-none mb-6 overflow-x-auto flex-nowrap">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="rules">Rules & Guidelines</TabsTrigger>
+                <TabsTrigger value="location">Location</TabsTrigger>
+              </TabsList>
+              <TabsContent value="overview">
+                <h2 className="text-2xl font-bold mb-4">Event Overview</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  {/* Competition */}
+                  <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
+                    <CardHeader className="pb-2 flex flex-row items-center gap-3">
+                      <span className="rounded-full bg-blue-200 p-2">
+                        <FontAwesomeIcon
+                          icon={faMedal}
+                          className="w-6 h-6 text-blue-600"
+                        />
+                      </span>
+                      <CardTitle className="text-lg">Competition</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription>
+                        Challenge yourself against fellow sports enthusiasts in
+                        a friendly but competitive environment.
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                  {/* Community */}
+                  <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-100">
+                    <CardHeader className="pb-2 flex flex-row items-center gap-3">
+                      <span className="rounded-full bg-pink-200 p-2">
+                        <FontAwesomeIcon
+                          icon={faUsers}
+                          className="w-6 h-6 text-pink-600"
+                        />
+                      </span>
+                      <CardTitle className="text-lg text-pink-600">
+                        Community
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription>
+                        Connect with others who share your passion and expand
+                        your network.
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                  {/* Professional Timing */}
+                  <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up delay-200">
+                    <CardHeader className="pb-2 flex flex-row items-center gap-3">
+                      <span className="rounded-full bg-blue-100 p-2">
+                        <FontAwesomeIcon
+                          icon={faClock}
+                          className="w-6 h-6 text-blue-500"
+                        />
+                      </span>
+                      <CardTitle className="text-lg">
+                        Professional Timing
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription>
+                        All performances are timed using professional equipment
+                        for accurate results.
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                  {/* Expert Coaches */}
+                  <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-300">
+                    <CardHeader className="pb-2 flex flex-row items-center gap-3">
+                      <span className="rounded-full bg-pink-100 p-2">
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          className="w-6 h-6 text-pink-500"
+                        />
+                      </span>
+                      <CardTitle className="text-lg text-pink-500">
+                        Expert Coaches
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription>
+                        Qualified coaches will be present to provide guidance
+                        and feedback.
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                </div>
+                <h3 className="text-xl font-bold mb-3">Event Highlights</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {[
+                    {
+                      icon: faMedal,
+                      color: "bg-yellow-100 text-yellow-600",
+                      text: "Professional equipment and facilities",
+                    },
+                    {
+                      icon: faMedal,
+                      color: "bg-green-100 text-green-600",
+                      text: "Medals and certificates for top performers",
+                    },
+                    {
+                      icon: faClock,
+                      color: "bg-blue-100 text-blue-600",
+                      text: "Refreshments available throughout the event",
+                    },
+                    {
+                      icon: faUsers,
+                      color: "bg-pink-100 text-pink-600",
+                      text: "Photo opportunities and professional event photography",
+                    },
+                    {
+                      icon: faInfoCircle,
+                      color: "bg-purple-100 text-purple-600",
+                      text: "Networking opportunities with coaches and other participants",
+                    },
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 bg-white/80 rounded-lg shadow p-4 animate-fade-in-up"
+                    >
+                      <span className={`rounded-full p-2 ${item.color}`}>
+                        <FontAwesomeIcon icon={item.icon} className="w-5 h-5" />
+                      </span>
+                      <span className="text-base font-medium text-gray-700">
+                        {item.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+              <TabsContent value="rules">
+                <div className="space-y-8">
+                  {/* General Rules */}
+                  <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
+                    <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                      <span className="rounded-full bg-blue-200 p-2">
+                        <FontAwesomeIcon
+                          icon={faScroll}
+                          className="w-6 h-6 text-blue-600"
+                        />
+                      </span>
+                      <CardTitle className="text-lg">General Rules</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="list-none space-y-3 mt-2">
+                        {[
+                          "All participants must arrive 30 minutes before the scheduled start time",
+                          "Participants must bring valid ID matching their registration information",
+                          "Appropriate sports attire and gear are required",
+                          "Unsportsmanlike behavior will result in disqualification",
+                          "The decisions of the judges and referees are final",
+                        ].map((rule, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="mt-1 text-blue-400">
+                              <FontAwesomeIcon icon={faInfoCircle} />
+                            </span>
+                            <span className="text-gray-700">{rule}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  {/* Equipment Requirements */}
+                  <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-100">
+                    <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                      <span className="rounded-full bg-pink-200 p-2">
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          className="w-6 h-6 text-pink-600"
+                        />
+                      </span>
+                      <CardTitle className="text-lg text-pink-600">
+                        Equipment Requirements
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="list-none space-y-3 mt-2">
+                        {[
+                          "All participants must bring their own gear (specifics depend on the sport)",
+                          "Equipment must meet safety standards",
+                          "Limited equipment may be available for rent (subject to availability)",
+                          "Helmets are mandatory for all skating events",
+                        ].map((rule, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="mt-1 text-pink-400">
+                              <FontAwesomeIcon icon={faInfoCircle} />
+                            </span>
+                            <span className="text-gray-700">{rule}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  {/* Scoring System */}
+                  <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up delay-200">
+                    <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                      <span className="rounded-full bg-yellow-100 p-2">
+                        <FontAwesomeIcon
+                          icon={faMedal}
+                          className="w-6 h-6 text-yellow-500"
+                        />
+                      </span>
+                      <CardTitle className="text-lg text-yellow-500">
+                        Scoring System
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground mb-3">
+                        Participants will be judged on the following criteria:
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[
+                          {
+                            title: "Technique",
+                            desc: "Proper form, execution of movements, and technical precision.",
+                            icon: faMedal,
+                            color: "bg-yellow-100 text-yellow-600",
+                          },
+                          {
+                            title: "Speed",
+                            desc: "Time taken to complete the course or performance.",
+                            icon: faClock,
+                            color: "bg-blue-100 text-blue-600",
+                          },
+                          {
+                            title: "Creativity",
+                            desc: "Unique elements, style, and artistic expression.",
+                            icon: faInfoCircle,
+                            color: "bg-pink-100 text-pink-600",
+                          },
+                          {
+                            title: "Difficulty",
+                            desc: "Level of challenge in the performed routines or maneuvers.",
+                            icon: faUsers,
+                            color: "bg-green-100 text-green-600",
+                          },
+                        ].map((item, i) => (
+                          <div
+                            key={i}
+                            className="flex items-start gap-3 bg-white/80 rounded-lg shadow p-4 animate-fade-in-up"
+                          >
+                            <span className={`rounded-full p-2 ${item.color}`}>
+                              <FontAwesomeIcon
+                                icon={item.icon}
+                                className="w-5 h-5"
+                              />
+                            </span>
+                            <div>
+                              <div className="font-semibold text-gray-800">
+                                {item.title}
+                              </div>
+                              <div className="text-gray-600 text-sm">
+                                {item.desc}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              <TabsContent value="location">
+                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                  <FontAwesomeIcon
+                    icon={faMapMarkerAlt}
+                    className="text-pink-500 w-7 h-7 animate-bounce-x"
+                  />
+                  Event Location
+                </h2>
+
+                <div className="rounded-2xl overflow-hidden border-2 border-blue-100 h-[400px] mb-8 shadow-xl animate-fade-in-up relative">
+                  {!isMapLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
+                    </div>
+                  )}
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                      event.location
+                    )}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                    className="w-full h-full"
+                    onLoad={() => setIsMapLoaded(true)}
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Event Location"
+                  ></iframe>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow animate-fade-in-up">
+                    <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                      <span className="rounded-full bg-blue-200 p-2">
+                        <FontAwesomeIcon
+                          icon={faArrowRight}
+                          className="w-5 h-5 text-blue-600"
+                        />
+                      </span>
+                      <CardTitle className="text-lg">Directions</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-3 text-gray-700">
+                        <li className="flex items-start gap-2">
+                          <FontAwesomeIcon
+                            icon={faCar}
+                            className="text-blue-400 mt-1"
+                          />
+                          <span>
+                            <strong>By Car:</strong> Parking available on-site.
+                            Follow signs for event parking.
                           </span>
-                          <span className="text-gray-700">{rule}</span>
                         </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-                {/* Equipment Requirements */}
-                <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-100">
-                  <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                    <span className="rounded-full bg-pink-200 p-2">
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        className="w-6 h-6 text-pink-600"
-                      />
-                    </span>
-                    <CardTitle className="text-lg text-pink-600">
-                      Equipment Requirements
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-none space-y-3 mt-2">
-                      {[
-                        "All participants must bring their own gear (specifics depend on the sport)",
-                        "Equipment must meet safety standards",
-                        "Limited equipment may be available for rent (subject to availability)",
-                        "Helmets are mandatory for all skating events",
-                      ].map((rule, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="mt-1 text-pink-400">
-                            <FontAwesomeIcon icon={faInfoCircle} />
+                        <li className="flex items-start gap-2">
+                          <FontAwesomeIcon
+                            icon={faBus}
+                            className="text-pink-400 mt-1"
+                          />
+                          <span>
+                            <strong>Public Transport:</strong> Bus routes 22,
+                            34, and 56 stop within a 5-minute walk.
                           </span>
-                          <span className="text-gray-700">{rule}</span>
                         </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-                {/* Scoring System */}
-                <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up delay-200">
-                  <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                        <li className="flex items-start gap-2">
+                          <FontAwesomeIcon
+                            icon={faBicycle}
+                            className="text-green-400 mt-1"
+                          />
+                          <span>
+                            <strong>Cycling:</strong> Bike racks available at
+                            the entrance.
+                          </span>
+                        </li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow animate-fade-in-up delay-100">
+                    <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                      <span className="rounded-full bg-pink-200 p-2">
+                        <FontAwesomeIcon
+                          icon={faInfoCircle}
+                          className="w-5 h-5 text-pink-600"
+                        />
+                      </span>
+                      <CardTitle className="text-lg text-pink-600">
+                        Venue Facilities
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-3 text-gray-700">
+                        <li className="flex items-start gap-2">
+                          <FontAwesomeIcon
+                            icon={faRestroom}
+                            className="text-blue-400 mt-1"
+                          />
+                          <span>
+                            <strong>Restrooms:</strong> Located on each level of
+                            the venue.
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <FontAwesomeIcon
+                            icon={faUtensils}
+                            className="text-pink-400 mt-1"
+                          />
+                          <span>
+                            <strong>Food:</strong> Cafeteria and food stalls
+                            available.
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <FontAwesomeIcon
+                            icon={faFirstAid}
+                            className="text-green-400 mt-1"
+                          />
+                          <span>
+                            <strong>First Aid:</strong> Medical station near the
+                            main entrance.
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <FontAwesomeIcon
+                            icon={faWifi}
+                            className="text-purple-400 mt-1"
+                          />
+                          <span>
+                            <strong>Wi-Fi:</strong> Free for all participants
+                            and spectators.
+                          </span>
+                        </li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+          {/* Sidebar */}
+          <div
+            className="w-full lg:w-1/3 space-y-6 animate-fade-in-up"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-xl animate-fade-in-up">
+              <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                <span className="rounded-full bg-blue-200 p-2">
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    className="w-6 h-6 text-blue-600"
+                  />
+                </span>
+                <CardTitle className="text-lg">Event Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up">
                     <span className="rounded-full bg-yellow-100 p-2">
                       <FontAwesomeIcon
                         icon={faMedal}
-                        className="w-6 h-6 text-yellow-500"
+                        className="w-5 h-5 text-yellow-600"
                       />
                     </span>
-                    <CardTitle className="text-lg text-yellow-500">
-                      Scoring System
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-3">
-                      Participants will be judged on the following criteria:
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {[
-                        {
-                          title: "Technique",
-                          desc: "Proper form, execution of movements, and technical precision.",
-                          icon: faMedal,
-                          color: "bg-yellow-100 text-yellow-600",
-                        },
-                        {
-                          title: "Speed",
-                          desc: "Time taken to complete the course or performance.",
-                          icon: faClock,
-                          color: "bg-blue-100 text-blue-600",
-                        },
-                        {
-                          title: "Creativity",
-                          desc: "Unique elements, style, and artistic expression.",
-                          icon: faInfoCircle,
-                          color: "bg-pink-100 text-pink-600",
-                        },
-                        {
-                          title: "Difficulty",
-                          desc: "Level of challenge in the performed routines or maneuvers.",
-                          icon: faUsers,
-                          color: "bg-green-100 text-green-600",
-                        },
-                      ].map((item, i) => (
-                        <div
-                          key={i}
-                          className="flex items-start gap-3 bg-white/80 rounded-lg shadow p-4 animate-fade-in-up"
-                        >
-                          <span className={`rounded-full p-2 ${item.color}`}>
-                            <FontAwesomeIcon
-                              icon={item.icon}
-                              className="w-5 h-5"
-                            />
-                          </span>
-                          <div>
-                            <div className="font-semibold text-gray-800">
-                              {item.title}
-                            </div>
-                            <div className="text-gray-600 text-sm">
-                              {item.desc}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-            <TabsContent value="location">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                <FontAwesomeIcon
-                  icon={faMapMarkerAlt}
-                  className="text-pink-500 w-7 h-7 animate-bounce-x"
-                />
-                Event Location
-              </h2>
-
-              <div className="rounded-2xl overflow-hidden border-2 border-blue-100 h-[400px] mb-8 shadow-xl animate-fade-in-up relative">
-                {!isMapLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400"></div>
-                  </div>
-                )}
-                <iframe
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                    event.location
-                  )}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-                  className="w-full h-full"
-                  onLoad={() => setIsMapLoaded(true)}
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Event Location"
-                ></iframe>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow animate-fade-in-up">
-                  <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                    <span className="rounded-full bg-blue-200 p-2">
-                      <FontAwesomeIcon
-                        icon={faArrowRight}
-                        className="w-5 h-5 text-blue-600"
-                      />
+                    <span className="text-muted-foreground flex-1">
+                      Registration Fee
                     </span>
-                    <CardTitle className="text-lg">Directions</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-3 text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <FontAwesomeIcon
-                          icon={faCar}
-                          className="text-blue-400 mt-1"
-                        />
-                        <span>
-                          <strong>By Car:</strong> Parking available on-site.
-                          Follow signs for event parking.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <FontAwesomeIcon
-                          icon={faBus}
-                          className="text-pink-400 mt-1"
-                        />
-                        <span>
-                          <strong>Public Transport:</strong> Bus routes 22, 34,
-                          and 56 stop within a 5-minute walk.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <FontAwesomeIcon
-                          icon={faBicycle}
-                          className="text-green-400 mt-1"
-                        />
-                        <span>
-                          <strong>Cycling:</strong> Bike racks available at the
-                          entrance.
-                        </span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow animate-fade-in-up delay-100">
-                  <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                    <span className="rounded-full bg-pink-200 p-2">
-                      <FontAwesomeIcon
-                        icon={faInfoCircle}
-                        className="w-5 h-5 text-pink-600"
-                      />
-                    </span>
-                    <CardTitle className="text-lg text-pink-600">
-                      Venue Facilities
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-3 text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <FontAwesomeIcon
-                          icon={faRestroom}
-                          className="text-blue-400 mt-1"
-                        />
-                        <span>
-                          <strong>Restrooms:</strong> Located on each level of
-                          the venue.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <FontAwesomeIcon
-                          icon={faUtensils}
-                          className="text-pink-400 mt-1"
-                        />
-                        <span>
-                          <strong>Food:</strong> Cafeteria and food stalls
-                          available.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <FontAwesomeIcon
-                          icon={faFirstAid}
-                          className="text-green-400 mt-1"
-                        />
-                        <span>
-                          <strong>First Aid:</strong> Medical station near the
-                          main entrance.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <FontAwesomeIcon
-                          icon={faWifi}
-                          className="text-purple-400 mt-1"
-                        />
-                        <span>
-                          <strong>Wi-Fi:</strong> Free for all participants and
-                          spectators.
-                        </span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-        {/* Sidebar */}
-        <div
-          className="w-full lg:w-1/3 space-y-6 animate-fade-in-up"
-          data-aos="fade-up"
-          data-aos-delay="200"
-        >
-          <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-xl animate-fade-in-up">
-            <CardHeader className="flex flex-row items-center gap-3 pb-2">
-              <span className="rounded-full bg-blue-200 p-2">
-                <FontAwesomeIcon
-                  icon={faInfoCircle}
-                  className="w-6 h-6 text-blue-600"
-                />
-              </span>
-              <CardTitle className="text-lg">Event Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 gap-3">
-                <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up">
-                  <span className="rounded-full bg-yellow-100 p-2">
-                    <FontAwesomeIcon
-                      icon={faMedal}
-                      className="w-5 h-5 text-yellow-600"
-                    />
-                  </span>
-                  <span className="text-muted-foreground flex-1">
-                    Registration Fee
-                  </span>
-                  <span className="font-bold text-lg text-yellow-700">
-                    Rs.{" "}
-                    {parseFloat(
-                      event.price_per_person * event.max_team_size
-                    ).toFixed(2)}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-150">
-                  <span className="rounded-full bg-green-100 p-2">
-                    <FontAwesomeIcon
-                      icon={faUsers}
-                      className="w-5 h-5 text-green-600"
-                    />
-                  </span>
-                  <span className="text-muted-foreground flex-1">
-                    Age Group
-                  </span>
-                  <span className="font-medium">{event.age_group}</span>
-                </div>
-                <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-200">
-                  <span className="rounded-full bg-purple-100 p-2">
-                    <FontAwesomeIcon
-                      icon={faInfoCircle}
-                      className="w-5 h-5 text-purple-600"
-                    />
-                  </span>
-                  <span className="text-muted-foreground flex-1">Gender</span>
-                  <span className="font-medium">{event.gender}</span>
-                </div>
-                <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-250">
-                  <span className="rounded-full bg-orange-100 p-2">
-                    <FontAwesomeIcon
-                      icon={event.is_team_event ? faUsers : faMedal}
-                      className="w-5 h-5 text-orange-600"
-                    />
-                  </span>
-                  <span className="text-muted-foreground flex-1">Type</span>
-                  <span className="font-medium">
-                    {event.is_team_event ? "Team" : "Individual"}
-                  </span>
-                </div>
-              </div>
-              <div className="pt-4 space-y-3">
-                {!user || user.role !== "player" ? (
-                  <Button
-                    size="lg"
-                    className="w-full border-1 bg-yellow-400 text-white hover:bg-yellow-500"
-                    onClick={() => setIsLoginModalOpen(true)}
-                  >
-                    Login first to register for event
-                  </Button>
-                ) : user && isRegistered ? (
-                  <Button
-                    size="lg"
-                    className="w-full border-1 bg-green-500 text-white hover:bg-green-600 transition-colors animate-fade-in-up"
-                    onClick={() => navigate("/dashboard")}
-                  >
-                    <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
-                    Pay
-                  </Button>
-                ) : (
-                  <Button size="lg" className="w-full border-1" asChild>
-                    <FontAwesomeIcon icon={faArrowRight} className="mr-2" />
-                    <Link to={`/register/${event.id}`}>Register Now</Link>
-                  </Button>
-                )}
-                <Button
-                  variant="outline"
-                  className="w-full cursor-pointer border-1"
-                  onClick={handleShare}
-                >
-                  <FontAwesomeIcon icon={faShareAlt} className="mr-2" />
-                  Share Event
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-xl animate-fade-in-up">
-            <CardHeader className="flex flex-row items-center gap-3 pb-2">
-              <span className="rounded-full bg-pink-200 p-2">
-                <FontAwesomeIcon
-                  icon={faInfoCircle}
-                  className="w-6 h-6 text-pink-600"
-                />
-              </span>
-              <CardTitle className="text-lg text-pink-600">
-                Contact Organizer
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <p className="text-muted-foreground text-base">
-                  Have questions about this event? Contact the organizer
-                  directly for more information or assistance.
-                </p>
-                <div className="grid grid-cols-1 gap-3">
-                  <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up">
-                    <span className="rounded-full bg-blue-100 p-2">
-                      <FontAwesomeIcon
-                        icon={faEnvelope}
-                        className="w-5 h-5 text-blue-600"
-                      />
-                    </span>
-                    <span className="text-muted-foreground flex-1">Email</span>
-                    <span className="font-medium break-all text-sm sm:text-base">
-                      saiskatingacademy@gmail.com
+                    <span className="font-bold text-lg text-yellow-700">
+                      Rs.{" "}
+                      {parseFloat(
+                        event.price_per_person * event.max_team_size
+                      ).toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-50">
+
+                  <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-150">
                     <span className="rounded-full bg-green-100 p-2">
                       <FontAwesomeIcon
-                        icon={faPhone}
+                        icon={faUsers}
                         className="w-5 h-5 text-green-600"
                       />
                     </span>
-                    <span className="text-muted-foreground flex-1">Phone</span>
-                    <span className="font-medium">(+91) 123-456-7890</span>
+                    <span className="text-muted-foreground flex-1">
+                      Age Group
+                    </span>
+                    <span className="font-medium">{event.age_group}</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-200">
+                    <span className="rounded-full bg-purple-100 p-2">
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        className="w-5 h-5 text-purple-600"
+                      />
+                    </span>
+                    <span className="text-muted-foreground flex-1">Gender</span>
+                    <span className="font-medium">{event.gender}</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-250">
+                    <span className="rounded-full bg-orange-100 p-2">
+                      <FontAwesomeIcon
+                        icon={event.is_team_event ? faUsers : faMedal}
+                        className="w-5 h-5 text-orange-600"
+                      />
+                    </span>
+                    <span className="text-muted-foreground flex-1">Type</span>
+                    <span className="font-medium">
+                      {event.is_team_event ? "Team" : "Individual"}
+                    </span>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-      <Footer />
-      {isLoginModalOpen && (
-        <LoginModal onClose={() => setIsLoginModalOpen(false)} />
-      )}
-    </div>
+                <div className="pt-4 space-y-3">
+                  {!user ? (
+                    <Button
+                      size="lg"
+                      className="w-full border-1 bg-yellow-400 text-white hover:bg-yellow-500"
+                      onClick={() => setIsLoginModalOpen(true)}
+                    >
+                      Login first to register for event
+                    </Button>
+                  ) : user && isRegistered ? (
+                    <Button
+                      size="lg"
+                      className="w-full border-1 bg-green-500 text-white hover:bg-green-600 transition-colors animate-fade-in-up"
+                      onClick={() => navigate("/dashboard")}
+                    >
+                      <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
+                      Pay
+                    </Button>
+                  ) : (
+                    <Button size="lg" className="w-full border-1" asChild>
+                      <FontAwesomeIcon icon={faArrowRight} className="mr-2" />
+                      <Link to={`/register/${event.id}`}>Register Now</Link>
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    className="w-full cursor-pointer border-1"
+                    onClick={handleShare}
+                  >
+                    <FontAwesomeIcon icon={faShareAlt} className="mr-2" />
+                    Share Event
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-xl animate-fade-in-up">
+              <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                <span className="rounded-full bg-pink-200 p-2">
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    className="w-6 h-6 text-pink-600"
+                  />
+                </span>
+                <CardTitle className="text-lg text-pink-600">
+                  Contact Organizer
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-muted-foreground text-base">
+                    Have questions about this event? Contact the organizer
+                    directly for more information or assistance.
+                  </p>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up">
+                      <span className="rounded-full bg-blue-100 p-2">
+                        <FontAwesomeIcon
+                          icon={faEnvelope}
+                          className="w-5 h-5 text-blue-600"
+                        />
+                      </span>
+                      <span className="text-muted-foreground flex-1">
+                        Email
+                      </span>
+                      <span className="font-medium break-all text-sm sm:text-base">
+                        saiskatingacademy@gmail.com
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-50">
+                      <span className="rounded-full bg-green-100 p-2">
+                        <FontAwesomeIcon
+                          icon={faPhone}
+                          className="w-5 h-5 text-green-600"
+                        />
+                      </span>
+                      <span className="text-muted-foreground flex-1">
+                        Phone
+                      </span>
+                      <span className="font-medium">(+91) 123-456-7890</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+        {isLoginModalOpen && (
+          <LoginModal onClose={() => setIsLoginModalOpen(false)} />
+        )}
+      </div>
+    </>
   );
 };
 

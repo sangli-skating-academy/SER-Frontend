@@ -6,7 +6,7 @@ const Input = forwardRef(function Input(
   ref
 ) {
   return (
-    <div className="mb-2">
+    <div className="">
       {label && (
         <label
           htmlFor={name}
