@@ -63,6 +63,7 @@ const DashboardPage = () => {
   const [profileEditMode, setProfileEditMode] = useState(false);
   const [profileEdit, setProfileEdit] = useState({});
   const [profileLoading, setProfileLoading] = useState(false);
+  const [aadhaarPreview, setAadhaarPreview] = useState(null);
 
   useEffect(() => {
     if (!user) {
@@ -966,14 +967,14 @@ const DashboardPage = () => {
                             typeof editDetails.aadhaar_image === "string" && (
                               <div className="mt-1 text-xs text-gray-500">
                                 Current:{" "}
-                                <a
-                                  href={editDetails.aadhaar_image}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 underline"
+                                <span
+                                  className="text-blue-600 underline cursor-pointer"
+                                  onClick={() =>
+                                    setAadhaarPreview(editDetails.aadhaar_image)
+                                  }
                                 >
                                   View
-                                </a>
+                                </span>
                               </div>
                             )}
                         </div>
@@ -1124,28 +1125,32 @@ const DashboardPage = () => {
                           {userDetails.aadhaar_image ? (
                             user.role === "admin" ||
                             user.role === "superadmin" ? (
-                              <a
-                                href={`${backendUrl}/api/secure-file/${userDetails.aadhaar_image
-                                  .split("/")
-                                  .pop()}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline"
+                              <span
+                                className="text-blue-600 underline cursor-pointer"
+                                onClick={() =>
+                                  setAadhaarPreview(
+                                    `${backendUrl}/api/secure-file/${userDetails.aadhaar_image
+                                      .split("/")
+                                      .pop()}`
+                                  )
+                                }
                               >
                                 View
-                              </a>
+                              </span>
                             ) : // Only allow user to view their own Aadhaar image
                             userDetails.user_id === user.id ? (
-                              <a
-                                href={`${backendUrl}/api/secure-file/${userDetails.aadhaar_image
-                                  .split("/")
-                                  .pop()}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline"
+                              <span
+                                className="text-blue-600 underline cursor-pointer"
+                                onClick={() =>
+                                  setAadhaarPreview(
+                                    `${backendUrl}/api/secure-file/${userDetails.aadhaar_image
+                                      .split("/")
+                                      .pop()}`
+                                  )
+                                }
                               >
                                 View
-                              </a>
+                              </span>
                             ) : (
                               "N/A"
                             )
@@ -1219,6 +1224,27 @@ const DashboardPage = () => {
                   Yes, Delete
                 </Button>
               </div>
+            </div>
+          </div>
+        )}
+        {/* Aadhaar Image Preview Modal */}
+        {aadhaarPreview && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+            onClick={() => setAadhaarPreview(null)}
+          >
+            <div
+              className="bg-white rounded-lg p-4 shadow-lg max-w-lg w-full flex flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={aadhaarPreview}
+                alt="Aadhaar Preview"
+                className="max-h-[70vh] max-w-full rounded mb-4"
+              />
+              <Button variant="outline" onClick={() => setAadhaarPreview(null)}>
+                Close
+              </Button>
             </div>
           </div>
         )}

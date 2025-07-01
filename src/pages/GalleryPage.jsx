@@ -124,8 +124,8 @@ export default function GalleryPage() {
               data-aos="fade-up"
               data-aos-delay="100"
             >
-              <div className="flex flex-col md:flex-row gap-4 items-end">
-                <div className="flex-1 min-w-[180px]">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end w-full">
+                <div className="flex-1 min-w-[160px]">
                   <label
                     htmlFor="search"
                     className="block text-sm font-medium text-gray-700"
@@ -146,7 +146,7 @@ export default function GalleryPage() {
                     />
                   </div>
                 </div>
-                <div className="flex-1 min-w-[180px]">
+                <div className="flex-1 min-w-[140px]">
                   <label
                     htmlFor="category"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -167,7 +167,7 @@ export default function GalleryPage() {
                     ))}
                   </select>
                 </div>
-                <div className="flex-1 min-w-[120px]">
+                <div className="flex-1 min-w-[110px]">
                   <label
                     htmlFor="year"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -188,10 +188,10 @@ export default function GalleryPage() {
                     ))}
                   </select>
                 </div>
-                <div className="flex items-end">
+                <div className="flex items-end w-full sm:w-auto">
                   <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-43 h-[40px]"
+                    className="flex items-center gap-2 w-full sm:w-43 h-[40px]"
                     onClick={() => {
                       setSearchTerm("");
                       setCategoryFilter("all");

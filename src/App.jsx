@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ToastViewport from "./components/ui/ToastViewport";
 import ScrollToTop from "./components/layouts/ScrollToTop";
 
 // Pages
@@ -25,7 +24,6 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <ToastViewport />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
