@@ -18,7 +18,7 @@ export default function AllRegistrations() {
 
   useEffect(() => {
     setLoading(true);
-    apiFetch("/api/registrations/all")
+    apiFetch("/api/admin/registrations/all")
       .then((res) => setRegistrations(res.registrations || res))
       .catch(() => setError("Failed to load registrations"))
       .finally(() => setLoading(false));
@@ -26,7 +26,7 @@ export default function AllRegistrations() {
 
   const refreshData = () => {
     setLoading(true);
-    apiFetch("/api/registrations/all")
+    apiFetch("/api/admin/registrations/all")
       .then((res) => setRegistrations(res.registrations || res))
       .catch(() => setError("Failed to load registrations"))
       .finally(() => setLoading(false));

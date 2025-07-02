@@ -83,7 +83,7 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
                     href={
                       selectedReg.aadhaar_image.startsWith("http")
                         ? selectedReg.aadhaar_image
-                        : `${backendUrl}/api/secure-file/${selectedReg.aadhaar_image
+                        : `${backendUrl}/api/admin/secure-file/${selectedReg.aadhaar_image
                             .split("/")
                             .pop()}`
                     }

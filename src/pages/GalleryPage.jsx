@@ -50,7 +50,7 @@ export default function GalleryPage() {
     if (categoryFilter !== "all") {
       filtered = filtered.filter(
         (image) =>
-          (image.event_title || "").toLowerCase() ===
+          (image.event_name || "").toLowerCase() ===
           categoryFilter.toLowerCase()
       );
     }
@@ -76,7 +76,7 @@ export default function GalleryPage() {
 
   // Get unique event titles and years for filters
   const eventTitles = [
-    ...new Set(galleryImages.map((img) => img.event_title).filter(Boolean)),
+    ...new Set(galleryImages.map((img) => img.event_name).filter(Boolean)),
   ];
   const years = [
     ...new Set(
@@ -258,20 +258,18 @@ export default function GalleryPage() {
                               : image.image_url || "/placeholder.svg"
                           }
                           alt={
-                            image.title || image.event_title || "Gallery image"
+                            image.title || image.event_name || "Gallery image"
                           }
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                           <div>
                             <span className="text-white font-medium block">
-                              {image.title || image.event_title}
+                              {image.title || image.event_name}
                             </span>
                             <span className="text-gray-300 text-sm">
-                              {image.event_title} •{" "}
-                              {image.uploaded_at
-                                ? new Date(image.uploaded_at).getFullYear()
-                                : ""}
+                              {image.event_name} •{" "}
+                              {new Date(image.date).toLocaleDateString()}
                             </span>
                           </div>
                         </div>
@@ -305,7 +303,7 @@ export default function GalleryPage() {
                       }
                       alt={
                         selectedImage.title ||
-                        selectedImage.event_title ||
+                        selectedImage.event_name ||
                         "Gallery image"
                       }
                       className="max-h-[80vh] max-w-full rounded-lg shadow-xl"
@@ -313,7 +311,7 @@ export default function GalleryPage() {
                       onClick={(e) => e.stopPropagation()}
                     />
                     <button
-                      className="absolute top-1 right-11 text-white bg-black/60 rounded-full p-2 hover:bg-pink-500 transition-colors shadow-lg focus:outline-none z-20"
+                      className="absolute top-4 right-4 text-white bg-black/60 rounded-full p-2 hover:bg-pink-500 transition-colors shadow-lg focus:outline-none z-20"
                       onClick={closeLightbox}
                     >
                       <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
@@ -321,12 +319,12 @@ export default function GalleryPage() {
                   </div>
                   <div className="bg-black/50 p-4 text-white mt-2 rounded-b-xl">
                     <h3 className="text-xl font-medium">
-                      {selectedImage.title || selectedImage.event_title}
+                      {selectedImage.title || selectedImage.event_name}
                     </h3>
                     <p className="text-gray-300">
-                      {selectedImage.event_title} •{" "}
-                      {selectedImage.uploaded_at
-                        ? new Date(selectedImage.uploaded_at).getFullYear()
+                      {selectedImage.event_name} •{" "}
+                      {selectedImage.date
+                        ? new Date(selectedImage.date).toLocaleDateString()
                         : ""}
                     </p>
                   </div>

@@ -20,7 +20,7 @@ export default function AllEvents() {
     setLoading(true);
     Promise.all([
       fetchEvents({ includePast: "true" }).then((res) => res.events || res),
-      apiFetch("/api/registrations/all").then(
+      apiFetch("/api/admin/registrations/all").then(
         (res) => res.registrations || res
       ),
     ])
@@ -48,7 +48,7 @@ export default function AllEvents() {
     setLoading(true);
     Promise.all([
       fetchEvents({ includePast: "true" }).then((res) => res.events || res),
-      apiFetch("/api/registrations/all").then(
+      apiFetch("/api/admin/registrations/all").then(
         (res) => res.registrations || res
       ),
     ])

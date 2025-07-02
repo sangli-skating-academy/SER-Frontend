@@ -80,20 +80,30 @@ const TimelineSection = () => {
                     ></div>
                     {/* Card */}
                     <div
-                      className={`relative z-0 bg-white rounded-lg shadow-md p-6 md:w-5/12 ${
+                      className={`relative z-0 bg-gradient-to-br from-white via-blue-50 to-pink-50 rounded-2xl shadow-xl p-6 md:w-5/12 border border-blue-100 hover:shadow-2xl transition-shadow duration-300 ${
                         isLeft ? "md:mr-auto md:ml-8" : "md:ml-auto md:mr-8"
-                      }`}
+                      } animate-fade-in-up`}
                     >
                       <div
-                        className={`font-bold text-sm inline-block px-3 py-1 rounded-full mb-3 truncate max-w-[180px] ${color.title}`}
+                        className={`font-bold text-sm inline-block px-3 py-1 rounded-full mb-3 truncate max-w-[180px] ${color.title} shadow-md`}
                         title={event.title}
                       >
                         {event.title}
                       </div>
-                      <h3 className="font-bold text-lg mb-2">
+                      <h3 className="font-bold text-lg mb-2 flex items-center gap-2 text-blue-800">
+                        <span className="inline-block w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
                         {new Date(event.start_date).toLocaleDateString()}
                       </h3>
-                      <p className="text-gray-600">{event.description}</p>
+                      {event.description && event.description.trim() ? (
+                        <p className="text-gray-600 text-base leading-relaxed mt-1">
+                          {event.description.split(".")[0] +
+                            (event.description.includes(".") ? "." : "")}
+                        </p>
+                      ) : (
+                        <div className="text-gray-400 italic text-sm mt-2">
+                          No description available for this event.
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

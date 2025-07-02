@@ -7,11 +7,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSyncAlt, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { apiFetch } from "../../../services/api";
 import GalleryTable from "../Tables/GalleryTable";
+import EditGallery from "../Modals/EditGallery";
 
 export default function AllGallery() {
   const [gallery, setGallery] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +30,17 @@ export default function AllGallery() {
       .then((res) => setGallery(res || []))
       .catch(() => setError("Failed to load gallery items"))
       .finally(() => setLoading(false));
+  };
+
+  // Add handler for saving new gallery item
+  const handleAddGallery = async (formData) => {
+    await apiFetch("/api/admin/gallery/add", {
+      method: "POST",
+      body: formData,
+      isFormData: true,
+      credentials: "include",
+    });
+    refreshData();
   };
 
   return (
@@ -62,7 +75,7 @@ export default function AllGallery() {
                 variant="secondary"
                 size="sm"
                 className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-semibold shadow hover:scale-105 transition-transform"
-                onClick={() => navigate("/admin/addgallery")}
+                onClick={() => setAddModalOpen(true)}
               >
                 <FontAwesomeIcon icon={faPlusCircle} className="mr-2 h-4 w-4" />
                 Add Gallery Item
@@ -73,9 +86,23 @@ export default function AllGallery() {
             ) : error ? (
               <div className="text-red-500">{error}</div>
             ) : (
-              <GalleryTable data={gallery} rowLimit={null} />
+              <GalleryTable
+                data={gallery}
+                rowLimit={null}
+                onRefresh={refreshData}
+              />
             )}
           </div>
+          {/* Add Gallery Modal */}
+          <EditGallery
+            open={addModalOpen}
+            onClose={() => setAddModalOpen(false)}
+            gallery={{ title: "", event_name: "", image_url: "" }}
+            onSave={async (formData) => {
+              await handleAddGallery(formData);
+              setAddModalOpen(false);
+            }}
+          />
         </main>
       </div>
     </AdminLayout>

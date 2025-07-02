@@ -502,16 +502,6 @@ const EventDetailPage = () => {
                         </li>
                         <li className="flex items-start gap-2">
                           <FontAwesomeIcon
-                            icon={faBus}
-                            className="text-pink-400 mt-1"
-                          />
-                          <span>
-                            <strong>Public Transport:</strong> Bus routes 22,
-                            34, and 56 stop within a 5-minute walk.
-                          </span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <FontAwesomeIcon
                             icon={faBicycle}
                             className="text-green-400 mt-1"
                           />
@@ -563,18 +553,7 @@ const EventDetailPage = () => {
                             className="text-green-400 mt-1"
                           />
                           <span>
-                            <strong>First Aid:</strong> Medical station near the
-                            main entrance.
-                          </span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <FontAwesomeIcon
-                            icon={faWifi}
-                            className="text-purple-400 mt-1"
-                          />
-                          <span>
-                            <strong>Wi-Fi:</strong> Free for all participants
-                            and spectators.
+                            <strong>First Aid:</strong> Medical team on site.
                           </span>
                         </li>
                       </ul>

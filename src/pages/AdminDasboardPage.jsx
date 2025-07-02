@@ -65,11 +65,11 @@ const AdminDasboardPage = () => {
         contactRes,
         galleryRes,
       ] = await Promise.all([
-        apiFetch("/api/users"),
+        apiFetch("/api/admin/users"),
         fetchEvents({ includePast: "true" }), // Pass as string to match backend check
-        apiFetch("/api/registrations/all"),
+        apiFetch("/api/admin/registrations/all"),
         apiFetch("/api/payments").catch(() => []), // payments optional
-        apiFetch("/api/contact/all").catch(() => []), // contact messages
+        apiFetch("/api/admin/contact/all").catch(() => []), // contact messages
         apiFetch("/api/gallery/all").catch(() => []), // gallery items
       ]);
       setUsers(usersRes.users || usersRes);
