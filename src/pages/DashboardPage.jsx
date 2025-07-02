@@ -293,6 +293,7 @@ const DashboardPage = () => {
                   <RegistrationsTab
                     loading={loading}
                     registrations={registrations}
+                    events={events} // pass events prop
                     getEventName={getEventName}
                     handlePaymentClick={handlePaymentClick}
                     handleViewDetails={handleViewDetails}
