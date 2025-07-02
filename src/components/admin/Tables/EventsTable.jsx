@@ -1,4 +1,6 @@
 import Button from "../../ui/button";
+import { useRef, useState } from "react";
+import EventDetails from "../Modals/EventDetails";
 
 export default function EventsTable({
   data,
@@ -6,8 +8,48 @@ export default function EventsTable({
   registrations,
   onRowClick,
 }) {
+  const scrollRef = useRef(null);
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  // Drag-to-scroll handlers
+  const handleMouseDown = (e) => {
+    isDown = true;
+    scrollRef.current.classList.add("scrolling");
+    startX = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeft = scrollRef.current.scrollLeft;
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  };
+  const handleMouseMove = (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5; // scroll-fast
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
+  const handleMouseUp = () => {
+    isDown = false;
+    scrollRef.current.classList.remove("scrolling");
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("mouseup", handleMouseUp);
+  };
+
+  // Open modal on row click
+  const handleRowClick = (event) => {
+    setSelectedEvent(event);
+    if (onRowClick) onRowClick(event);
+  };
+
   return (
-    <div className="bg-white/90 rounded-xl shadow-lg border overflow-x-auto">
+    <div
+      ref={scrollRef}
+      className="bg-white/90 rounded-xl shadow-lg border overflow-x-auto select-none cursor-grab"
+      onMouseDown={handleMouseDown}
+      style={{ userSelect: "none" }}
+    >
       <table className="w-full min-w-[1600px]">
         <thead>
           <tr className="bg-gradient-to-r from-blue-50 via-pink-50 to-blue-100">
@@ -19,6 +61,9 @@ export default function EventsTable({
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
               Description
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+              Rules & Guidelines
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
               Location
@@ -65,15 +110,63 @@ export default function EventsTable({
               <tr
                 key={event.id}
                 className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-pink-50 transition-colors duration-200 cursor-pointer"
-                onClick={() => onRowClick && onRowClick(event)}
+                onClick={() => handleRowClick(event)}
               >
                 <td className="px-4 py-4 whitespace-nowrap">{idx + 1}</td>
                 <td className="px-4 py-4 whitespace-nowrap">{event.title}</td>
-                <td
-                  className="px-4 py-4 whitespace-nowrap max-w-xs truncate"
-                  title={event.description}
-                >
+                <td className="px-4 py-4 whitespace-nowrap max-w-xs truncate">
                   {event.description}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap max-w-s truncate">
+                  {event.rules_and_guidelines ? (
+                    <span>
+                      <div>
+                        <strong>General Rule:</strong>{" "}
+                        {(() => {
+                          const arr = event.rules_and_guidelines.general_rules;
+                          if (!arr || arr.length === 0)
+                            return <span className="text-gray-400">-</span>;
+                          const first = arr[0];
+                          if (!first)
+                            return <span className="text-gray-400">-</span>;
+                          const words = first.split(" ");
+                          return words.length > 6
+                            ? words.slice(0, 6).join(" ") + "..."
+                            : first;
+                        })()}
+                      </div>
+                      <div>
+                        <strong>Equipment Rule:</strong>{" "}
+                        {(() => {
+                          const arr =
+                            event.rules_and_guidelines.equipment_requirements;
+                          if (!arr || arr.length === 0)
+                            return <span className="text-gray-400">-</span>;
+                          const first = arr[0];
+                          if (!first)
+                            return <span className="text-gray-400">-</span>;
+                          const words = first.split(" ");
+                          return words.length > 6
+                            ? words.slice(0, 6).join(" ") + "..."
+                            : first;
+                        })()}
+                      </div>
+                      <div>
+                        <strong>Scoring System:</strong>{" "}
+                        {(() => {
+                          const arr = event.rules_and_guidelines.scoring_system;
+                          if (!arr || arr.length === 0)
+                            return <span className="text-gray-400">-</span>;
+                          const first = arr[0];
+                          if (!first || !first.title)
+                            return <span className="text-gray-400">-</span>;
+                          return first.title;
+                        })()}
+                      </div>
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">-</span>
+                  )}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   {event.location}
@@ -151,6 +244,12 @@ export default function EventsTable({
           })}
         </tbody>
       </table>
+      {selectedEvent && (
+        <EventDetails
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+        />
+      )}
     </div>
   );
 }

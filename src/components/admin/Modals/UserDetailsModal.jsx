@@ -1,9 +1,19 @@
+import { useState } from "react";
 import { Dialog } from "../../ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 
 export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
   if (!open || !selectedReg) return null;
   const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  const aadhaarImageUrl = selectedReg.aadhaar_image
+    ? selectedReg.aadhaar_image.startsWith("http")
+      ? selectedReg.aadhaar_image
+      : `${backendUrl}/api/admin/secure-file/${selectedReg.aadhaar_image
+          .split("/")
+          .pop()}`
+    : null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <div className="relative p-4 w-full max-w-lg">
@@ -78,33 +88,20 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
               </div>
               <div>
                 <b>Aadhaar Image:</b>{" "}
-                {selectedReg.aadhaar_image ? (
-                  <a
-                    href={
-                      selectedReg.aadhaar_image.startsWith("http")
-                        ? selectedReg.aadhaar_image
-                        : `${backendUrl}/api/admin/secure-file/${selectedReg.aadhaar_image
-                            .split("/")
-                            .pop()}`
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block ml-2 text-blue-600 underline"
+                {aadhaarImageUrl ? (
+                  <button
+                    className="inline-block ml-2 text-blue-600 underline cursor-pointer"
+                    onClick={() => {
+                      setImageUrl(aadhaarImageUrl);
+                      setImageModalOpen(true);
+                    }}
+                    type="button"
                   >
                     View Image
-                  </a>
+                  </button>
                 ) : (
                   "-"
                 )}
-              </div>
-              <div>
-                <b>District:</b> {selectedReg.district || "-"}
-              </div>
-              <div>
-                <b>State:</b> {selectedReg.state || "-"}
-              </div>
-              <div>
-                <b>Pincode:</b> {selectedReg.pincode || "-"}
               </div>
               <div>
                 <b>Event:</b> {selectedReg.event_title}
@@ -141,6 +138,28 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
           </TabsContent>
         </Tabs>
       </div>
+      {/* Aadhaar Image Modal */}
+      {imageModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-lg shadow-lg p-4 max-w-xl w-full relative animate-fade-in-up">
+            <button
+              aria-label="Close"
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full transition"
+              onClick={() => setImageModalOpen(false)}
+              tabIndex={0}
+              type="button"
+            >
+              &times;
+            </button>
+            <h3 className="text-lg font-semibold mb-2">Aadhaar Image</h3>
+            <img
+              src={imageUrl}
+              alt="Aadhaar"
+              className="w-full max-h-[32rem] object-contain rounded border shadow"
+            />
+          </div>
+        </div>
+      )}
     </Dialog>
   );
 }

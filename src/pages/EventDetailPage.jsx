@@ -10,7 +10,6 @@ import {
   CardTitle,
   CardDescription,
 } from "../components/ui/card";
-import Badge from "../components/ui/badge";
 import Button from "../components/ui/button";
 import {
   Tabs,
@@ -18,7 +17,6 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../components/ui/tabs";
-import { Separator } from "../components/ui/seperator";
 import Skeleton from "../components/ui/skeleton";
 import { useToast } from "../hooks/use-toasts";
 import { fetchEventById } from "../services/eventApi";
@@ -37,12 +35,10 @@ import {
   faEnvelope,
   faPhone,
   faCar,
-  faBus,
   faBicycle,
   faRestroom,
   faUtensils,
   faFirstAid,
-  faWifi,
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -320,133 +316,110 @@ const EventDetailPage = () => {
               <TabsContent value="rules">
                 <div className="space-y-8">
                   {/* General Rules */}
-                  <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
-                    <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                      <span className="rounded-full bg-blue-200 p-2">
-                        <FontAwesomeIcon
-                          icon={faScroll}
-                          className="w-6 h-6 text-blue-600"
-                        />
-                      </span>
-                      <CardTitle className="text-lg">General Rules</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-none space-y-3 mt-2">
-                        {[
-                          "All participants must arrive 30 minutes before the scheduled start time",
-                          "Participants must bring valid ID matching their registration information",
-                          "Appropriate sports attire and gear are required",
-                          "Unsportsmanlike behavior will result in disqualification",
-                          "The decisions of the judges and referees are final",
-                        ].map((rule, i) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <span className="mt-1 text-blue-400">
-                              <FontAwesomeIcon icon={faInfoCircle} />
-                            </span>
-                            <span className="text-gray-700">{rule}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
+                  {event.rules_and_guidelines?.general_rules?.length > 0 && (
+                    <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
+                      <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                        <span className="rounded-full bg-blue-200 p-2">
+                          <FontAwesomeIcon
+                            icon={faScroll}
+                            className="w-6 h-6 text-blue-600"
+                          />
+                        </span>
+                        <CardTitle className="text-lg">General Rules</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-none space-y-3 mt-2">
+                          {event.rules_and_guidelines.general_rules.map(
+                            (rule, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <span className="mt-1 text-blue-400">
+                                  <FontAwesomeIcon icon={faInfoCircle} />
+                                </span>
+                                <span className="text-gray-700">{rule}</span>
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
                   {/* Equipment Requirements */}
-                  <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-100">
-                    <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                      <span className="rounded-full bg-pink-200 p-2">
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          className="w-6 h-6 text-pink-600"
-                        />
-                      </span>
-                      <CardTitle className="text-lg text-pink-600">
-                        Equipment Requirements
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="list-none space-y-3 mt-2">
-                        {[
-                          "All participants must bring their own gear (specifics depend on the sport)",
-                          "Equipment must meet safety standards",
-                          "Limited equipment may be available for rent (subject to availability)",
-                          "Helmets are mandatory for all skating events",
-                        ].map((rule, i) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <span className="mt-1 text-pink-400">
-                              <FontAwesomeIcon icon={faInfoCircle} />
-                            </span>
-                            <span className="text-gray-700">{rule}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
+                  {event.rules_and_guidelines?.equipment_requirements?.length >
+                    0 && (
+                    <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-100">
+                      <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                        <span className="rounded-full bg-pink-200 p-2">
+                          <FontAwesomeIcon
+                            icon={faInfoCircle}
+                            className="w-6 h-6 text-pink-600"
+                          />
+                        </span>
+                        <CardTitle className="text-lg text-pink-600">
+                          Equipment Requirements
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="list-none space-y-3 mt-2">
+                          {event.rules_and_guidelines.equipment_requirements.map(
+                            (rule, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <span className="mt-1 text-pink-400">
+                                  <FontAwesomeIcon icon={faInfoCircle} />
+                                </span>
+                                <span className="text-gray-700">{rule}</span>
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
                   {/* Scoring System */}
-                  <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up delay-200">
-                    <CardHeader className="flex flex-row items-center gap-3 pb-2">
-                      <span className="rounded-full bg-yellow-100 p-2">
-                        <FontAwesomeIcon
-                          icon={faMedal}
-                          className="w-6 h-6 text-yellow-500"
-                        />
-                      </span>
-                      <CardTitle className="text-lg text-yellow-500">
-                        Scoring System
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground mb-3">
-                        Participants will be judged on the following criteria:
-                      </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[
-                          {
-                            title: "Technique",
-                            desc: "Proper form, execution of movements, and technical precision.",
-                            icon: faMedal,
-                            color: "bg-yellow-100 text-yellow-600",
-                          },
-                          {
-                            title: "Speed",
-                            desc: "Time taken to complete the course or performance.",
-                            icon: faClock,
-                            color: "bg-blue-100 text-blue-600",
-                          },
-                          {
-                            title: "Creativity",
-                            desc: "Unique elements, style, and artistic expression.",
-                            icon: faInfoCircle,
-                            color: "bg-pink-100 text-pink-600",
-                          },
-                          {
-                            title: "Difficulty",
-                            desc: "Level of challenge in the performed routines or maneuvers.",
-                            icon: faUsers,
-                            color: "bg-green-100 text-green-600",
-                          },
-                        ].map((item, i) => (
-                          <div
-                            key={i}
-                            className="flex items-start gap-3 bg-white/80 rounded-lg shadow p-4 animate-fade-in-up"
-                          >
-                            <span className={`rounded-full p-2 ${item.color}`}>
-                              <FontAwesomeIcon
-                                icon={item.icon}
-                                className="w-5 h-5"
-                              />
-                            </span>
-                            <div>
-                              <div className="font-semibold text-gray-800">
-                                {item.title}
+                  {event.rules_and_guidelines?.scoring_system?.length > 0 && (
+                    <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up delay-200">
+                      <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                        <span className="rounded-full bg-yellow-100 p-2">
+                          <FontAwesomeIcon
+                            icon={faMedal}
+                            className="w-6 h-6 text-yellow-500"
+                          />
+                        </span>
+                        <CardTitle className="text-lg text-yellow-500">
+                          Scoring System
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground mb-3">
+                          Participants will be judged on the following criteria:
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {event.rules_and_guidelines.scoring_system.map(
+                            (item, i) => (
+                              <div
+                                key={i}
+                                className="flex items-start gap-3 bg-white/80 rounded-lg shadow p-4 animate-fade-in-up"
+                              >
+                                <span className="rounded-full bg-yellow-200 p-2">
+                                  <FontAwesomeIcon
+                                    icon={faInfoCircle}
+                                    className="w-6 h-6 text-yellow-600"
+                                  />
+                                </span>
+                                <div>
+                                  <div className="font-semibold text-gray-800">
+                                    {item.title}
+                                  </div>
+                                  <div className="text-gray-600 text-sm">
+                                    {item.desc}
+                                  </div>
+                                </div>
                               </div>
-                              <div className="text-gray-600 text-sm">
-                                {item.desc}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                            )
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               </TabsContent>
               <TabsContent value="location">

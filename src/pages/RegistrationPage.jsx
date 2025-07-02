@@ -574,19 +574,7 @@ const RegistrationPage = () => {
                           placeholder="Enter team name"
                         />
                         <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-bold">Team Members</h3>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={addTeamMember}
-                              className="flex items-center"
-                            >
-                              <i className="fas fa-plus-circle mr-2"></i> Add
-                              Member
-                            </Button>
-                          </div>
+                          <h3 className="font-bold">Team Members</h3>
                           <AnimatePresence>
                             {form.team_members.map((member, idx) => (
                               <motion.div
