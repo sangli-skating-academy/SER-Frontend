@@ -127,7 +127,10 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-medium mb-1">Address</h4>
-                  <p className="text-gray-600">Sangli, Maharashtra, India</p>
+                  <p className="text-gray-600">
+                    Shivaji Stadium Skating Rink, Near Ambrai Garden , Sangli
+                    416416{" "}
+                  </p>
                 </div>
               </div>
               <div className="flex items-start animate-fade-in delay-100">
@@ -136,7 +139,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-medium mb-1">Phone</h4>
-                  <p className="text-gray-600">+91 12345 67890</p>
+                  <p className="text-gray-600">+91 9595893434</p>
                 </div>
               </div>
               <div className="flex items-start animate-fade-in delay-200">

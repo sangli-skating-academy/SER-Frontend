@@ -19,6 +19,7 @@ import AllRegistrations from "./components/admin/Pages/AllRegistrations";
 import AllEvents from "./components/admin/Pages/AllEvents";
 import AllContactMessage from "./components/admin/Pages/AllContactMessage";
 import AllGallery from "./components/admin/Pages/AllGallery";
+import AboutPage from "./pages/AboutPage";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/events/:id" element={<EventDetailPage />} />
         <Route path="/register/:id?" element={<RegistrationPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route
           path="/admin"
           element={

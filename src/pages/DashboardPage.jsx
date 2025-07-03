@@ -224,7 +224,6 @@ const DashboardPage = () => {
         body: JSON.stringify(profileEdit),
       });
       if (auth && auth.setUser) auth.setUser(updated);
-      window.location.reload();
       toast({ title: "Profile Updated", variant: "success" });
       setProfileEditMode(false);
     } catch (err) {

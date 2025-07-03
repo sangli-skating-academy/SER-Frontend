@@ -136,7 +136,9 @@ export default function Footer() {
               Contact Us
             </h3>
             <address className="not-italic text-gray-300 space-y-2">
-              <p>Sangli, Maharashtra, India</p>
+              <p>
+                Shivaji Stadium Skating Rink, Near Ambrai Garden , Sangli 416416{" "}
+              </p>
               <p>
                 Email:{" "}
                 <a
@@ -152,7 +154,7 @@ export default function Footer() {
                   href="tel:+911234567890"
                   className="hover:text-blue-400 transition-colors"
                 >
-                  +91 12345 67890
+                  +91 9595893434
                 </a>
               </p>
             </address>
