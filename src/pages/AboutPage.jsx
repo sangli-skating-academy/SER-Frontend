@@ -67,27 +67,6 @@ const achievements = [
   },
 ];
 
-const events = [
-  {
-    id: 1,
-    title: "All-India Skating Open 2025",
-    date: "2025-08-20",
-    location: "Bangalore Sports Complex",
-  },
-  {
-    id: 2,
-    title: "Junior Skating League",
-    date: "2025-09-15",
-    location: "Delhi Arena",
-  },
-  {
-    id: 3,
-    title: "Winter Skating Fest",
-    date: "2025-12-05",
-    location: "Mumbai Rink",
-  },
-];
-
 const vision = {
   statement:
     "To inspire and empower every skater in our region to reach their full potential, fostering a culture of excellence, inclusivity, and sportsmanship.",
@@ -153,8 +132,8 @@ export default function AboutPage() {
             viewport={{ once: true }}
           >
             <img
-              src="/public/logo-header.png"
-              alt="SCERS platform demo"
+              src="/logo-header.png"
+              alt="Sangli Miraj Kupwad Roller Skating Association"
               className="rounded-xl shadow-lg w-full max-w-md md:max-w-lg h-auto object-cover border border-blue-100 mx-auto"
             />
           </motion.div>
