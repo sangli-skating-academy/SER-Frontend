@@ -28,10 +28,16 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
           &times;
         </button>
         <h2 className="text-xl font-bold mb-4">Registration Details</h2>
-        <Tabs defaultValue="user" className="w-full">
-          <TabsList className="mb-4 w-full grid grid-cols-3">
+        <Tabs
+          defaultValue={selectedReg.is_team_event ? "team" : "user"}
+          className="w-full"
+        >
+          <TabsList className="mb-4 w-full grid grid-cols-4">
             <TabsTrigger value="user">User Details</TabsTrigger>
             <TabsTrigger value="player">Player Details</TabsTrigger>
+            {selectedReg.registration_type === "team" && (
+              <TabsTrigger value="team">Team Details</TabsTrigger>
+            )}
             <TabsTrigger value="payment">Payment Details</TabsTrigger>
           </TabsList>
           <TabsContent value="user">
@@ -114,6 +120,37 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
               </div>
             </div>
           </TabsContent>
+          {selectedReg.registration_type === "team" && (
+            <TabsContent value="team">
+              <div className="space-y-2">
+                <div>
+                  <b>Team Name:</b> {selectedReg.team_name || "-"}
+                </div>
+                <div>
+                  <b>Team Members:</b>
+                  {Array.isArray(selectedReg.team_members) &&
+                  selectedReg.team_members.length > 0 ? (
+                    <ul className="list-disc ml-6">
+                      {selectedReg.team_members.map((member, idx) => (
+                        <li key={idx}>
+                          {member.full_name ||
+                            member.name ||
+                            member.username ||
+                            member.email ||
+                            "-"}{" "}
+                          (Age: {member.age || "-"}, Gender:{" "}
+                          {member.gender || "-"}, Experience:{" "}
+                          {member.experience || "-"})
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span> - </span>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+          )}
           <TabsContent value="payment">
             <div className="space-y-2">
               <div>

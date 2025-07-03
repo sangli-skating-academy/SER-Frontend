@@ -1,34 +1,66 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "../../ui/button";
 import { apiFetch } from "../../../services/api";
 
 export default function EventDetails({ event, onClose, onEventUpdated }) {
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState(event || {});
+  const [form, setForm] = useState({ ...event, file: null });
+  const [preview, setPreview] = useState(event?.image_url || "");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (event) {
+      setForm({ ...event, file: null });
+      setPreview(event.image_url || "");
+    }
+  }, [event]);
 
   if (!event) return null;
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    const { name, value, files } = e.target;
+    if (name === "file" && files && files[0]) {
+      setForm((f) => ({ ...f, file: files[0] }));
+      setPreview(URL.createObjectURL(files[0]));
+    } else {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
   };
 
-  const handleSave = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setSaving(true);
+    setError("");
     try {
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("description", form.description);
+      formData.append("location", form.location);
+      formData.append("start_date", form.start_date);
+      formData.append("gender", form.gender);
+      formData.append("age_group", form.age_group);
+      formData.append("is_team_event", form.is_team_event);
+      formData.append("price_per_person", form.price_per_person);
+      formData.append("max_team_size", form.max_team_size);
+      formData.append("is_featured", form.is_featured);
+      if (form.file) formData.append("file", form.file); // Backend expects 'file' now
+      // Add rules_and_guidelines as JSON string if present
+      if (form.rules_and_guidelines)
+        formData.append(
+          "rules_and_guidelines",
+          JSON.stringify(form.rules_and_guidelines)
+        );
       const res = await apiFetch(`/api/admin/events/${event.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: formData,
       });
       setEditMode(false);
+      setForm({ ...res.event, file: null });
+      setPreview(res.event.image_url || "");
       if (onEventUpdated) onEventUpdated(res.event);
     } catch (err) {
-      // Optionally handle error UI here
+      setError("Failed to update event");
     } finally {
       setSaving(false);
     }
@@ -66,10 +98,7 @@ export default function EventDetails({ event, onClose, onEventUpdated }) {
         </h2>
         <form
           className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSave();
-          }}
+          onSubmit={handleSubmit}
         >
           <div className="space-y-4">
             <div>
@@ -250,31 +279,31 @@ export default function EventDetails({ event, onClose, onEventUpdated }) {
                 )}
               </div>
             </div>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-2">
-            <label className="block font-semibold text-gray-600 mb-1">
-              Image
-            </label>
-            {editMode ? (
-              <input
-                name="image_url"
-                value={form.image_url || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 w-full mb-2 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                placeholder="Image URL"
-              />
-            ) : event.image_url ? (
-              <img
-                src={event.image_url}
-                alt={event.title}
-                className="rounded-lg shadow w-full max-w-xs object-cover mb-2"
-                loading="lazy"
-              />
-            ) : (
-              <div className="w-full h-32 bg-gray-100 rounded flex items-center justify-center text-gray-400">
-                No Image
-              </div>
-            )}
+            <div className="flex flex-col items-center justify-center gap-2">
+              <label className="block font-semibold text-gray-600 mb-1">
+                Image
+              </label>
+              {editMode ? (
+                <input
+                  type="file"
+                  name="file"
+                  accept="image/*"
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 w-full mb-2 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
+                />
+              ) : preview ? (
+                <img
+                  src={preview}
+                  alt={event.title}
+                  className="rounded-lg shadow w-full max-w-xs object-cover mb-2"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full h-32 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+                  No Image
+                </div>
+              )}
+            </div>
             <div className="mt-4">
               <label className="block font-semibold text-gray-600 mb-1">
                 Rules & Guidelines
@@ -399,46 +428,48 @@ export default function EventDetails({ event, onClose, onEventUpdated }) {
               </div>
             </div>
           </div>
-        </form>
-        <div className="flex justify-end gap-4 mt-6">
-          {editMode ? (
-            <>
+          {error && <div className="text-red-500 text-sm">{error}</div>}
+          <div className="flex justify-end gap-4 mt-6 col-span-full">
+            {editMode ? (
+              <>
+                <Button
+                  variant="solid"
+                  className="bg-green-500 hover:bg-green-600 text-white font-semibold shadow px-6 py-2 text-lg"
+                  type="submit"
+                  disabled={saving}
+                >
+                  {saving ? "Saving..." : "Save"}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="font-semibold shadow bg-gray-100 text-gray-600 hover:bg-gray-200 px-6 py-2 text-lg"
+                  onClick={() => {
+                    setEditMode(false);
+                    setForm({ ...event, file: null });
+                    setPreview(event.image_url || "");
+                  }}
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : (
               <Button
                 variant="solid"
                 className="bg-green-500 hover:bg-green-600 text-white font-semibold shadow px-6 py-2 text-lg"
-                onClick={handleSave}
-                disabled={saving}
+                onClick={() => setEditMode(true)}
               >
-                {saving ? "Saving..." : "Save"}
+                Edit
               </Button>
-              <Button
-                variant="outline"
-                className="font-semibold shadow bg-gray-100 text-gray-600 hover:bg-gray-200 px-6 py-2 text-lg"
-                onClick={() => {
-                  setEditMode(false);
-                  setForm(event);
-                }}
-              >
-                Cancel
-              </Button>
-            </>
-          ) : (
+            )}
             <Button
-              variant="solid"
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold shadow px-6 py-2 text-lg"
-              onClick={() => setEditMode(true)}
+              variant="outline"
+              className="font-semibold shadow bg-red-100 text-red-600 hover:bg-red-200 px-6 py-2 text-lg"
+              onClick={onClose}
             >
-              Edit
+              Close
             </Button>
-          )}
-          <Button
-            variant="outline"
-            className="font-semibold shadow bg-red-100 text-red-600 hover:bg-red-200 px-6 py-2 text-lg"
-            onClick={onClose}
-          >
-            Close
-          </Button>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );
