@@ -8,12 +8,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSyncAlt, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { apiFetch } from "../../../services/api";
 import EventsTable from "../Tables/EventsTable";
+import EventDetails from "../Modals/EventDetails";
 
 export default function AllEvents() {
   const [events, setEvents] = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [eventToEdit, setEventToEdit] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,10 +74,35 @@ export default function AllEvents() {
       .finally(() => setLoading(false));
   };
 
-  // Split events into active and closed
+  // Split events into happening today, active, and closed
   const now = new Date();
-  const activeEvents = events.filter((e) => new Date(e.start_date) >= now);
-  const closedEvents = events.filter((e) => new Date(e.start_date) < now);
+  now.setHours(0, 0, 0, 0);
+  const happeningToday = events.filter((e) => {
+    if (!e.start_date) return false;
+    const eventDate = new Date(e.start_date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate.getTime() === now.getTime();
+  });
+  const activeEvents = events.filter((e) => {
+    if (!e.start_date) return false;
+    const eventDate = new Date(e.start_date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate.getTime() > now.getTime();
+  });
+  const closedEvents = events.filter((e) => {
+    if (!e.start_date) return false;
+    const eventDate = new Date(e.start_date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate.getTime() < now.getTime();
+  });
+
+  // Handler to update event in state after edit
+  const handleEventUpdated = (updatedEvent) => {
+    setEvents((prevEvents) =>
+      prevEvents.map((ev) => (ev.id === updatedEvent.id ? updatedEvent : ev))
+    );
+    setEventToEdit(null);
+  };
 
   return (
     <AdminLayout>
@@ -121,12 +148,27 @@ export default function AllEvents() {
               <div className="text-red-500">{error}</div>
             ) : (
               <>
-                <h2 className="text-2xl font-semibold mb-2 mt-6">
+                {happeningToday.length > 0 && (
+                  <>
+                    <h2 className="text-2xl font-semibold mb-2 mt-6">
+                      Happening Today
+                    </h2>
+                    <EventsTable
+                      data={happeningToday}
+                      registrations={registrations}
+                      label="Happening Today"
+                      onEditEvent={setEventToEdit}
+                    />
+                  </>
+                )}
+                <h2 className="text-2xl font-semibold mb-2 mt-10">
                   Active Events
                 </h2>
                 <EventsTable
                   data={activeEvents}
                   registrations={registrations}
+                  label="Upcoming Events"
+                  onEditEvent={setEventToEdit}
                 />
                 <h2 className="text-2xl font-semibold mb-2 mt-10">
                   Closed Events
@@ -134,11 +176,20 @@ export default function AllEvents() {
                 <EventsTable
                   data={closedEvents}
                   registrations={registrations}
+                  label="Closed Events"
+                  onEditEvent={setEventToEdit}
                 />
               </>
             )}
           </div>
         </main>
+        {eventToEdit && (
+          <EventDetails
+            event={eventToEdit}
+            onClose={() => setEventToEdit(null)}
+            onEventUpdated={handleEventUpdated}
+          />
+        )}
       </div>
     </AdminLayout>
   );

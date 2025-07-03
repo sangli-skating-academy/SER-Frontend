@@ -6,7 +6,6 @@ import {
   faClipboardList,
   faImage,
   faMessage,
-  faChartBar,
   faSignOutAlt,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
@@ -36,11 +35,6 @@ const navLinks = [
     to: "/admin/allcontactmessages",
     label: "Contact Messages",
     icon: faMessage,
-  },
-  {
-    to: "/admin/analytics",
-    label: "Analytics",
-    icon: faChartBar,
   },
   {
     to: "/admin/profile",

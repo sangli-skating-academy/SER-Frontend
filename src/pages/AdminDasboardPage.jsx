@@ -1,14 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import useAuth from "../hooks/useAuth";
 import AdminLayout from "../components/admin/layouts/AdminLayout";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+import { Card, CardContent, CardTitle } from "../components/ui/card";
 import {
   Tabs,
   TabsContent,
@@ -25,8 +19,6 @@ import {
   faMoneyBillWave,
   faSyncAlt,
   faPlusCircle,
-  faChartBar,
-  faDownload,
   faMessage,
   faImage,
 } from "@fortawesome/free-solid-svg-icons";
@@ -108,13 +100,36 @@ const AdminDasboardPage = () => {
       fetchDashboardData();
   }, [mounted, auth.user]);
 
+  // Split events into 'happening today' and 'upcoming'
+  const todayEventsDate = new Date();
+  todayEventsDate.setHours(0, 0, 0, 0);
+  const happeningToday = events.filter((e) => {
+    if (!e.start_date) return false;
+    const eventDate = new Date(e.start_date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate.getTime() === todayEventsDate.getTime();
+  });
+  const upcomingEvents = events.filter((e) => {
+    if (!e.start_date) return false;
+    const eventDate = new Date(e.start_date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate.getTime() > todayEventsDate.getTime();
+  });
+
   // Calculate stats
   const totalUsers = users.length;
   const playerCount = users.filter((u) => u.role === "player").length;
   const coachCount = users.filter((u) => u.role === "coach").length;
   const adminCount = users.filter((u) => u.role === "admin").length;
   const totalEvents = events.length;
-  const totalRegistrations = registrations.length;
+  // Only count registrations for events that are happening today or upcoming
+  const activeEventIds = new Set([
+    ...happeningToday.map((e) => e.id),
+    ...upcomingEvents.map((e) => e.id),
+  ]);
+  const totalRegistrations = registrations.filter((r) =>
+    activeEventIds.has(r.event_id)
+  ).length;
   const totalRevenue = payments.reduce(
     (sum, p) => (p.status === "success" ? sum + Number(p.amount) : sum),
     0
@@ -123,14 +138,24 @@ const AdminDasboardPage = () => {
     (e) => !e.is_archived && new Date(e.start_date) >= new Date()
   ).length;
   const pendingRegistrations = registrations.filter(
-    (r) => r.status === "pending"
+    (r) => r.status === "pending" && activeEventIds.has(r.event_id)
   ).length;
   const overEvents = events.filter(
     (e) => new Date(e.start_date) < new Date()
   ).length;
+  const happeningTodayCount = happeningToday.length;
 
-  // Recent registrations (latest 5)
-  const recentRegs = registrations
+  // Filter out registrations for events that have already started
+  const today = new Date();
+  const filteredRegistrations = registrations.filter((r) => {
+    const eventStart =
+      r.event_start_date || r.eventStartDate || r.event_start || r.start_date;
+    if (!eventStart) return true;
+    return new Date(eventStart) >= today.setHours(0, 0, 0, 0);
+  });
+
+  // Recent registrations (latest 5, only for upcoming/ongoing events)
+  const recentRegs = filteredRegistrations
     .slice()
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 5)
@@ -229,7 +254,7 @@ const AdminDasboardPage = () => {
                 value: totalEvents,
                 icon: faCalendarAlt,
                 color: "from-pink-400 to-pink-600",
-                sub: `${activeEvents} active | ${overEvents} over | ${totalEvents} total`,
+                sub: `${activeEvents} active | ${happeningTodayCount} today | ${overEvents} over | ${totalEvents} total`,
               },
               {
                 label: "Total Registrations",
@@ -314,12 +339,6 @@ const AdminDasboardPage = () => {
                 <FontAwesomeIcon icon={faMessage} className="mr-2" />
                 Contact Messages
               </TabsTrigger>
-              <TabsTrigger
-                value="analytics"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-lg font-semibold transition-all duration-200"
-              >
-                <FontAwesomeIcon icon={faChartBar} className="mr-2" /> Analytics
-              </TabsTrigger>
             </TabsList>
 
             {/* Registrations Tab */}
@@ -369,10 +388,21 @@ const AdminDasboardPage = () => {
                   <Link to="/admin/events">Manage Events</Link>
                 </Button>
               </div>
+              {/* Happening Today Table */}
+              {happeningToday.length > 0 && (
+                <EventsTable
+                  data={happeningToday}
+                  rowLimit={5}
+                  registrations={registrations}
+                  label="Happening Today"
+                />
+              )}
+              {/* Upcoming Events Table */}
               <EventsTable
-                data={upcomingEvts}
+                data={upcomingEvents}
                 rowLimit={5}
                 registrations={registrations}
+                label="Upcoming Events"
               />
             </TabsContent>
 
@@ -457,98 +487,6 @@ const AdminDasboardPage = () => {
                     </tbody>
                   </table>
                 </div>
-              </div>
-            </TabsContent>
-
-            {/* Analytics Tab */}
-            <TabsContent
-              value="analytics"
-              className="space-y-4 animate-fade-in-up"
-            >
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Analytics Overview</h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                  className="transition-all hover:scale-105"
-                >
-                  <Link to="/admin/analytics">Detailed Analytics</Link>
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="animate-fade-in-up">
-                  <CardHeader>
-                    <CardTitle>Registration Trends</CardTitle>
-                    <div className="text-gray-500 text-sm">
-                      Monthly registration statistics
-                    </div>
-                  </CardHeader>
-                  <CardContent className="h-80 flex items-center justify-center">
-                    <div className="text-center">
-                      <FontAwesomeIcon
-                        icon={faChartBar}
-                        className="h-16 w-16 mx-auto text-blue-300 animate-bounce mb-2"
-                      />
-                      <p className="mt-4 text-gray-500 ">
-                        Registration analytics visualization would appear here
-                      </p>
-                    </div>
-                  </CardContent>
-                  <div className="p-4 border-t">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full transition-all hover:scale-105"
-                      asChild
-                    >
-                      <Link to="/admin/analytics/registrations">
-                        <FontAwesomeIcon
-                          icon={faDownload}
-                          className="mr-2 h-4 w-4"
-                        />
-                        Export Data
-                      </Link>
-                    </Button>
-                  </div>
-                </Card>
-
-                <Card className="animate-fade-in-up">
-                  <CardHeader>
-                    <CardTitle>Revenue Analysis</CardTitle>
-                    <div className="text-gray-500 text-sm">
-                      Monthly revenue breakdown
-                    </div>
-                  </CardHeader>
-                  <CardContent className="h-80 flex items-center justify-center">
-                    <div className="text-center">
-                      <FontAwesomeIcon
-                        icon={faMoneyBillWave}
-                        className="h-16 w-16 mx-auto text-green-300 animate-bounce mb-2"
-                      />
-                      <p className="mt-4 text-gray-500 ">
-                        Revenue analytics visualization would appear here
-                      </p>
-                    </div>
-                  </CardContent>
-                  <div className="p-4 border-t">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full transition-all hover:scale-105"
-                      asChild
-                    >
-                      <Link to="/admin/analytics/revenue">
-                        <FontAwesomeIcon
-                          icon={faDownload}
-                          className="mr-2 h-4 w-4"
-                        />
-                        Export Data
-                      </Link>
-                    </Button>
-                  </div>
-                </Card>
               </div>
             </TabsContent>
           </Tabs>

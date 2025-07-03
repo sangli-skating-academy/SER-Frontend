@@ -153,8 +153,20 @@ const RegistrationPage = () => {
   // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return; // Prevent double submit
     setSubmitting(true);
     setError("");
+    // Team event: validate all team members
+    if (event.is_team_event) {
+      for (let i = 0; i < form.team_members.length; i++) {
+        const m = form.team_members[i];
+        if (!m.full_name || !m.age || !m.gender || !m.experience) {
+          setError(`Please fill all fields for team member ${i + 1}`);
+          setSubmitting(false);
+          return;
+        }
+      }
+    }
     if (!user) {
       toast({
         title: "Login Required",
@@ -165,8 +177,8 @@ const RegistrationPage = () => {
       return;
     }
     try {
-      // Check duplicate for individual
-      if (!event.is_team_event) {
+      // Block duplicate registration for non-coach users (both individual and team events)
+      if (user.role !== "coach") {
         const regs = await apiFetch(`/api/registrations/user/${user.id}`);
         if (regs.some((r) => r.event_id === event.id)) {
           setError("You have already registered for this event.");
@@ -196,8 +208,12 @@ const RegistrationPage = () => {
         description: "You have registered successfully!",
         variant: "default",
       });
-    } catch (e) {
-      setError(e.message || "Registration failed");
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Registration failed. Please try again later.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -443,6 +459,7 @@ const RegistrationPage = () => {
                         </label>
                         <Select
                           name="gender"
+                          aria-label="Gender"
                           value={form.gender}
                           onValueChange={(val) =>
                             setForm((f) => ({ ...f, gender: val }))
@@ -476,6 +493,7 @@ const RegistrationPage = () => {
                         </label>
                         <Select
                           name="category"
+                          aria-label="Category"
                           value={form.category}
                           onValueChange={(val) =>
                             setForm((f) => ({ ...f, category: val }))
@@ -501,6 +519,7 @@ const RegistrationPage = () => {
                         </label>
                         <Select
                           name="experience"
+                          aria-label="Experience"
                           value={form.experience || "beginner"}
                           onValueChange={(val) =>
                             setForm((f) => ({ ...f, experience: val }))
@@ -670,8 +689,8 @@ const RegistrationPage = () => {
                                       <SelectItem value="intermediate">
                                         Intermediate (1-3 years)
                                       </SelectItem>
-                                      <SelectItem value="advanced">
-                                        Advanced (3+ years)
+                                      <SelectItem value="pro">
+                                        Pro (3+ years)
                                       </SelectItem>
                                     </SelectContent>
                                   </Select>
@@ -679,6 +698,23 @@ const RegistrationPage = () => {
                               </motion.div>
                             ))}
                           </AnimatePresence>
+                        </div>
+                        <div className="flex items-center gap-4 mt-2">
+                          <Button
+                            type="button"
+                            onClick={addTeamMember}
+                            disabled={
+                              form.team_members.length >= event.max_team_size
+                            }
+                            className="bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200"
+                            aria-label="Add team member"
+                          >
+                            <i className="fas fa-plus mr-1"></i> Add Team Member
+                          </Button>
+                          <span className="text-sm text-gray-600">
+                            Team size: {form.team_members.length} /{" "}
+                            {event.max_team_size}
+                          </span>
                         </div>
                       </>
                     )}
