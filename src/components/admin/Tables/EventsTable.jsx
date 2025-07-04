@@ -1,6 +1,8 @@
 import Button from "../../ui/button";
 import { useRef, useState } from "react";
 import EventDetails from "../Modals/EventDetails";
+import { apiFetch } from "../../../services/api";
+import { useNavigate } from "react-router-dom";
 
 export default function EventsTable({
   data,
@@ -15,6 +17,11 @@ export default function EventsTable({
   let startX;
   let scrollLeft;
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState({
+    show: false,
+    event: null,
+  });
+  const navigate = useNavigate();
 
   // Drag-to-scroll handlers
   const handleMouseDown = (e) => {
@@ -44,6 +51,27 @@ export default function EventsTable({
     setSelectedEvent(event);
     if (onRowClick) onRowClick(event);
   };
+
+  const handleDelete = async (event) => {
+    setDeleteConfirm({ show: true, event });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm.event) return;
+    try {
+      await apiFetch(`/api/admin/events/${deleteConfirm.event.id}`, {
+        method: "DELETE",
+      });
+      setDeleteConfirm({ show: false, event: null });
+      // Optionally, trigger a refresh or callback
+      if (typeof onEditEvent === "function") onEditEvent();
+    } catch (err) {
+      setDeleteConfirm({ show: false, event: null });
+      alert("Failed to delete event.");
+    }
+  };
+
+  const cancelDelete = () => setDeleteConfirm({ show: false, event: null });
 
   return (
     <div>
@@ -233,7 +261,11 @@ export default function EventsTable({
                       className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2 text-xs font-semibold shadow"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (onEditEvent) onEditEvent(event);
+                        if (onEditEvent) {
+                          onEditEvent(event);
+                        } else {
+                          navigate("/admin/addevent", { state: { event } });
+                        }
                       }}
                     >
                       Edit
@@ -243,8 +275,7 @@ export default function EventsTable({
                       className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold shadow"
                       onClick={(e) => {
                         e.stopPropagation();
-                        // TODO: Implement delete event logic
-                        alert(`Delete event: ${event.title}`);
+                        handleDelete(event);
                       }}
                     >
                       Delete
@@ -262,6 +293,30 @@ export default function EventsTable({
           />
         )}
       </div>
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-8 flex flex-col items-center gap-4">
+            <h3 className="text-lg font-bold text-red-600 mb-2">
+              Confirm Delete
+            </h3>
+            <p className="text-gray-700 mb-4">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold">
+                {deleteConfirm.event?.title}
+              </span>
+              ?
+            </p>
+            <div className="flex gap-4">
+              <Button className="bg-red-500 text-white" onClick={confirmDelete}>
+                Delete
+              </Button>
+              <Button variant="outline" onClick={cancelDelete}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
