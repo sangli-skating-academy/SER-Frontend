@@ -166,6 +166,15 @@ const EventDetailPage = () => {
             <div className="flex items-center text-white/90 mt-2 animate-fade-in">
               <FontAwesomeIcon icon={faCalendarAlt} className="w-5 h-5 mr-2" />
               <span>{formatDate(event.start_date)}</span>
+              {event.start_time && (
+                <>
+                  <FontAwesomeIcon
+                    icon={faClock}
+                    className="w-5 h-5 ml-6 mr-2"
+                  />
+                  <span>{event.start_time}</span>
+                </>
+              )}
               <FontAwesomeIcon
                 icon={faMapMarkerAlt}
                 className="w-5 h-5 ml-6 mr-2"
@@ -685,7 +694,7 @@ const EventDetailPage = () => {
                       <span className="text-muted-foreground flex-1">
                         Phone
                       </span>
-                      <span className="font-medium">(+91) 123-456-7890</span>
+                      <span className="font-medium">(+91) 9595893434</span>
                     </div>
                   </div>
                 </div>

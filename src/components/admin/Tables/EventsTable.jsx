@@ -76,6 +76,9 @@ export default function EventsTable({
                 Date
               </th>
               <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Start Time
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                 Gender
               </th>
               <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -181,6 +184,9 @@ export default function EventsTable({
                     {event.start_date
                       ? new Date(event.start_date).toLocaleDateString()
                       : "-"}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {event.start_time ? event.start_time : "-"}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     {event.gender || "-"}

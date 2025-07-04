@@ -9,6 +9,7 @@ import {
   faUser,
   faUsers,
   faCalendarAlt,
+  faClock,
 } from "@fortawesome/free-solid-svg-icons";
 
 const EventCard = ({ event, className = "", style = {} }) => {
@@ -73,6 +74,22 @@ const EventCard = ({ event, className = "", style = {} }) => {
               : ""}
           </span>
         </div>
+        {/* Event Time */}
+        {event.start_time && (
+          <div className="flex items-center text-gray-500 text-s mb-2 gap-2">
+            <FontAwesomeIcon icon={faClock} className="text-yellow-400" />
+            <span className="truncate">
+              {new Date(`1970-01-01T${event.start_time}`).toLocaleTimeString(
+                [],
+                {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }
+              )}
+            </span>
+          </div>
+        )}
+        {/* Hashtags */}
         {event.hashtags && event.hashtags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-2">
             {event.hashtags.map((tag) => (

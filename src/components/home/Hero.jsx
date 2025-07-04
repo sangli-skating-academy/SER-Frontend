@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSkating } from "@fortawesome/free-solid-svg-icons";
 import Button from "../ui/button";
@@ -52,14 +52,15 @@ const Hero = () => {
                 size="lg"
                 className="px-8 py-3 bg-gradient-to-r from-blue-400 to-pink-400 hover:from-pink-500 hover:to-blue-500 rounded-full font-bold font-montserrat shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl animate-fade-in w-11/12 sm:w-auto mx-auto sm:mx-0"
               >
-                <Link href="#events">
-                  <span className="flex items-center gap-2 justify-center">
-                    <FontAwesomeIcon
-                      icon={faSkating}
-                      className="text-lg md:text-xl"
-                    />
-                    Explore Events
-                  </span>
+                <Link
+                  to="/events"
+                  className="flex items-center gap-2 justify-center"
+                >
+                  <FontAwesomeIcon
+                    icon={faSkating}
+                    className="text-lg md:text-xl"
+                  />
+                  Explore Events
                 </Link>
               </Button>
             </div>

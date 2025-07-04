@@ -1,76 +1,289 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
 import Input from "../../ui/input";
-// import Select from "../ui/select";
 import Button from "../../ui/button";
 import { useToast } from "../../../hooks/use-toasts";
+import { apiFetch } from "../../../services/api";
 
 const initialForm = {
   title: "",
   description: "",
-  date: "",
-  registrationEndDate: "",
+  start_date: "",
+  start_time: "", // <-- add this field
   location: "",
-  category: "",
-  ageGroup: "",
+  hashtags: [], // for category/tags (array)
+  age_group: "",
   gender: "",
-  individualFee: "",
-  maxTeamSize: "",
-  rules: "",
-  publishImmediately: true,
+  price_per_person: "",
+  price_per_team: "", // <-- add this field
+  max_team_size: "",
+  is_team_event: false,
+  is_featured: false,
+  file: null, // for image upload
 };
 
-const categories = [
-  "Inline Skating",
-  "Roller Skating",
-  "Freestyle",
-  "Speed Skating",
+const hashtagOptions = [
+  "inline-skating",
+  "roller-skating",
+  "freestyle",
+  "speed-skating",
+  "youth",
+  "adult",
+  "team",
+  // Add more as needed
 ];
-const ageGroups = ["Under 12", "Under 18", "Adult", "All Ages"];
+const ageGroups = ["Under 10", "Under 12", "Under 18", "Adult", "All Ages"];
 const genders = ["Male", "Female", "All"];
 
+// Helper to convert UTC/ISO date string to local yyyy-mm-dd for input type="date"
+function toLocalYYYYMMDD(dateStringOrDate) {
+  const d =
+    typeof dateStringOrDate === "string"
+      ? new Date(dateStringOrDate)
+      : dateStringOrDate;
+  if (isNaN(d)) return "";
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export default function AddEvent() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  // If coming from EventDetails, event data will be in location.state.event
+  const eventToEdit = location.state?.event;
+
+  // State
   const [form, setForm] = useState(initialForm);
   const [isLoading, setIsLoading] = useState(false);
-  const [scheduleItems, setScheduleItems] = useState([
-    { time: "", activity: "" },
-  ]);
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const [preview, setPreview] = useState("");
+  const [generalRules, setGeneralRules] = useState([""]);
+  const [equipmentRequirements, setEquipmentRequirements] = useState([""]);
+  const [scoringSystem, setScoringSystem] = useState([{ title: "", desc: "" }]);
+  const [customHashtagInput, setCustomHashtagInput] = useState("");
 
+  // Populate form if editing
+  useEffect(() => {
+    if (eventToEdit) {
+      setForm((prev) => {
+        let start_date = eventToEdit.start_date;
+        if (start_date) {
+          start_date = toLocalYYYYMMDD(start_date);
+        } else {
+          start_date = "";
+        }
+        return {
+          ...prev,
+          ...eventToEdit,
+          start_date: start_date,
+          start_time: eventToEdit.start_time || "",
+          file: null, // don't prefill file
+          price_per_team:
+            eventToEdit.price_per_team ||
+            (eventToEdit.price_per_person && eventToEdit.max_team_size
+              ? (
+                  Number(eventToEdit.price_per_person) *
+                  Number(eventToEdit.max_team_size)
+                ).toFixed(2)
+              : ""),
+        };
+      });
+      setPreview(eventToEdit.image_url || "");
+      // Rules & Guidelines
+      setGeneralRules(
+        eventToEdit.rules_and_guidelines?.general_rules?.length > 0
+          ? eventToEdit.rules_and_guidelines.general_rules
+          : [""]
+      );
+      setEquipmentRequirements(
+        eventToEdit.rules_and_guidelines?.equipment_requirements?.length > 0
+          ? eventToEdit.rules_and_guidelines.equipment_requirements
+          : [""]
+      );
+      setScoringSystem(
+        eventToEdit.rules_and_guidelines?.scoring_system?.length > 0
+          ? eventToEdit.rules_and_guidelines.scoring_system
+          : [{ title: "", desc: "" }]
+      );
+    }
+  }, [eventToEdit]);
+
+  // Automatically calculate team fee when price_per_person or max_team_size changes
+  const updateTeamFee = (person, teamSize) => {
+    const fee =
+      !isNaN(Number(person)) && !isNaN(Number(teamSize)) && teamSize > 0
+        ? (Number(person) * Number(teamSize)).toFixed(2)
+        : "";
+    setForm((prev) => ({ ...prev, price_per_team: fee }));
+  };
+
+  // Capitalize first letter of every input value (except for checkboxes, files, and arrays)
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    const { name, value, type, checked, files } = e.target;
+    if (name === "file" && files && files[0]) {
+      setForm((prev) => ({ ...prev, file: files[0] }));
+      setPreview(URL.createObjectURL(files[0]));
+    } else if (type === "checkbox") {
+      setForm((prev) => ({ ...prev, [name]: checked }));
+    } else {
+      setForm((prev) => {
+        let newValue = value;
+        // Only capitalize for string fields, not arrays or numbers
+        if (
+          typeof newValue === "string" &&
+          newValue.length > 0 &&
+          name !== "hashtags" &&
+          name !== "price_per_person" &&
+          name !== "price_per_team" &&
+          name !== "max_team_size"
+        ) {
+          newValue = newValue.charAt(0).toUpperCase() + newValue.slice(1);
+        }
+        let updated = { ...prev, [name]: newValue };
+        // If price_per_person or max_team_size changes, recalc team fee
+        if (name === "price_per_person" || name === "max_team_size") {
+          updateTeamFee(
+            name === "price_per_person" ? newValue : prev.price_per_person,
+            name === "max_team_size" ? newValue : prev.max_team_size
+          );
+        }
+        // If max_team_size changes and is > 1, set is_team_event true
+        if (name === "max_team_size") {
+          const size = Number(newValue);
+          if (!isNaN(size) && size > 1) {
+            updated.is_team_event = true;
+          } else if (!isNaN(size) && size <= 1) {
+            updated.is_team_event = false;
+          }
+        }
+        return updated;
+      });
+    }
   };
 
-  const addScheduleItem = () => {
-    setScheduleItems([...scheduleItems, { time: "", activity: "" }]);
-  };
-  const removeScheduleItem = (index) => {
-    if (scheduleItems.length === 1) return;
-    setScheduleItems(scheduleItems.filter((_, i) => i !== index));
-  };
-  const updateScheduleItem = (index, field, value) => {
-    setScheduleItems((items) =>
-      items.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+  // General Rules
+  const handleGeneralRuleChange = (idx, value) => {
+    // Capitalize first letter
+    const capitalized =
+      value.length > 0 ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+    setGeneralRules((rules) =>
+      rules.map((r, i) => (i === idx ? capitalized : r))
     );
+  };
+  const addGeneralRule = () => setGeneralRules((r) => [...r, ""]);
+  const removeGeneralRule = (idx) =>
+    setGeneralRules((r) => (r.length > 1 ? r.filter((_, i) => i !== idx) : r));
+
+  // Equipment Requirements
+  const handleEquipmentChange = (idx, value) => {
+    // Capitalize first letter
+    const capitalized =
+      value.length > 0 ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+    setEquipmentRequirements((eq) =>
+      eq.map((e, i) => (i === idx ? capitalized : e))
+    );
+  };
+  const addEquipment = () => setEquipmentRequirements((eq) => [...eq, ""]);
+  const removeEquipment = (idx) =>
+    setEquipmentRequirements((eq) =>
+      eq.length > 1 ? eq.filter((_, i) => i !== idx) : eq
+    );
+
+  // Scoring System
+  const handleScoringChange = (idx, field, value) => {
+    // Capitalize first letter for both title and desc
+    const capitalized =
+      value.length > 0 ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+    setScoringSystem((ss) =>
+      ss.map((item, i) =>
+        i === idx ? { ...item, [field]: capitalized } : item
+      )
+    );
+  };
+  const addScoring = () =>
+    setScoringSystem((ss) => [...ss, { title: "", desc: "" }]);
+  const removeScoring = (idx) =>
+    setScoringSystem((ss) =>
+      ss.length > 1 ? ss.filter((_, i) => i !== idx) : ss
+    );
+
+  // Hashtags multi-select handler
+  const handleHashtagsChange = (e) => {
+    const options = Array.from(e.target.selectedOptions).map((o) => o.value);
+    setForm((f) => ({ ...f, hashtags: options }));
+  };
+
+  // Hashtag add handler
+  const handleCustomHashtagKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const tag = customHashtagInput.trim().replace(/\s+/g, "-");
+      if (tag && !form.hashtags.includes(tag)) {
+        setForm((f) => ({ ...f, hashtags: [...f.hashtags, tag] }));
+      }
+      setCustomHashtagInput("");
+    }
+  };
+  const handleRemoveCustomHashtag = (tag) => {
+    setForm((f) => ({ ...f, hashtags: f.hashtags.filter((h) => h !== tag) }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((res) => setTimeout(res, 1500));
-      toast({
-        title: "Event Created",
-        description: "The event has been created successfully!",
-      });
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("description", form.description);
+      formData.append("location", form.location);
+      formData.append("start_date", form.start_date);
+      formData.append("start_time", form.start_time);
+      formData.append("gender", form.gender);
+      formData.append("age_group", form.age_group);
+      formData.append("is_team_event", form.is_team_event);
+      formData.append("price_per_person", form.price_per_person);
+      formData.append("price_per_team", form.price_per_team);
+      formData.append("max_team_size", form.max_team_size);
+      formData.append("is_featured", form.is_featured);
+      if (form.file) formData.append("file", form.file);
+      if (form.hashtags && form.hashtags.length > 0)
+        formData.append("hashtags", JSON.stringify(form.hashtags));
+      formData.append(
+        "rules_and_guidelines",
+        JSON.stringify({
+          general_rules: generalRules.filter((r) => r.trim()),
+          equipment_requirements: equipmentRequirements.filter((e) => e.trim()),
+          scoring_system: scoringSystem.filter(
+            (s) => s.title.trim() || s.desc.trim()
+          ),
+        })
+      );
+
+      if (eventToEdit && eventToEdit.id) {
+        // PATCH for editing
+        await apiFetch(`/api/admin/events/${eventToEdit.id}`, {
+          method: "PATCH",
+          body: formData,
+        });
+        toast({
+          title: "Event Updated",
+          description: "The event has been updated successfully!",
+        });
+      } else {
+        // POST for new event
+        await apiFetch("/api/admin/events", {
+          method: "POST",
+          body: formData,
+        });
+        toast({
+          title: "Event Created",
+          description: "The event has been created successfully!",
+        });
+      }
       navigate("/admin/events");
     } catch (err) {
       toast({
@@ -98,10 +311,12 @@ export default function AddEvent() {
               ← Back
             </Button>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-400 via-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x mb-2">
-              Create New Event
+              {eventToEdit ? "Edit Event" : "Create New Event"}
             </h1>
             <p className="text-gray-500 mb-8">
-              Fill in the details to create a new skating event
+              {eventToEdit
+                ? "Update the details and save changes to this skating event."
+                : "Fill in the details to create a new skating event"}
             </p>
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -114,22 +329,6 @@ export default function AddEvent() {
                   required
                 />
                 <Input
-                  label="Event Date"
-                  name="date"
-                  type="date"
-                  value={form.date}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  label="Registration End Date"
-                  name="registrationEndDate"
-                  type="date"
-                  value={form.registrationEndDate}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
                   label="Event Location"
                   name="location"
                   value={form.location}
@@ -137,32 +336,109 @@ export default function AddEvent() {
                   placeholder="Enter event location"
                   required
                 />
-                <div>
+                <Input
+                  label="Event Date"
+                  name="start_date"
+                  type="date"
+                  value={form.start_date}
+                  onChange={handleChange}
+                  required
+                />
+                <Input
+                  label="Start Time"
+                  name="start_time"
+                  type="time"
+                  value={form.start_time || ""}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-sm font-semibold mb-1 text-black">
+                  Event Description
+                </label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  placeholder="Enter a detailed description of the event"
+                  className="w-full min-h-24 rounded-md border px-3 py-2 text-black"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
                   <label className="block text-sm font-semibold mb-1 text-black">
-                    Category
+                    Hashtags (select one or more)
                   </label>
-                  <select
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    className="w-full h-10 rounded-md border px-3 py-2 text-black"
-                    required
-                  >
-                    <option value="">Select category</option>
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {hashtagOptions.map((tag) => (
+                      <label
+                        key={tag}
+                        className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          value={tag}
+                          checked={form.hashtags.includes(tag)}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setForm((f) => ({
+                              ...f,
+                              hashtags: checked
+                                ? [...f.hashtags, tag]
+                                : f.hashtags.filter((h) => h !== tag),
+                            }));
+                          }}
+                          className="accent-blue-500"
+                        />
+                        <span className="text-xs">#{tag}</span>
+                      </label>
                     ))}
-                  </select>
+                    {/* Custom hashtag chips */}
+                    {form.hashtags
+                      .filter((h) => !hashtagOptions.includes(h))
+                      .map((tag) => (
+                        <span
+                          key={tag}
+                          className="flex items-center gap-1 bg-pink-100 text-pink-700 px-2 py-1 rounded-full text-xs font-semibold shadow-sm border border-pink-200"
+                        >
+                          #{tag}
+                          <button
+                            type="button"
+                            className="ml-1 text-pink-500 hover:text-pink-700"
+                            onClick={() => handleRemoveCustomHashtag(tag)}
+                            aria-label="Remove hashtag"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full mt-2 rounded-md border px-3 py-2 text-black"
+                    placeholder="Type hashtag and press Enter or comma (e.g. fun, summer, open)"
+                    value={customHashtagInput}
+                    onChange={(e) =>
+                      setCustomHashtagInput(
+                        e.target.value.replace(/[^\w-]/g, "")
+                      )
+                    }
+                    onKeyDown={handleCustomHashtagKeyDown}
+                  />
+                  <span className="text-xs text-gray-400">
+                    Tick to select hashtags. Type and press Enter or comma to
+                    add custom hashtags. No spaces allowed in hashtags.
+                  </span>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-1 text-black">
                     Age Group
                   </label>
                   <select
-                    name="ageGroup"
-                    value={form.ageGroup}
+                    name="age_group"
+                    value={form.age_group}
                     onChange={handleChange}
                     className="w-full h-10 rounded-md border px-3 py-2 text-black"
                     required
@@ -183,7 +459,7 @@ export default function AddEvent() {
                     name="gender"
                     value={form.gender}
                     onChange={handleChange}
-                    className="w-full h-10 rounded-md border px-3 py-2 text-black"
+                    className="w-full h-10 rounded-md border px-3 py-2 text-black bg-white"
                     required
                   >
                     <option value="">Select gender</option>
@@ -195,179 +471,271 @@ export default function AddEvent() {
                   </select>
                 </div>
                 <Input
-                  label="Individual Registration Fee ($)"
-                  name="individualFee"
+                  label="Individual Registration Fee (₹)"
+                  name="price_per_person"
                   type="number"
-                  value={form.individualFee}
+                  value={form.price_per_person}
                   onChange={handleChange}
                   placeholder=""
                   required
                 />
                 <Input
-                  label="Maximum Team Size"
-                  name="maxTeamSize"
+                  label="Team Registration Fee (₹)"
+                  name="price_per_team"
                   type="number"
-                  value={form.maxTeamSize}
+                  value={form.price_per_team}
                   onChange={handleChange}
-                  placeholder="6"
+                  placeholder=""
+                  readOnly
+                />
+                <Input
+                  label="Maximum Team Size"
+                  name="max_team_size"
+                  type="number"
+                  value={form.max_team_size}
+                  onChange={handleChange}
+                  placeholder="1"
                   required
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-1 text-black">
-                  Event Description
-                </label>
-                <textarea
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  placeholder="Enter a detailed description of the event"
-                  className="w-full min-h-24 rounded-md border px-3 py-2 text-black"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-1 text-black">
-                  Rules & Regulations
-                </label>
-                <textarea
-                  name="rules"
-                  value={form.rules}
-                  onChange={handleChange}
-                  placeholder="Enter the rules and regulations for the event"
-                  className="w-full min-h-24 rounded-md border px-3 py-2 text-black"
-                  required
-                />
-              </div>
-              <div>
-                <h3 className="text-lg font-medium mb-4">Event Schedule</h3>
-                <div className="space-y-4">
-                  {scheduleItems.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col md:flex-row items-center gap-4"
-                    >
-                      <div className="flex-1 w-full">
-                        <label
-                          className={
-                            index !== 0
-                              ? "sr-only"
-                              : "block text-sm font-semibold mb-1 text-black"
-                          }
-                        >
-                          Time
-                        </label>
-                        <Input
-                          type="time"
-                          value={item.time}
-                          onChange={(e) =>
-                            updateScheduleItem(index, "time", e.target.value)
-                          }
-                          placeholder="Time"
-                        />
-                      </div>
-                      <div className="flex-[3] w-full">
-                        <label
-                          className={
-                            index !== 0
-                              ? "sr-only"
-                              : "block text-sm font-semibold mb-1 text-black"
-                          }
-                        >
-                          Activity
-                        </label>
-                        <Input
-                          value={item.activity}
-                          onChange={(e) =>
-                            updateScheduleItem(
-                              index,
-                              "activity",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Activity description"
-                        />
-                      </div>
-                      <div className="flex items-end">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeScheduleItem(index)}
-                          disabled={scheduleItems.length === 1}
-                        >
-                          ✕<span className="sr-only">Remove</span>
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addScheduleItem}
+                <div className="flex items-center gap-2 mt-2"></div>
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="checkbox"
+                    id="is_team_event"
+                    name="is_team_event"
+                    checked={!!form.is_team_event}
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <label
+                    htmlFor="is_team_event"
+                    className="text-sm font-medium"
                   >
-                    ＋ Add Schedule Item
-                  </Button>
+                    Team Event
+                  </label>
+                  <input
+                    type="checkbox"
+                    id="is_featured"
+                    name="is_featured"
+                    checked={!!form.is_featured}
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <label htmlFor="is_featured" className="text-sm font-medium">
+                    Featured Event
+                  </label>
                 </div>
               </div>
+              {/* Rules & Regulations Section */}
+              <div className="w-full">
+                <h3 className="text-lg font-medium mb-4">
+                  Rules & Regulations
+                </h3>
+                {/* General Rules */}
+                <div className="mb-6 w-full">
+                  <div className="flex items-center mb-2">
+                    <span className="font-semibold text-black mr-2">
+                      General Rules
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      onClick={addGeneralRule}
+                    >
+                      ＋
+                    </Button>
+                  </div>
+                  {generalRules.map((rule, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 mb-2 w-full"
+                    >
+                      <Input
+                        value={rule}
+                        onChange={(e) =>
+                          handleGeneralRuleChange(idx, e.target.value)
+                        }
+                        placeholder={`Rule #${idx + 1}`}
+                        className="w-3xl"
+                        style={{ minWidth: 0, flex: 1 }}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeGeneralRule(idx)}
+                        disabled={generalRules.length === 1}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                {/* Equipment Requirements */}
+                <div className="mb-6 w-full">
+                  <div className="flex items-center mb-2">
+                    <span className="font-semibold text-black mr-2">
+                      Equipment Requirements
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      onClick={addEquipment}
+                    >
+                      ＋
+                    </Button>
+                  </div>
+                  {equipmentRequirements.map((eq, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 mb-2 w-full"
+                    >
+                      <Input
+                        value={eq}
+                        onChange={(e) =>
+                          handleEquipmentChange(idx, e.target.value)
+                        }
+                        placeholder={`Requirement #${idx + 1}`}
+                        className="w-3xl"
+                        style={{ minWidth: 0, flex: 1 }}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeEquipment(idx)}
+                        disabled={equipmentRequirements.length === 1}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                {/* Scoring System */}
+                <div className="mb-6 w-full">
+                  <div className="flex items-center mb-2">
+                    <span className="font-semibold text-black mr-2">
+                      Scoring System
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      onClick={addScoring}
+                    >
+                      ＋
+                    </Button>
+                  </div>
+                  {scoringSystem.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 mb-2 w-full"
+                    >
+                      <Input
+                        value={item.title}
+                        onChange={(e) =>
+                          handleScoringChange(idx, "title", e.target.value)
+                        }
+                        placeholder={`Title #${idx + 1}`}
+                        className="w-1xl"
+                        style={{ minWidth: 0, flex: 1 }}
+                      />
+                      <Input
+                        value={item.desc}
+                        onChange={(e) =>
+                          handleScoringChange(idx, "desc", e.target.value)
+                        }
+                        placeholder="Description"
+                        className="w-xl"
+                        style={{ minWidth: 0, flex: 2 }}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeScoring(idx)}
+                        disabled={scoringSystem.length === 1}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Event Image Upload Section */}
               <div>
                 <h3 className="text-lg font-medium mb-4">Event Image</h3>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-white/70">
-                  <div className="h-8 w-8 mx-auto text-gray-400 text-3xl">
-                    🖼️
-                  </div>
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt="Event Preview"
+                      className="mx-auto mb-4 rounded-lg object-cover"
+                      style={{ maxHeight: 180, maxWidth: "100%" }}
+                    />
+                  ) : (
+                    <div className="h-8 w-8 mx-auto text-gray-400 text-3xl">
+                      🖼️
+                    </div>
+                  )}
                   <p className="mt-2 text-sm text-gray-500">
                     Drag and drop an image, or click to browse
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     Recommended size: 1200 x 600 pixels (16:9 ratio)
                   </p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="event-image-upload"
+                    name="file"
+                    onChange={handleChange}
+                    className="hidden"
+                  />
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     className="mt-4"
+                    onClick={() =>
+                      document.getElementById("event-image-upload").click()
+                    }
                   >
                     Upload Image
                   </Button>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="publishImmediately"
-                  name="publishImmediately"
-                  checked={form.publishImmediately}
-                  onChange={handleChange}
-                  className="h-4 w-4 rounded border-gray-300"
-                />
-                <label
-                  htmlFor="publishImmediately"
-                  className="text-sm font-medium"
-                >
-                  Publish immediately
-                </label>
-                <span className="text-xs text-gray-400 ml-2">
-                  If unchecked, the event will be saved as a draft
-                </span>
-              </div>
-              <div className="flex justify-end gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate(-1)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-semibold shadow hover:scale-105 transition-transform"
-                >
-                  {isLoading ? "Creating..." : "Create Event"}
-                </Button>
-              </div>
+              <Button
+                type="submit"
+                className="w-full h-12 rounded-md text-white bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 transition-all flex items-center justify-center gap-2"
+                disabled={isLoading}
+              >
+                {isLoading && (
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      fill="none"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="none"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                )}
+                {eventToEdit ? "Update Event" : "Create Event"}
+              </Button>
             </form>
           </div>
         </div>

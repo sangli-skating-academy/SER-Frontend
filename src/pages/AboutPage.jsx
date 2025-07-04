@@ -1,7 +1,7 @@
 import Button from "../components/ui/button";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent } from "../components/ui/card";
+import { Card } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import {
   Tabs,
@@ -9,39 +9,18 @@ import {
   TabsList,
   TabsTrigger,
 } from "../components/ui/tabs";
-import {
-  Award,
-  Calendar,
-  Clock,
-  MapPin,
-  Users,
-  CheckCircle,
-} from "lucide-react";
+import { Award, Clock, Users, CheckCircle } from "lucide-react";
 
 import Header from "../components/layouts/Header";
 import Footer from "../components/layouts/Footer";
 
-// Team data (replace with real data as needed)
+// Team data
 const team = [
   {
     id: 1,
-    name: "Aarav Patel",
-    role: "Founder & President",
-    bio: "Aarav's vision for accessible sports led to the creation of SCERS. He brings 15+ years of experience in event management and skating.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 2,
-    name: "Priya Sharma",
-    role: "Operations Head",
-    bio: "Priya ensures every event runs smoothly and every participant feels welcome.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 3,
-    name: "Rahul Verma",
-    role: "Community Manager",
-    bio: "Rahul connects skaters, coaches, and fans, building a vibrant community.",
+    name: "Suraj Ashok Shinde",
+    role: "International Coach",
+    bio: "",
     image: "/placeholder.svg",
   },
 ];
@@ -173,7 +152,8 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold mb-8 text-center">
               Meet the Team
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"> */}
+            <div>
               {team.map((member, i) => (
                 <motion.div
                   key={member.id}

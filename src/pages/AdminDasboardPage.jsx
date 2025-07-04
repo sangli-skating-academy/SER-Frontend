@@ -28,7 +28,6 @@ import UserDetailsModal from "../components/admin/Modals/UserDetailsModal";
 import RegistrationsTable from "../components/admin/Tables/RegistrationsTable";
 import EventsTable from "../components/admin/Tables/EventsTable";
 import GalleryTable from "../components/admin/Tables/GalleryTable";
-import AdminPanel from "../components/admin/Modals/AdminPanel";
 
 const AdminDasboardPage = () => {
   const [mounted, setMounted] = useState(false);
