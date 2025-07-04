@@ -43,6 +43,40 @@ export default function AllGallery() {
     refreshData();
   };
 
+  // Filter states
+  const [eventFilter, setEventFilter] = useState("all");
+  const [yearFilter, setYearFilter] = useState("all");
+
+  // Compute unique event names and years
+  const eventNames = Array.from(
+    new Set(gallery.map((g) => g.event_name).filter(Boolean))
+  );
+  const years = Array.from(
+    new Set(
+      gallery
+        .map((g) => {
+          // Try to get year from event_year, or from image date, or fallback to created_at
+          if (g.event_year) return g.event_year;
+          if (g.created_at) return new Date(g.created_at).getFullYear();
+          if (g.date) return new Date(g.date).getFullYear();
+          return null;
+        })
+        .filter(Boolean)
+    )
+  ).sort((a, b) => b - a);
+
+  // Filtered gallery
+  const filteredGallery = gallery.filter((g) => {
+    const matchesEvent = eventFilter === "all" || g.event_name === eventFilter;
+    let itemYear =
+      g.event_year ||
+      (g.created_at && new Date(g.created_at).getFullYear()) ||
+      (g.date && new Date(g.date).getFullYear());
+    const matchesYear =
+      yearFilter === "all" || String(itemYear) === String(yearFilter);
+    return matchesEvent && matchesYear;
+  });
+
   return (
     <AdminLayout>
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-pink-50 to-blue-50 animate-fade-in">
@@ -54,6 +88,69 @@ export default function AllGallery() {
             >
               &larr; Back
             </button>
+            {/* Filter Bar */}
+            <div
+              className="mb-8 bg-white/90 p-4 rounded-lg shadow-sm animate-fade-in-up"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            >
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end w-full">
+                <div className="flex-1 min-w-[140px]">
+                  <label
+                    htmlFor="event"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Event
+                  </label>
+                  <select
+                    id="event"
+                    value={eventFilter}
+                    onChange={(e) => setEventFilter(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2 h-[40px]"
+                  >
+                    <option value="all">All Events</option>
+                    {eventNames.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1 min-w-[110px]">
+                  <label
+                    htmlFor="year"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Year
+                  </label>
+                  <select
+                    id="year"
+                    value={yearFilter}
+                    onChange={(e) => setYearFilter(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2 h-[40px]"
+                  >
+                    <option value="all">All Years</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-end w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 w-full sm:w-43 h-[40px]"
+                    onClick={() => {
+                      setEventFilter("all");
+                      setYearFilter("all");
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              </div>
+            </div>
             <div className="flex items-center mb-6 gap-2">
               <h1 className="text-3xl font-bold mr-4">All Gallery Items</h1>
               <div className="flex-1" />
@@ -87,7 +184,7 @@ export default function AllGallery() {
               <div className="text-red-500">{error}</div>
             ) : (
               <GalleryTable
-                data={gallery}
+                data={filteredGallery}
                 rowLimit={null}
                 onRefresh={refreshData}
               />
