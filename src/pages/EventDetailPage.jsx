@@ -617,29 +617,63 @@ const EventDetailPage = () => {
                   </div>
                 </div>
                 <div className="pt-4 space-y-3">
-                  {!user ? (
-                    <Button
-                      size="lg"
-                      className="w-full border-1 bg-yellow-400 text-white hover:bg-yellow-500"
-                      onClick={() => setIsLoginModalOpen(true)}
-                    >
-                      Login first to register for event
-                    </Button>
-                  ) : user && isRegistered ? (
-                    <Button
-                      size="lg"
-                      className="w-full border-1 bg-green-500 text-white hover:bg-green-600 transition-colors animate-fade-in-up"
-                      onClick={() => navigate("/dashboard")}
-                    >
-                      <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
-                      Pay
-                    </Button>
-                  ) : (
-                    <Button size="lg" className="w-full border-1" asChild>
-                      <FontAwesomeIcon icon={faArrowRight} className="mr-2" />
-                      <Link to={`/register/${event.id}`}>Register Now</Link>
-                    </Button>
-                  )}
+                  {/* Registration button logic */}
+                  {(() => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const eventDate = event.start_date
+                      ? new Date(event.start_date)
+                      : null;
+                    if (eventDate) eventDate.setHours(0, 0, 0, 0);
+                    const isToday =
+                      eventDate && eventDate.getTime() === today.getTime();
+                    if (isToday) {
+                      return (
+                        <Button
+                          size="lg"
+                          className="w-full border-1 bg-gray-400 text-white cursor-not-allowed"
+                          disabled
+                        >
+                          Registration Closed
+                        </Button>
+                      );
+                    }
+                    if (!user) {
+                      return (
+                        <Button
+                          size="lg"
+                          className="w-full border-1 bg-yellow-400 text-white hover:bg-yellow-500"
+                          onClick={() => setIsLoginModalOpen(true)}
+                        >
+                          Login first to register for event
+                        </Button>
+                      );
+                    } else if (user && isRegistered) {
+                      return (
+                        <Button
+                          size="lg"
+                          className="w-full border-1 bg-green-500 text-white hover:bg-green-600 transition-colors animate-fade-in-up"
+                          onClick={() => navigate("/dashboard")}
+                        >
+                          <FontAwesomeIcon
+                            icon={faCheckCircle}
+                            className="mr-2"
+                          />
+                          Pay
+                        </Button>
+                      );
+                    } else {
+                      return (
+                        <Button size="lg" className="w-full border-1" asChild>
+                          <FontAwesomeIcon
+                            icon={faArrowRight}
+                            className="mr-2"
+                          />
+                          <Link to={`/register/${event.id}`}>Register Now</Link>
+                        </Button>
+                      );
+                    }
+                  })()}
                   <Button
                     variant="outline"
                     className="w-full cursor-pointer border-1"

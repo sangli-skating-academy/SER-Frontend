@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Header from "../../layouts/Header";
-import Footer from "../../layouts/Footer";
 import Input from "../../ui/input";
 import Button from "../../ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../../ui/select";
 import { useToast } from "../../../hooks/use-toasts";
 import { apiFetch } from "../../../services/api";
 
@@ -35,7 +40,7 @@ const hashtagOptions = [
   // Add more as needed
 ];
 const ageGroups = ["Under 10", "Under 12", "Under 18", "Adult", "All Ages"];
-const genders = ["Male", "Female", "All"];
+const genders = ["Male", "Female", "Mixed"];
 
 // Helper to convert UTC/ISO date string to local yyyy-mm-dd for input type="date"
 function toLocalYYYYMMDD(dateStringOrDate) {
@@ -298,7 +303,6 @@ export default function AddEvent() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-pink-50 to-blue-50 animate-fade-in">
-      <Header />
       <main className="flex-grow py-10 relative z-10">
         <div className="container mx-auto px-2 md:px-6">
           <div className="max-w-4xl mx-auto bg-white/90 rounded-2xl shadow-xl p-8 animate-fade-in-up">
@@ -436,39 +440,45 @@ export default function AddEvent() {
                   <label className="block text-sm font-semibold mb-1 text-black">
                     Age Group
                   </label>
-                  <select
-                    name="age_group"
+                  <Select
                     value={form.age_group}
-                    onChange={handleChange}
-                    className="w-full h-10 rounded-md border px-3 py-2 text-black"
-                    required
+                    onValueChange={(v) =>
+                      handleChange({ target: { name: "age_group", value: v } })
+                    }
                   >
-                    <option value="">Select age group</option>
-                    {ageGroups.map((ag) => (
-                      <option key={ag} value={ag}>
-                        {ag}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-full h-10 rounded-md border px-3 py-2 text-black">
+                      <SelectValue placeholder="Select age group" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ageGroups.map((ag) => (
+                        <SelectItem key={ag} value={ag}>
+                          {ag}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-1 text-black">
                     Gender
                   </label>
-                  <select
-                    name="gender"
+                  <Select
                     value={form.gender}
-                    onChange={handleChange}
-                    className="w-full h-10 rounded-md border px-3 py-2 text-black bg-white"
-                    required
+                    onValueChange={(v) =>
+                      handleChange({ target: { name: "gender", value: v } })
+                    }
                   >
-                    <option value="">Select gender</option>
-                    {genders.map((g) => (
-                      <option key={g} value={g}>
-                        {g}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-full h-10 rounded-md border px-3 py-2 text-black bg-white">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {genders.map((g) => (
+                        <SelectItem key={g} value={g}>
+                          {g}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <Input
                   label="Individual Registration Fee (₹)"
@@ -740,7 +750,6 @@ export default function AddEvent() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

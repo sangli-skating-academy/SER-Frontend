@@ -6,6 +6,14 @@ import Skeleton from "../components/ui/skeleton";
 import { fetchEvents } from "../services/eventApi";
 import { Helmet } from "react-helmet-async";
 import EventCard from "../components/ui/EventCard";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../components/ui/select";
+import Button from "../components/ui/button";
 
 const EventsPage = () => {
   const [filter, setFilter] = useState({
@@ -16,6 +24,8 @@ const EventsPage = () => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hashtags, setHashtags] = useState([]);
+  const [ageGroups, setAgeGroups] = useState(["all"]);
+  const [genders, setGenders] = useState(["all"]);
 
   useEffect(() => {
     document.title = "Browse All Events";
@@ -27,12 +37,25 @@ const EventsPage = () => {
       setEvents(eventsArr);
       // Collect all unique hashtags
       const allTags = new Set();
-      eventsArr.forEach((ev) =>
+      const allAgeGroups = new Set();
+      const allGenders = new Set();
+      eventsArr.forEach((ev) => {
+        // Hashtags
         Array.isArray(ev.hashtags)
           ? ev.hashtags.forEach((tag) => allTags.add(tag))
-          : null
-      );
+          : null;
+        // Age Groups
+        if (ev.age_group) allAgeGroups.add(ev.age_group);
+        // Genders
+        if (ev.gender) allGenders.add(ev.gender);
+      });
+      // Remove any accidental "all" from event data
+      allTags.delete("all");
+      allAgeGroups.delete("all");
+      allGenders.delete("all");
       setHashtags(["all", ...Array.from(allTags)]);
+      setAgeGroups(["all", ...Array.from(allAgeGroups)]);
+      setGenders(["all", ...Array.from(allGenders)]);
       setIsLoading(false);
     };
     fetchData();
@@ -109,93 +132,96 @@ const EventsPage = () => {
               data-aos="fade-up"
               data-aos-delay="100"
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* <div>
-                  <label
-                    htmlFor="search"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Search
-                  </label>
-                  <div className="relative">
-                    <Input
-                      id="search"
-                      placeholder="Search events..."
-                      value={filter.search}
-                      onChange={(e) =>
-                        handleFilterChange("search", e.target.value)
-                      }
-                      className="w-full pl-10"
-                    />
-                    <FontAwesomeIcon
-                      icon={faSearch}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300"
-                    />
-                  </div>
-                </div> */}
-                <div>
+              <div className="flex flex-col md:flex-row md:items-end gap-4">
+                <div className="flex-1 min-w-[140px]">
                   <label
                     htmlFor="hashtag"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Hashtag
                   </label>
-                  <select
-                    id="hashtag"
+                  <Select
                     value={filter.hashtag}
-                    onChange={(e) =>
-                      handleFilterChange("hashtag", e.target.value)
-                    }
-                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2"
+                    onValueChange={(v) => handleFilterChange("hashtag", v)}
                   >
-                    {hashtags.map((tag) => (
-                      <option key={tag} value={tag}>
-                        {tag === "all" ? "All Hashtags" : tag}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All Hashtags" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60 overflow-y-auto">
+                      {hashtags.map((tag) => (
+                        <SelectItem
+                          key={tag}
+                          value={tag}
+                          className="overflow-scroll overflow-x-auto"
+                        >
+                          {tag === "all" ? "All Hashtags" : tag}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>
+                <div className="flex-1 min-w-[140px]">
                   <label
                     htmlFor="ageGroup"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Age Group
                   </label>
-                  <select
-                    id="ageGroup"
+                  <Select
                     value={filter.ageGroup}
-                    onChange={(e) =>
-                      handleFilterChange("ageGroup", e.target.value)
-                    }
-                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2"
+                    onValueChange={(v) => handleFilterChange("ageGroup", v)}
                   >
-                    <option value="all">All Age Groups</option>
-                    <option value="Under 10">Under 10</option>
-                    <option value="Under 18">Under 18</option>
-                    <option value="Adults">Adults</option>
-                  </select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All Age Groups" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ageGroups.map((group) => (
+                        <SelectItem key={group} value={group}>
+                          {group === "all" ? "All Age Groups" : group}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>
+                <div className="flex-1 min-w-[140px]">
                   <label
                     htmlFor="gender"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Gender
                   </label>
-                  <select
-                    id="gender"
+                  <Select
                     value={filter.gender}
-                    onChange={(e) =>
-                      handleFilterChange("gender", e.target.value)
-                    }
-                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2"
+                    onValueChange={(v) => handleFilterChange("gender", v)}
                   >
-                    <option value="all">All</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="mixed">Mixed</option>
-                  </select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {genders.map((g) => (
+                        <SelectItem key={g} value={g}>
+                          {g === "all"
+                            ? "All"
+                            : g.charAt(0).toUpperCase() + g.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 w-full sm:w-43 h-[40px]"
+                    onClick={() =>
+                      setFilter({
+                        hashtag: "all",
+                        ageGroup: "all",
+                        gender: "all",
+                      })
+                    }
+                  >
+                    Clear Filters
+                  </Button>
                 </div>
               </div>
             </div>

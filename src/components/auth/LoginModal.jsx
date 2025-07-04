@@ -5,6 +5,13 @@ import * as yup from "yup";
 // import useAuth from "../../hooks/useAuth";
 import Button from "../ui/button";
 import Input from "../ui/input";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../ui/select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSignInAlt,
@@ -16,12 +23,18 @@ import {
   faUserShield,
   faUserFriends,
   faCheckCircle,
+  faExclamationCircle,
+  faEye,
+  faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 
 const LoginModal = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("login");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   // const { login } = useAuth();
 
   // Reset loading and error state when modal is closed
@@ -189,6 +202,22 @@ const LoginModal = ({ onClose }) => {
     }
   };
 
+  // Helper for all inputs to suppress browser validation
+  const suppressInvalid = (e) => e.preventDefault();
+
+  // Helper for error display
+  const renderFieldError = (errorMsg) =>
+    errorMsg ? (
+      <div className="flex items-center gap-1 mt-1 text-xs text-red-600 font-semibold animate-fade-in">
+        <FontAwesomeIcon icon={faExclamationCircle} className="text-red-400" />
+        <span>{errorMsg}</span>
+      </div>
+    ) : (
+      <span className="block min-h-[1.2em] text-xs text-transparent">
+        &nbsp;
+      </span>
+    );
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-2 sm:px-4">
       {/* Overlay - now clickable to close modal */}
@@ -310,10 +339,23 @@ const LoginModal = ({ onClose }) => {
                 <Input
                   id="login-password"
                   {...loginForm.register("password")}
-                  type="password"
+                  type={showLoginPassword ? "text" : "password"}
                   placeholder="Password"
-                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                  className="w-full min-w-0 pl-10 pr-10 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
                 />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600 focus:outline-none"
+                  onClick={() => setShowLoginPassword((v) => !v)}
+                  aria-label={
+                    showLoginPassword ? "Hide password" : "Show password"
+                  }
+                >
+                  <FontAwesomeIcon
+                    icon={showLoginPassword ? faEyeSlash : faEye}
+                  />
+                </button>
               </div>
               <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
                 {loginForm.formState.errors.password?.message || ""}
@@ -379,9 +421,9 @@ const LoginModal = ({ onClose }) => {
                   className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
                 />
               </div>
-              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
-                {registerForm.formState.errors.fullName?.message || ""}
-              </span>
+              {renderFieldError(
+                registerForm.formState.errors.fullName?.message
+              )}
             </div>
             {/* Username */}
             <div className="mb-2">
@@ -403,9 +445,9 @@ const LoginModal = ({ onClose }) => {
                   className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
                 />
               </div>
-              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
-                {registerForm.formState.errors.username?.message || ""}
-              </span>
+              {renderFieldError(
+                registerForm.formState.errors.username?.message
+              )}
             </div>
             {/* Email */}
             <div className="mb-2">
@@ -428,9 +470,7 @@ const LoginModal = ({ onClose }) => {
                   className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
                 />
               </div>
-              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
-                {registerForm.formState.errors.email?.message || ""}
-              </span>
+              {renderFieldError(registerForm.formState.errors.email?.message)}
             </div>
             {/* Password */}
             <div className="mb-2">
@@ -448,14 +488,27 @@ const LoginModal = ({ onClose }) => {
                 <input
                   id="register-password"
                   {...registerForm.register("password")}
-                  type="password"
+                  type={showRegPassword ? "text" : "password"}
                   placeholder="Password"
-                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                  className="w-full min-w-0 pl-10 pr-10 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
                 />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600 focus:outline-none"
+                  onClick={() => setShowRegPassword((v) => !v)}
+                  aria-label={
+                    showRegPassword ? "Hide password" : "Show password"
+                  }
+                >
+                  <FontAwesomeIcon
+                    icon={showRegPassword ? faEyeSlash : faEye}
+                  />
+                </button>
               </div>
-              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
-                {registerForm.formState.errors.password?.message || ""}
-              </span>
+              {renderFieldError(
+                registerForm.formState.errors.password?.message
+              )}
             </div>
             {/* Confirm Password */}
             <div className="mb-2">
@@ -473,14 +526,27 @@ const LoginModal = ({ onClose }) => {
                 <input
                   id="register-confirmPassword"
                   {...registerForm.register("confirmPassword")}
-                  type="password"
+                  type={showRegConfirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
-                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                  className="w-full min-w-0 pl-10 pr-10 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
                 />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600 focus:outline-none"
+                  onClick={() => setShowRegConfirmPassword((v) => !v)}
+                  aria-label={
+                    showRegConfirmPassword ? "Hide password" : "Show password"
+                  }
+                >
+                  <FontAwesomeIcon
+                    icon={showRegConfirmPassword ? faEyeSlash : faEye}
+                  />
+                </button>
               </div>
-              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
-                {registerForm.formState.errors.confirmPassword?.message || ""}
-              </span>
+              {renderFieldError(
+                registerForm.formState.errors.confirmPassword?.message
+              )}
             </div>
             {/* Phone Number */}
             <div className="mb-2">
@@ -505,9 +571,7 @@ const LoginModal = ({ onClose }) => {
                   className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
                 />
               </div>
-              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
-                {registerForm.formState.errors.phone?.message || ""}
-              </span>
+              {renderFieldError(registerForm.formState.errors.phone?.message)}
             </div>
             {/* Date of Birth */}
             <div className="mb-2">
@@ -527,12 +591,15 @@ const LoginModal = ({ onClose }) => {
                   {...registerForm.register("date_of_birth")}
                   type="date"
                   placeholder="Date of Birth"
+                  pattern="\d{4}-\d{2}-\d{2}"
+                  onInvalid={(e) => e.preventDefault()}
+                  autoComplete="off"
                   className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
                 />
               </div>
-              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
-                {registerForm.formState.errors.date_of_birth?.message || ""}
-              </span>
+              {renderFieldError(
+                registerForm.formState.errors.date_of_birth?.message
+              )}
             </div>
             {/* Gender Selection */}
             <div className="mb-2">
@@ -547,20 +614,22 @@ const LoginModal = ({ onClose }) => {
                   icon={faUser}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
                 />
-                <select
-                  id="register-gender"
-                  {...registerForm.register("gender")}
-                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                <Select
+                  value={registerForm.watch("gender")}
+                  onValueChange={(v) => registerForm.setValue("gender", v)}
                 >
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
+                  <SelectTrigger className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {/* <SelectItem value="">Select Gender</SelectItem> */}
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
-                {registerForm.formState.errors.gender?.message || ""}
-              </span>
+              {renderFieldError(registerForm.formState.errors.gender?.message)}
             </div>
             {/* Role Selection */}
             <div className="mb-2">
@@ -617,9 +686,7 @@ const LoginModal = ({ onClose }) => {
                   <span>Coach</span>
                 </label>
               </div>
-              <span className="block min-h-[1.2em] text-xs text-red-600 ml-2">
-                {registerForm.formState.errors.role?.message || ""}
-              </span>
+              {renderFieldError(registerForm.formState.errors.role?.message)}
             </div>
             {/* Terms and Conditions */}
             <div className="flex items-start space-x-2 mt-2 sm:mt-4 animate-fade-in mb-2">
@@ -652,9 +719,7 @@ const LoginModal = ({ onClose }) => {
                 </a>
               </label>
             </div>
-            <span className="block min-h-[1.2em] text-xs text-red-600 ml-2 mb-2">
-              {registerForm.formState.errors.terms?.message || ""}
-            </span>
+            {renderFieldError(registerForm.formState.errors.terms?.message)}
             {/* Error Message */}
             {error && (
               <div className="text-red-600 text-center mb-2 animate-fade-in">

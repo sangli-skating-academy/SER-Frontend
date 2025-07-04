@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { apiFetch } from "../../../services/api";
 import Button from "../../ui/button";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +8,18 @@ import {
   faSyncAlt,
   faSearch,
   faFilter,
+  faFileDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import RegistrationsTable from "../Tables/RegistrationsTable";
 import AdminLayout from "../layouts/AdminLayout";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../../ui/select";
+import { saveAs } from "file-saver";
 
 export default function AllRegistrations() {
   const [registrations, setRegistrations] = useState([]);
@@ -107,6 +116,45 @@ export default function AllRegistrations() {
     roleFilter,
   ]);
 
+  const filteredRef = useRef(filteredRegistrations);
+  filteredRef.current = filteredRegistrations;
+
+  // CSV Export helper
+  function exportToCSV() {
+    const data = filteredRef.current;
+    if (!data.length) return;
+    // Get all unique keys from all objects (for wide tables)
+    const allKeys = Array.from(
+      data.reduce((set, row) => {
+        Object.keys(row).forEach((k) => set.add(k));
+        return set;
+      }, new Set())
+    );
+    // CSV header
+    const header = allKeys.join(",");
+    // CSV rows
+    const rows = data.map((row) =>
+      allKeys
+        .map((k) => {
+          let val = row[k];
+          if (val === null || val === undefined) return "";
+          val = String(val).replace(/"/g, '""');
+          if (val.includes(",") || val.includes("\n") || val.includes('"')) {
+            return `"${val}"`;
+          }
+          return val;
+        })
+        .join(",")
+    );
+    const csv = [header, ...rows].join("\n");
+    // Download
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    saveAs(
+      blob,
+      `registrations_export_${new Date().toISOString().slice(0, 10)}.csv`
+    );
+  }
+
   return (
     <AdminLayout>
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-pink-50 to-blue-50 animate-fade-in">
@@ -135,6 +183,19 @@ export default function AllRegistrations() {
                   className="mr-2 h-4 w-4"
                 />
                 Refresh
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={exportToCSV}
+                className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-semibold shadow hover:scale-105 transition-transform"
+                disabled={loading || !filteredRegistrations.length}
+              >
+                <FontAwesomeIcon
+                  icon={faFileDownload}
+                  className="mr-2 h-4 w-4"
+                />
+                Export CSV
               </Button>
             </div>
             {/* Filter Bar */}
@@ -172,19 +233,19 @@ export default function AllRegistrations() {
                   >
                     Event
                   </label>
-                  <select
-                    id="event"
-                    value={eventFilter}
-                    onChange={(e) => setEventFilter(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2 h-[40px]"
-                  >
-                    <option value="all">All Events</option>
-                    {eventTitles.map((title) => (
-                      <option key={title} value={title}>
-                        {title}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={eventFilter} onValueChange={setEventFilter}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All Events" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Events</SelectItem>
+                      {eventTitles.map((title) => (
+                        <SelectItem key={title} value={title}>
+                          {title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex-1 min-w-[110px]">
                   <label
@@ -193,19 +254,19 @@ export default function AllRegistrations() {
                   >
                     Type
                   </label>
-                  <select
-                    id="type"
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2 h-[40px]"
-                  >
-                    <option value="all">All Types</option>
-                    {types.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      {types.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex-1 min-w-[110px]">
                   <label
@@ -214,19 +275,19 @@ export default function AllRegistrations() {
                   >
                     Status
                   </label>
-                  <select
-                    id="status"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2 h-[40px]"
-                  >
-                    <option value="all">All Statuses</option>
-                    {statuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All Statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      {statuses.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex-1 min-w-[110px]">
                   <label
@@ -235,19 +296,19 @@ export default function AllRegistrations() {
                   >
                     Role
                   </label>
-                  <select
-                    id="role"
-                    value={roleFilter}
-                    onChange={(e) => setRoleFilter(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2 h-[40px]"
-                  >
-                    <option value="all">All Roles</option>
-                    {roles.map((role) => (
-                      <option key={role} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={roleFilter} onValueChange={setRoleFilter}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All Roles" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Roles</SelectItem>
+                      {roles.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex items-end w-full sm:w-auto">
                   <Button

@@ -8,6 +8,13 @@ import { faSyncAlt, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { apiFetch } from "../../../services/api";
 import GalleryTable from "../Tables/GalleryTable";
 import EditGallery from "../Modals/EditGallery";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../../ui/select";
 
 export default function AllGallery() {
   const [gallery, setGallery] = useState([]);
@@ -88,69 +95,6 @@ export default function AllGallery() {
             >
               &larr; Back
             </button>
-            {/* Filter Bar */}
-            <div
-              className="mb-8 bg-white/90 p-4 rounded-lg shadow-sm animate-fade-in-up"
-              data-aos="fade-up"
-              data-aos-delay="100"
-            >
-              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end w-full">
-                <div className="flex-1 min-w-[140px]">
-                  <label
-                    htmlFor="event"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Event
-                  </label>
-                  <select
-                    id="event"
-                    value={eventFilter}
-                    onChange={(e) => setEventFilter(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2 h-[40px]"
-                  >
-                    <option value="all">All Events</option>
-                    {eventNames.map((name) => (
-                      <option key={name} value={name}>
-                        {name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex-1 min-w-[110px]">
-                  <label
-                    htmlFor="year"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Year
-                  </label>
-                  <select
-                    id="year"
-                    value={yearFilter}
-                    onChange={(e) => setYearFilter(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-400/60 focus:shadow-lg transition-all text-base px-3 py-2 h-[40px]"
-                  >
-                    <option value="all">All Years</option>
-                    {years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex items-end w-full sm:w-auto">
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 w-full sm:w-43 h-[40px]"
-                    onClick={() => {
-                      setEventFilter("all");
-                      setYearFilter("all");
-                    }}
-                  >
-                    Clear Filters
-                  </Button>
-                </div>
-              </div>
-            </div>
             <div className="flex items-center mb-6 gap-2">
               <h1 className="text-3xl font-bold mr-4">All Gallery Items</h1>
               <div className="flex-1" />
@@ -177,6 +121,69 @@ export default function AllGallery() {
                 <FontAwesomeIcon icon={faPlusCircle} className="mr-2 h-4 w-4" />
                 Add Gallery Item
               </Button>
+            </div>
+            {/* Filter Bar moved below the title */}
+            <div
+              className="mb-8 bg-white/90 p-4 rounded-lg shadow-sm animate-fade-in-up"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            >
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end w-full">
+                <div className="flex-1 min-w-[140px]">
+                  <label
+                    htmlFor="event"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Event
+                  </label>
+                  <Select value={eventFilter} onValueChange={setEventFilter}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All Events" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Events</SelectItem>
+                      {eventNames.map((name) => (
+                        <SelectItem key={name} value={name}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex-1 min-w-[110px]">
+                  <label
+                    htmlFor="year"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Year
+                  </label>
+                  <Select value={yearFilter} onValueChange={setYearFilter}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="All Years" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Years</SelectItem>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-end w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 w-full sm:w-43 h-[40px]"
+                    onClick={() => {
+                      setEventFilter("all");
+                      setYearFilter("all");
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              </div>
             </div>
             {loading ? (
               <Skeleton className="w-full h-40" />

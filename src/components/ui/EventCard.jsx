@@ -48,12 +48,11 @@ const EventCard = ({ event, className = "", style = {} }) => {
       <CardContent className="p-6 flex flex-col gap-2">
         <div className="flex flex-wrap gap-2 mb-2">
           <Badge className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold shadow">
-            {event.gender === "all"
-              ? "All Genders"
-              : event.gender?.charAt(0).toUpperCase() + event.gender?.slice(1)}
+            Gender:{" "}
+            {event.gender?.charAt(0).toUpperCase() + event.gender?.slice(1)}
           </Badge>
           <Badge className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-xs font-semibold shadow">
-            {event.age_group}
+            Age Group: {event.age_group}
           </Badge>
         </div>
         <h3 className="font-extrabold text-xl mb-1 font-montserrat bg-gradient-to-r from-blue-500 via-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x drop-shadow">
@@ -115,7 +114,7 @@ const EventCard = ({ event, className = "", style = {} }) => {
           <Button
             asChild
             variant="outline"
-            className="px-4 py-2 border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-colors text-sm font-semibold shadow animate-fade-in"
+            className="px-4 py-2 border-primary text-primary rounded-full hover:bg-blue-500 hover:text-white transition-colors text-sm font-semibold shadow animate-fade-in"
           >
             <Link to={`/events/${event.id}`}>View Details</Link>
           </Button>
