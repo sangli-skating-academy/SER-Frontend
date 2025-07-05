@@ -223,23 +223,23 @@ const RegistrationCard = ({
           <div className="flex flex-wrap gap-2 mb-2">
             <Badge
               variant={
-                registration.payment_status === "paid" ? "success" : "warning"
+                registration.status === "confirmed" ? "success" : "warning"
               }
               className={
-                registration.payment_status === "paid"
-                  ? "bg-green-100 text-green-800 border-green-300 animate-pulse"
-                  : "bg-yellow-100 text-yellow-800 border-yellow-300 animate-pulse"
+                registration.status === "confirmed"
+                  ? "bg-green-100 text-green-800 border-green-300"
+                  : "bg-yellow-100 text-yellow-800 border-yellow-300"
               }
             >
               <FontAwesomeIcon
                 icon={
-                  registration.payment_status === "paid"
+                  registration.status === "confirmed"
                     ? faCheckCircle
                     : faMoneyBillWave
                 }
                 className="mr-1"
               />
-              {registration.payment_status === "paid" ? "Paid" : "Unpaid"}
+              {registration.status === "confirmed" ? "Paid" : "Unpaid"}
             </Badge>
             <Badge
               variant="outline"
@@ -267,7 +267,7 @@ const RegistrationCard = ({
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          {registration.payment_status !== "paid" &&
+          {registration.status !== "confirmed" &&
             (isPaymentClosed ? (
               <Button
                 variant="outline"
