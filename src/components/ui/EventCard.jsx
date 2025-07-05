@@ -55,17 +55,17 @@ const EventCard = ({ event, className = "", style = {} }) => {
             Age Group: {event.age_group}
           </Badge>
         </div>
-        <h3 className="font-extrabold text-xl mb-1 font-montserrat bg-gradient-to-r from-blue-500 via-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x drop-shadow">
+        <h3 className="font-extrabold text-xl font-montserrat bg-gradient-to-r from-blue-500 via-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x drop-shadow">
           {event.title}
         </h3>
         <div className="text-gray-600 text-sm mb-2 line-clamp-2">
           {event.description}
         </div>
-        <div className="flex items-center text-gray-500 text-s mb-2 gap-2">
+        <div className="flex items-center text-gray-500 text-s gap-2">
           <FontAwesomeIcon icon={faMapMarkerAlt} className="text-pink-400" />
           <span className="truncate">{event.location}</span>
         </div>
-        <div className="flex items-center text-gray-500 text-s mb-2 gap-2">
+        <div className="flex items-center text-gray-500 text-s gap-2">
           <FontAwesomeIcon icon={faCalendarAlt} className="text-blue-400" />
           <span className="truncate">
             {event.start_date
@@ -106,10 +106,10 @@ const EventCard = ({ event, className = "", style = {} }) => {
             {event.is_team_event
               ? `Rs. ${parseFloat(
                   event.price_per_person * (event.max_team_size || 1)
-                ).toFixed(2)} / Team`
+                ).toFixed(2)}(Team)`
               : `Rs. ${parseFloat(
                   event.price_per_person * (event.max_team_size || 1)
-                ).toFixed(2)} / Person`}
+                ).toFixed(2)}(Person)`}
           </span>
           <Button
             asChild
