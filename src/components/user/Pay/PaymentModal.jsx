@@ -48,7 +48,7 @@ const PaymentModal = ({ selectedRegistration, isOpen, onClose }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: selectedRegistration.fee * 100, // in paise
+          amount: selectedRegistration.fee, // in paise
           registrationId: selectedRegistration.id, // use id, not _id
           eventName: selectedRegistration.eventName,
           phone: user?.phone,
