@@ -59,7 +59,7 @@ const AdminDasboardPage = () => {
         apiFetch("/api/admin/users"),
         fetchEvents({ includePast: "true" }), // Pass as string to match backend check
         apiFetch("/api/admin/registrations/all"),
-        apiFetch("/api/payments").catch(() => []), // payments optional
+        apiFetch("/api/payment").catch(() => []), // payments optional
         apiFetch("/api/admin/contact/all").catch(() => []), // contact messages
         apiFetch("/api/gallery/all").catch(() => []), // gallery items
       ]);

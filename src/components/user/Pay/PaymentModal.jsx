@@ -82,6 +82,9 @@ const PaymentModal = ({ selectedRegistration, isOpen, onClose }) => {
             if (verifyData.success) {
               setSuccess(true);
               setError("");
+              setTimeout(() => {
+                window.location.href = "/dashboard";
+              }, 1200);
             } else {
               setError(verifyData.message || "Payment verification failed");
             }

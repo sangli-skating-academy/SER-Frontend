@@ -56,6 +56,7 @@ const EventDetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [registrationStatus, setRegistrationStatus] = useState(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
@@ -69,8 +70,14 @@ const EventDetailPage = () => {
       apiFetch(`/api/registrations/user/${user.id}`)
         .then((regs) => {
           setIsRegistered(regs.some((r) => r.event_id === Number(id)));
+          // Find registration for this event
+          const reg = regs.find((r) => r.event_id === Number(id));
+          setRegistrationStatus(reg ? reg.status : null);
         })
-        .catch(() => setIsRegistered(false));
+        .catch(() => {
+          setIsRegistered(false);
+          setRegistrationStatus(null);
+        });
     }
   }, [id, user]);
 
@@ -627,7 +634,9 @@ const EventDetailPage = () => {
                     if (eventDate) eventDate.setHours(0, 0, 0, 0);
                     const isToday =
                       eventDate && eventDate.getTime() === today.getTime();
-                    if (isToday) {
+
+                    // If not logged in or not registered, show Registration Closed on event day
+                    if (isToday && (!user || !isRegistered)) {
                       return (
                         <Button
                           size="lg"
@@ -638,6 +647,41 @@ const EventDetailPage = () => {
                         </Button>
                       );
                     }
+                    // If user is registered
+                    if (user && isRegistered) {
+                      // If registration is confirmed, show dashboard button
+                      if (registrationStatus === "confirmed") {
+                        return (
+                          <Button
+                            size="lg"
+                            className="w-full border-1 bg-blue-500 text-white hover:bg-blue-600 transition-colors animate-fade-in-up"
+                            onClick={() => navigate("/dashboard")}
+                          >
+                            <FontAwesomeIcon
+                              icon={faCheckCircle}
+                              className="mr-2"
+                            />
+                            Take me to Dashboard
+                          </Button>
+                        );
+                      } else {
+                        // Not confirmed, show Pay button
+                        return (
+                          <Button
+                            size="lg"
+                            className="w-full border-1 bg-green-500 text-white hover:bg-green-600 transition-colors animate-fade-in-up"
+                            onClick={() => navigate("/dashboard")}
+                          >
+                            <FontAwesomeIcon
+                              icon={faCheckCircle}
+                              className="mr-2"
+                            />
+                            Pay
+                          </Button>
+                        );
+                      }
+                    }
+                    // Not logged in
                     if (!user) {
                       return (
                         <Button
@@ -648,31 +692,14 @@ const EventDetailPage = () => {
                           Login first to register for event
                         </Button>
                       );
-                    } else if (user && isRegistered) {
-                      return (
-                        <Button
-                          size="lg"
-                          className="w-full border-1 bg-green-500 text-white hover:bg-green-600 transition-colors animate-fade-in-up"
-                          onClick={() => navigate("/dashboard")}
-                        >
-                          <FontAwesomeIcon
-                            icon={faCheckCircle}
-                            className="mr-2"
-                          />
-                          Pay
-                        </Button>
-                      );
-                    } else {
-                      return (
-                        <Button size="lg" className="w-full border-1" asChild>
-                          <FontAwesomeIcon
-                            icon={faArrowRight}
-                            className="mr-2"
-                          />
-                          <Link to={`/register/${event.id}`}>Register Now</Link>
-                        </Button>
-                      );
                     }
+                    // Default: show Register Now
+                    return (
+                      <Button size="lg" className="w-full border-1" asChild>
+                        <FontAwesomeIcon icon={faArrowRight} className="mr-2" />
+                        <Link to={`/register/${event.id}`}>Register Now</Link>
+                      </Button>
+                    );
                   })()}
                   <Button
                     variant="outline"

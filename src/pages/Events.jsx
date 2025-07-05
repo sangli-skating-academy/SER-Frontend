@@ -61,7 +61,16 @@ const EventsPage = () => {
     fetchData();
   }, []);
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const filteredEvents = events.filter((event) => {
+    // Only show events today or in the future
+    if (event.start_date) {
+      const eventDate = new Date(event.start_date);
+      eventDate.setHours(0, 0, 0, 0);
+      if (eventDate < today) return false;
+    }
     // Hashtag filter
     if (
       filter.hashtag !== "all" &&

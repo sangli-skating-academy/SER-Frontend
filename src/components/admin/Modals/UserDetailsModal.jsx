@@ -163,12 +163,12 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
                   : "-"}
               </div>
               <div>
-                <b>Payment ID:</b> {selectedReg.payment_id || "-"}
+                <b>Payment ID:</b> {selectedReg.razorpay_payment_id || "-"}
               </div>
               <div>
                 <b>Payment Date:</b>{" "}
-                {selectedReg.payment_date
-                  ? new Date(selectedReg.payment_date).toLocaleString()
+                {selectedReg.payment_created_at
+                  ? new Date(selectedReg.payment_created_at).toLocaleString()
                   : "-"}
               </div>
             </div>
