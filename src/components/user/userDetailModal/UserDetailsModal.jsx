@@ -24,7 +24,7 @@ const UserDetailsModal = ({
       <div>Loading...</div>
     ) : userDetails ? (
       <div>
-        {selectedRegistration?.team_id && userDetails?.team && children}
+        {/* {selectedRegistration?.team_id && userDetails?.team && children} */}
       </div>
     ) : (
       <div>No details found.</div>

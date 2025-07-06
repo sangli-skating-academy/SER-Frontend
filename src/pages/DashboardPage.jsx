@@ -339,7 +339,6 @@ const DashboardPage = () => {
                 <div>Loading...</div>
               ) : userDetails ? (
                 <div>
-                  <TeamDetails team={userDetails.team} />
                   <UserDetailsGrid
                     userDetails={userDetails}
                     user={user}

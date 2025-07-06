@@ -352,7 +352,11 @@ const RegistrationCard = ({
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-gray-700">Name:</span>
                     <span className="text-blue-800 font-bold text-right break-words max-w-[60%]">
-                      {ticketUserDetails.first_name || "-"}
+                      {ticketUserDetails.first_name +
+                        " " +
+                        ticketUserDetails.middle_name +
+                        " " +
+                        ticketUserDetails.last_name || "-"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">

@@ -68,7 +68,9 @@ const TeamDetails = ({
                 <th className="px-3 py-2 border-b font-semibold text-blue-900">
                   Experience
                 </th>
-                {editMode && <th className="px-3 py-2 border-b"></th>}
+                {editMode && selectedRegistration?.status !== "confirmed" && (
+                  <th className="px-3 py-2 border-b"></th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -153,7 +155,10 @@ const TeamDetails = ({
                         </span>
                       )}
                     </td>
-                    {editMode && <td className="px-3 py-2 border-b"></td>}
+                    {editMode &&
+                      selectedRegistration?.status !== "confirmed" && (
+                        <td className="px-3 py-2 border-b"></td>
+                      )}
                   </tr>
                 ))
               ) : (
@@ -179,14 +184,16 @@ const TeamDetails = ({
               {saving ? "Saving..." : "Save"}
             </Button>
           ) : (
-            <Button
-              className="bg-gradient-to-r from-blue-500 to-pink-400 text-white font-bold"
-              onClick={() => setEditMode(true)}
-            >
-              Edit
-            </Button>
+            selectedRegistration?.status !== "confirmed" && (
+              <Button
+                className="bg-gradient-to-r from-blue-500 to-pink-400 text-white font-bold"
+                onClick={() => setEditMode(true)}
+              >
+                Edit
+              </Button>
+            )
           )}
-          {editMode && (
+          {editMode && selectedRegistration?.status !== "confirmed" && (
             <Button
               variant="outline"
               onClick={() => {

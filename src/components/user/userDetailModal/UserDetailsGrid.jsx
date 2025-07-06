@@ -8,6 +8,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Button from "../../ui/button";
 import { apiFetch } from "../../../services/api";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../../ui/select";
+import TeamDetails from "./TeamDetails";
 
 const AadhaarPreviewModal = ({ aadhaarPreview, setAadhaarPreview }) => {
   if (!aadhaarPreview) return null;
@@ -69,14 +77,76 @@ const UserDetailsGrid = ({
         userDetails.id &&
         editDetails &&
         userDetails.id === editDetails.id;
-      if (
-        editDetails.aadhaar_image &&
-        editDetails.aadhaar_image instanceof File
-      ) {
+
+      // Compute changed fields only for PATCH
+      let changedFields = {};
+      if (shouldPatch) {
+        Object.keys(editDetails).forEach((key) => {
+          // Aadhaar image: if a new file is selected or user clears the file input
+          if (key === "aadhaar_image") {
+            if (editDetails[key] instanceof File) {
+              changedFields[key] = editDetails[key];
+            } else if (
+              (!editDetails[key] && userDetails[key]) ||
+              (typeof editDetails[key] === "string" &&
+                editDetails[key] !== userDetails[key])
+            ) {
+              changedFields[key] = null; // send null to remove
+            }
+          } else if (
+            key === "category" &&
+            (editDetails[key] !== userDetails[key] ||
+              (editDetails[key] === "" && userDetails[key] !== ""))
+          ) {
+            changedFields[key] = editDetails[key];
+          } else if (
+            key === "gender" &&
+            (editDetails[key] !== userDetails[key] ||
+              (editDetails[key] === "" && userDetails[key] !== ""))
+          ) {
+            changedFields[key] = editDetails[key];
+          } else if (
+            editDetails[key] !== userDetails[key] &&
+            !(editDetails[key] === undefined && userDetails[key] === null)
+          ) {
+            changedFields[key] = editDetails[key];
+          }
+        });
+      }
+
+      if (shouldPatch && Object.keys(changedFields).length === 0) {
+        // Show error toast if nothing changed
+        if (window && window.dispatchEvent) {
+          window.dispatchEvent(
+            new CustomEvent("show-toast", {
+              detail: {
+                title: "No Changes",
+                message: "No fields were changed.",
+                variant: "destructive",
+              },
+            })
+          );
+        }
+        setSaving(false);
+        return;
+      }
+
+      // Use FormData if aadhaar_image is being uploaded, else JSON
+      const useFormData =
+        (shouldPatch && changedFields.aadhaar_image instanceof File) ||
+        (!shouldPatch && editDetails.aadhaar_image instanceof File);
+
+      if (useFormData) {
         body = new FormData();
-        Object.entries(editDetails).forEach(([key, value]) => {
+        const fieldsToSend = shouldPatch ? changedFields : editDetails;
+        Object.entries(fieldsToSend).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
-            body.append(key, value);
+            // Use 'aadhaarImage' for file upload to match registration and multer config
+            if (key === "aadhaar_image" && value instanceof File) {
+              body.append("aadhaar_image", value);
+            } else {
+              body.append(key, value);
+            }
           }
         });
         // Always include registration_id for POST
@@ -85,16 +155,20 @@ const UserDetailsGrid = ({
         }
         headers = undefined;
       } else {
-        body = JSON.stringify({
-          ...editDetails,
-          // Always include registration_id for POST
-          ...(shouldPatch ? {} : { registration_id: selectedRegistration?.id }),
-        });
+        body = JSON.stringify(
+          shouldPatch
+            ? changedFields
+            : {
+                ...editDetails,
+                ...(shouldPatch
+                  ? {}
+                  : { registration_id: selectedRegistration?.id }),
+              }
+        );
         headers = { "Content-Type": "application/json" };
       }
       if (shouldPatch) {
         method = "PATCH";
-        // PATCH by registration id, not userDetails.id
         url = `/api/user-details/${selectedRegistration.id}`;
       } else {
         method = "POST";
@@ -144,6 +218,15 @@ const UserDetailsGrid = ({
 
   return (
     <>
+      {/* Render TeamDetails and pass selectedRegistration */}
+      {userDetails.team && (
+        <TeamDetails
+          team={userDetails.team}
+          selectedRegistration={selectedRegistration}
+          setUserDetails={setUserDetails}
+          backendUrl={backendUrl}
+        />
+      )}
       {editMode ? (
         <form className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -206,17 +289,23 @@ const UserDetailsGrid = ({
               <label className="block text-xs font-semibold text-gray-500 mb-1">
                 Gender
               </label>
-              <select
+              <Select
                 name="gender"
                 value={editDetails?.gender || ""}
-                onChange={handleEditDetailsChange}
+                onValueChange={(value) =>
+                  setEditDetails((prev) => ({ ...prev, gender: value }))
+                }
                 className="border rounded px-2 py-1 w-full"
               >
-                <option value="">Select</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
@@ -260,12 +349,23 @@ const UserDetailsGrid = ({
               <label className="block text-xs font-semibold text-gray-500 mb-1">
                 Category
               </label>
-              <input
+              <Select
                 name="category"
                 value={editDetails?.category || ""}
-                onChange={handleEditDetailsChange}
+                onValueChange={(value) =>
+                  setEditDetails((prev) => ({ ...prev, category: value }))
+                }
                 className="border rounded px-2 py-1 w-full"
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="quad">Quad</SelectItem>
+                  <SelectItem value="inline">Inline</SelectItem>
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
@@ -454,13 +554,15 @@ const UserDetailsGrid = ({
               >
                 Close
               </Button>
-              <Button
-                variant="outline"
-                className="text-red-700 border-gray-300 hover:bg-red-100"
-                onClick={() => setEditMode(true)}
-              >
-                Edit Details
-              </Button>
+              {selectedRegistration?.status !== "confirmed" && (
+                <Button
+                  variant="outline"
+                  className="text-red-700 border-gray-300 hover:bg-red-100"
+                  onClick={() => setEditMode(true)}
+                >
+                  Edit Details
+                </Button>
+              )}
             </div>
           </div>
         </>
