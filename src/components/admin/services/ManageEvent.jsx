@@ -24,6 +24,10 @@ const initialForm = {
   price_per_person: "",
   price_per_team: "", // <-- add this field
   max_team_size: "",
+  rules_and_guidelines: {
+    general_rules: [""],
+    equipment_requirements: [""],
+  },
   is_team_event: false,
   is_featured: false,
   file: null, // for image upload
