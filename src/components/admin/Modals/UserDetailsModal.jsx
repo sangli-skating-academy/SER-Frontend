@@ -32,7 +32,13 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
           defaultValue={selectedReg.is_team_event ? "team" : "user"}
           className="w-full"
         >
-          <TabsList className="mb-4 w-full grid grid-cols-4">
+          <TabsList
+            className={`mb-4 w-full grid ${
+              selectedReg.registration_type === "team"
+                ? "grid-cols-4"
+                : "grid-cols-3"
+            }`}
+          >
             <TabsTrigger value="user">User Details</TabsTrigger>
             <TabsTrigger value="player">Player Details</TabsTrigger>
             {selectedReg.registration_type === "team" && (
@@ -165,7 +171,7 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
               <div>
                 <b>Amount:</b>{" "}
                 {selectedReg.payment_amount
-                  ? `$${selectedReg.payment_amount}`
+                  ? `Rs ${selectedReg.payment_amount}`
                   : "-"}
               </div>
               <div>

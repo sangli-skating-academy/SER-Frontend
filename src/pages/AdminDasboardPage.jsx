@@ -149,7 +149,10 @@ const AdminDasboardPage = () => {
   const filteredRegistrations = registrations.filter((r) => {
     const eventStart =
       r.event_start_date || r.eventStartDate || r.event_start || r.start_date;
-    if (!eventStart) return true;
+    // only status confirmed events
+    if (!eventStart) return false; // Skip if no start date
+    if (r.status !== "confirmed") return false; // Only confirmed registrations
+    if (!eventStart && r.status === "confirmed") return true;
     return new Date(eventStart) >= today.setHours(0, 0, 0, 0);
   });
 

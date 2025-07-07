@@ -24,13 +24,13 @@ const Hero = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-9xl flex flex-col items-center sm:items-start animate-fade-in-up">
             <div className="flex items-center gap-4 mb-4 sm:justify-start justify-center w-full">
-              <span className="inline-flex items-center justify-center w-13 h-13 rounded-full bg-gradient-to-tr from-blue-500 to-blue-300 shadow-lg animate-bounce-slow">
+              <span className="inline-flex items-center justify-center w-20 h-12 md:h-13 md:w-13 rounded-full bg-gradient-to-tr from-blue-500 to-blue-300 shadow-lg animate-bounce-slow">
                 <FontAwesomeIcon
                   icon={faSkating}
                   className="text-3xl text-white drop-shadow-xl animate-spin-slow"
                 />
               </span>
-              <span className="text-lg md:text-4xl font-semibold bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x sm:text-left text-center">
+              <span className="text-2xl md:text-4xl font-semibold bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x text-left">
                 Sangli Miraj Kupwad Roller Skating Association
               </span>
             </div>

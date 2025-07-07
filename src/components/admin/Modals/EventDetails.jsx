@@ -47,7 +47,7 @@ export default function EventDetails({ event, onClose }) {
                   src={event.image_url}
                   alt={event.title}
                   className="rounded-xl shadow-lg w-full object-cover border border-blue-200"
-                  style={{ minHeight: '180px', maxHeight: '260px' }}
+                  style={{ minHeight: "180px", maxHeight: "260px" }}
                   loading="lazy"
                 />
               ) : (
@@ -183,21 +183,6 @@ export default function EventDetails({ event, onClose }) {
                   ).map((rule, i) => (
                     <li key={i}>{rule}</li>
                   ))}
-                </ul>
-              </div>
-              <div>
-                <span className="font-semibold text-gray-700">
-                  Scoring System:
-                </span>
-                <ul className="list-disc list-inside text-gray-700 ml-4 mt-1">
-                  {event.rules_and_guidelines?.scoring_system?.length > 0
-                    ? event.rules_and_guidelines.scoring_system.map((s, i) => (
-                        <li key={i}>
-                          <span className="font-semibold">{s.title}:</span>{" "}
-                          {s.desc}
-                        </li>
-                      ))
-                    : ["-"]}
                 </ul>
               </div>
             </div>

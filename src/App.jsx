@@ -20,6 +20,7 @@ import AllEvents from "./components/admin/Pages/AllEvents";
 import AllContactMessage from "./components/admin/Pages/AllContactMessage";
 import AllGallery from "./components/admin/Pages/AllGallery";
 import AboutPage from "./pages/AboutPage";
+import Profile from "./components/admin/Pages/Profile";
 
 function App() {
   return (
@@ -79,6 +80,14 @@ function App() {
           element={
             <AdminRoute>
               <AllGallery />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/profile"
+          element={
+            <AdminRoute>
+              <Profile />
             </AdminRoute>
           }
         />

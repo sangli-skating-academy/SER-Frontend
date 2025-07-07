@@ -131,6 +131,9 @@ export default function EventsTable({
                 Registrations
               </th>
               <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Amount Collected
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                 Action
               </th>
             </tr>
@@ -138,8 +141,11 @@ export default function EventsTable({
           <tbody className="divide-y divide-gray-200">
             {(rowLimit ? data.slice(0, rowLimit) : data).map((event, idx) => {
               const regCount =
+                // only confirmed registration count
                 registrations && event.id
-                  ? registrations.filter((r) => r.event_id === event.id).length
+                  ? registrations.filter(
+                      (r) => r.event_id === event.id && r.status === "confirmed"
+                    ).length
                   : event.registrations;
               return (
                 <tr
@@ -185,19 +191,6 @@ export default function EventsTable({
                             return words.length > 6
                               ? words.slice(0, 6).join(" ") + "..."
                               : first;
-                          })()}
-                        </div>
-                        <div>
-                          <strong>Scoring System:</strong>{" "}
-                          {(() => {
-                            const arr =
-                              event.rules_and_guidelines.scoring_system;
-                            if (!arr || arr.length === 0)
-                              return <span className="text-gray-400">-</span>;
-                            const first = arr[0];
-                            if (!first || !first.title)
-                              return <span className="text-gray-400">-</span>;
-                            return first.title;
                           })()}
                         </div>
                       </span>
@@ -255,6 +248,11 @@ export default function EventsTable({
                     )}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">{regCount}</td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {regCount *
+                      (event.price_per_person || 0) *
+                      (event.max_team_size || 1)}
+                  </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <Button
                       size="sm"
