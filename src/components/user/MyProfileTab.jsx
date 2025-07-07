@@ -15,7 +15,7 @@ const MyProfileTab = ({
   setProfileEditMode,
 }) => (
   <div className="shadow-2xl border-2 border-blue-900 bg-white/80 rounded-3xl animate-fade-in-up">
-    <div className="flex flex-col items-center gap-2 pb-0 p-6 border-b">
+    <div className="flex flex-col items-center gap-2 pb-0 p-6">
       <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-blue-200 via-pink-100 to-blue-100 flex items-center justify-center text-5xl font-extrabold text-blue-600 border-4 border-blue-300 mb-2 animate-fade-in-up shadow-lg">
         {user.username
           ? user.username
@@ -26,9 +26,6 @@ const MyProfileTab = ({
               .slice(0, 2)
           : user.username?.slice(0, 2).toUpperCase() || "U"}
       </div>
-      <p className="text-gray-500 text-lg animate-fade-in-up">
-        @{user.username || "N/A"}
-      </p>
     </div>
     <div className="p-6">
       <div className="grid gap-8 mt-2">
@@ -98,6 +95,20 @@ const MyProfileTab = ({
           </form>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex items-center gap-3">
+              <FontAwesomeIcon
+                icon={faEnvelope}
+                className="text-blue-400 text-xl"
+              />
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
+                  Username
+                </h3>
+                <p className="font-medium text-gray-800">
+                  {user.username || "N/A"}
+                </p>
+              </div>
+            </div>
             <div className="flex items-center gap-3">
               <FontAwesomeIcon
                 icon={faEnvelope}

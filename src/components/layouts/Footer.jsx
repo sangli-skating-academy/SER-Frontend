@@ -99,14 +99,6 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/faq"
-                  className="text-gray-300 hover:text-blue-400 transition-colors"
-                >
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link
                   to="/privacy"
                   className="text-gray-300 hover:text-blue-400 transition-colors"
                 >
@@ -162,10 +154,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-black-800 mt-10 pt-8 text-center text-gray-400 animate-fade-in-up delay-500">
-          <p>
-            &copy; {new Date().getFullYear()} Sports Club Event Registration
-            System. All rights reserved.
-          </p>
+          <p>Sports Club Event Registration System</p>
         </div>
       </div>
     </footer>

@@ -62,9 +62,6 @@ export default function RegistrationsTable({ data, rowLimit, onRowClick }) {
               User
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Role
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
               Event
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -101,9 +98,6 @@ export default function RegistrationsTable({ data, rowLimit, onRowClick }) {
                 <td className="px-4 py-4 whitespace-nowrap">{idx + 1}</td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   {reg.userName || reg.full_name || reg.username}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  {reg.userRole || reg.user_role}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   {reg.eventTitle || reg.event_title}

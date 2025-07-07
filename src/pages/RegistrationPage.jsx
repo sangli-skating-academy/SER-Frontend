@@ -124,20 +124,6 @@ const RegistrationPage = () => {
     });
   };
 
-  // Add/remove team member
-  const addTeamMember = () => {
-    setForm((f) => ({
-      ...f,
-      team_members: [...f.team_members, { full_name: "", age: "", gender: "" }],
-    }));
-  };
-  const removeTeamMember = (idx) => {
-    setForm((f) => ({
-      ...f,
-      team_members: f.team_members.filter((_, i) => i !== idx),
-    }));
-  };
-
   // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -263,54 +249,55 @@ const RegistrationPage = () => {
 
   if (success && showSuccessModal && registeredDetails)
     return (
-      window.screenTop && (
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-grow py-10 bg-gray-50">
-            <div className="container mx-auto px-4">
-              <div className="max-w-2xl mx-auto bg-white border border-green-300 p-8 rounded-lg text-center mt-10 shadow-lg">
-                <h2 className="text-2xl font-bold text-green-700 mb-4">
-                  Registration Successful!
-                </h2>
-                <div className="text-left text-gray-700 space-y-2 mb-6">
-                  <div>
-                    <b>Player Name:</b> {registeredDetails.first_name}{" "}
-                    {registeredDetails.middle_name}{" "}
-                    {registeredDetails.last_name}
-                  </div>
-                  <div>
-                    <b>District:</b> {registeredDetails.district}
-                  </div>
-                  <div>
-                    <b>State:</b> {registeredDetails.state}
-                  </div>
-                  <div>
-                    <b>Coach Name:</b> {registeredDetails.coach_name}
-                  </div>
-                  <div>
-                    <b>Age Group:</b> {registeredDetails.age_group}
-                  </div>
-                  <div>
-                    <b>Category:</b> {registeredDetails.category}
-                  </div>
-                  {event.is_team_event && (
-                    <div>
-                      <b>Team Name:</b> {registeredDetails.team_name}
-                    </div>
-                  )}
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow py-10 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-2xl mx-auto bg-white border border-green-300 p-8 rounded-lg text-center mt-10 shadow-lg">
+              <h2 className="text-2xl font-bold text-green-700 mb-4">
+                Registration Successful!
+              </h2>
+              <div className="text-left text-gray-700 space-y-2 mb-6">
+                <div>
+                  <b>Player Name:</b> {registeredDetails.first_name}{" "}
+                  {registeredDetails.middle_name} {registeredDetails.last_name}
                 </div>
-                <Button
-                  className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700"
-                  onClick={() => navigate("/dashboard")}
-                >
-                  Continue to Pay
-                </Button>
+                <div>
+                  <b>District:</b> {registeredDetails.district}
+                </div>
+                <div>
+                  <b>State:</b> {registeredDetails.state}
+                </div>
+                <div>
+                  <b>Coach Name:</b> {registeredDetails.coach_name}
+                </div>
+                <div>
+                  <b>Age Group:</b> {registeredDetails.age_group}
+                </div>
+                <div>
+                  <b>Category:</b> {registeredDetails.category}
+                </div>
+                {event.is_team_event && (
+                  <div>
+                    <b>Team Name:</b> {registeredDetails.team_name}
+                  </div>
+                )}
               </div>
+              <p className="text-gray-600 mb-6">
+                Thank you for registering! Please proceed to payment. If any
+                data is incorrect you can correct it in your dashboard.
+              </p>
+              <Button
+                className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700"
+                onClick={() => navigate("/dashboard")}
+              >
+                Continue to Pay
+              </Button>
             </div>
-          </main>
-          <Footer />
-        </div>
-      )
+          </div>
+        </main>
+        <Footer />
+      </div>
     );
 
   return (
@@ -638,7 +625,6 @@ const RegistrationPage = () => {
                                       variant="ghost"
                                       size="sm"
                                       className="text-red-500 h-8 px-2"
-                                      onClick={() => removeTeamMember(idx)}
                                     >
                                       <i className="fas fa-times"></i>
                                     </Button>
@@ -697,23 +683,6 @@ const RegistrationPage = () => {
                               </motion.div>
                             ))}
                           </AnimatePresence>
-                        </div>
-                        <div className="flex items-center gap-4 mt-2">
-                          <Button
-                            type="button"
-                            onClick={addTeamMember}
-                            disabled={
-                              form.team_members.length >= event.max_team_size
-                            }
-                            className="bg-blue-100 text-blue-800 border border-blue-200 hover:bg-blue-200"
-                            aria-label="Add team member"
-                          >
-                            <i className="fas fa-plus mr-1"></i> Add Team Member
-                          </Button>
-                          <span className="text-sm text-gray-600">
-                            Team size: {form.team_members.length} /{" "}
-                            {event.max_team_size}
-                          </span>
                         </div>
                       </>
                     )}

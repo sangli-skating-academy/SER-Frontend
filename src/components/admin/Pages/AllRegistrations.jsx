@@ -33,8 +33,7 @@ export default function AllRegistrations() {
   const [searchTerm, setSearchTerm] = useState("");
   const [eventFilter, setEventFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("confirmed");
 
   useEffect(() => {
     setLoading(true);
@@ -72,13 +71,6 @@ export default function AllRegistrations() {
       Array.from(new Set(registrations.map((r) => r.status).filter(Boolean))),
     [registrations]
   );
-  const roles = useMemo(
-    () =>
-      Array.from(
-        new Set(registrations.map((r) => r.user_role).filter(Boolean))
-      ),
-    [registrations]
-  );
 
   // Filtered registrations
   const filteredRegistrations = useMemo(() => {
@@ -97,24 +89,10 @@ export default function AllRegistrations() {
       // Status filter
       const matchesStatus =
         statusFilter === "all" || reg.status === statusFilter;
-      // Role filter
-      const matchesRole = roleFilter === "all" || reg.user_role === roleFilter;
-      return (
-        matchesSearch &&
-        matchesEvent &&
-        matchesType &&
-        matchesStatus &&
-        matchesRole
-      );
+
+      return matchesSearch && matchesEvent && matchesType && matchesStatus;
     });
-  }, [
-    registrations,
-    searchTerm,
-    eventFilter,
-    typeFilter,
-    statusFilter,
-    roleFilter,
-  ]);
+  }, [registrations, searchTerm, eventFilter, typeFilter, statusFilter]);
 
   const filteredRef = useRef(filteredRegistrations);
   filteredRef.current = filteredRegistrations;
@@ -268,48 +246,6 @@ export default function AllRegistrations() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex-1 min-w-[110px]">
-                  <label
-                    htmlFor="status"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Status
-                  </label>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Statuses" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
-                      {statuses.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex-1 min-w-[110px]">
-                  <label
-                    htmlFor="role"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Role
-                  </label>
-                  <Select value={roleFilter} onValueChange={setRoleFilter}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Roles" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Roles</SelectItem>
-                      {roles.map((role) => (
-                        <SelectItem key={role} value={role}>
-                          {role}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
                 <div className="flex items-end w-full sm:w-auto">
                   <Button
                     variant="outline"
@@ -318,8 +254,6 @@ export default function AllRegistrations() {
                       setSearchTerm("");
                       setEventFilter("all");
                       setTypeFilter("all");
-                      setStatusFilter("all");
-                      setRoleFilter("all");
                     }}
                   >
                     <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />{" "}
