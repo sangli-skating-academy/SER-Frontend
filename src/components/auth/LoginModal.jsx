@@ -33,7 +33,6 @@ const LoginModal = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showRegPassword, setShowRegPassword] = useState(false);
-  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   // const { login } = useAuth();
 
@@ -61,34 +60,20 @@ const LoginModal = ({ onClose }) => {
 
   // Register form validation schema
   const registerSchema = yup.object().shape({
-    fullName: yup
-      .string()
-      .min(2, "Full name is too short")
-      .required("Full name is required"),
     username: yup
       .string()
       .min(3, "Username must be at least 3 characters")
       .required("Username is required"),
     email: yup.string().email("Invalid email").required("Email is required"),
+    phone: yup.string().matches(/^\d{10}$/, "Phone must be exactly 10 digits"),
     password: yup
       .string()
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
-    confirmPassword: yup
-      .string()
-      .oneOf([yup.ref("password"), null], "Passwords must match")
-      .required("Confirm your password"),
-    phone: yup.string().matches(/^\d{10}$/, "Phone must be exactly 10 digits"),
-    date_of_birth: yup.string().required("Date of birth is required"),
-    gender: yup
-      .string()
-      .oneOf(["male", "female", "other"], "Select a gender")
-      .required("Gender is required"),
     role: yup
       .string()
       .oneOf(["player", "coach"], "Select a role")
       .required("Role is required"),
-    terms: yup.bool().oneOf([true], "You must agree to the Terms & Conditions"),
   });
 
   // Login form
@@ -103,16 +88,11 @@ const LoginModal = ({ onClose }) => {
   // Register form (updated to match RegisterModal)
   const registerForm = useForm({
     defaultValues: {
-      fullName: "",
       username: "",
       email: "",
-      password: "",
-      confirmPassword: "",
       phone: "",
-      date_of_birth: "",
-      gender: "",
+      password: "",
       role: "player",
-      terms: false,
     },
     resolver: yupResolver(registerSchema),
   });
@@ -152,17 +132,6 @@ const LoginModal = ({ onClose }) => {
   };
 
   const onRegisterSubmit = async (data) => {
-    setError("");
-    if (!data.terms) {
-      setError("You must agree to the Terms & Conditions.");
-      setIsLoading(false);
-      return;
-    }
-    if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match.");
-      setIsLoading(false);
-      return;
-    }
     setIsLoading(true);
     try {
       const res = await fetch(
@@ -175,12 +144,9 @@ const LoginModal = ({ onClose }) => {
           credentials: "include", // Ensure cookies are sent
           body: JSON.stringify({
             username: data.username,
-            full_name: data.fullName,
             email: data.email,
-            password: data.password,
             phone: data.phone,
-            date_of_birth: data.date_of_birth,
-            gender: data.gender,
+            password: data.password,
             role: data.role,
           }),
         }
@@ -401,30 +367,6 @@ const LoginModal = ({ onClose }) => {
             onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
             className="space-y-4 sm:space-y-5 animate-fade-in"
           >
-            {/* Full Name */}
-            <div className="mb-2">
-              <label
-                htmlFor="register-fullName"
-                className="block text-xs font-semibold text-gray-700 mb-1"
-              >
-                Full Name
-              </label>
-              <div className="relative group">
-                <FontAwesomeIcon
-                  icon={faUser}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
-                />
-                <input
-                  id="register-fullName"
-                  {...registerForm.register("fullName")}
-                  placeholder="Full Name"
-                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-                />
-              </div>
-              {renderFieldError(
-                registerForm.formState.errors.fullName?.message
-              )}
-            </div>
             {/* Username */}
             <div className="mb-2">
               <label
@@ -472,6 +414,31 @@ const LoginModal = ({ onClose }) => {
               </div>
               {renderFieldError(registerForm.formState.errors.email?.message)}
             </div>
+            {/* Phone Number */}
+            <div className="mb-2">
+              <label
+                htmlFor="register-phone"
+                className="block text-xs font-semibold text-gray-700 mb-1"
+              >
+                Phone Number
+              </label>
+              <div className="relative group">
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
+                />
+                <input
+                  id="register-phone"
+                  {...registerForm.register("phone")}
+                  placeholder="Phone Number"
+                  maxLength={10}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
+                />
+              </div>
+              {renderFieldError(registerForm.formState.errors.phone?.message)}
+            </div>
             {/* Password */}
             <div className="mb-2">
               <label
@@ -510,127 +477,7 @@ const LoginModal = ({ onClose }) => {
                 registerForm.formState.errors.password?.message
               )}
             </div>
-            {/* Confirm Password */}
-            <div className="mb-2">
-              <label
-                htmlFor="register-confirmPassword"
-                className="block text-xs font-semibold text-gray-700 mb-1"
-              >
-                Confirm Password
-              </label>
-              <div className="relative group">
-                <FontAwesomeIcon
-                  icon={faLock}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
-                />
-                <input
-                  id="register-confirmPassword"
-                  {...registerForm.register("confirmPassword")}
-                  type={showRegConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm Password"
-                  className="w-full min-w-0 pl-10 pr-10 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-                />
-                <button
-                  type="button"
-                  tabIndex={-1}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600 focus:outline-none"
-                  onClick={() => setShowRegConfirmPassword((v) => !v)}
-                  aria-label={
-                    showRegConfirmPassword ? "Hide password" : "Show password"
-                  }
-                >
-                  <FontAwesomeIcon
-                    icon={showRegConfirmPassword ? faEyeSlash : faEye}
-                  />
-                </button>
-              </div>
-              {renderFieldError(
-                registerForm.formState.errors.confirmPassword?.message
-              )}
-            </div>
-            {/* Phone Number */}
-            <div className="mb-2">
-              <label
-                htmlFor="register-phone"
-                className="block text-xs font-semibold text-gray-700 mb-1"
-              >
-                Phone Number
-              </label>
-              <div className="relative group">
-                <FontAwesomeIcon
-                  icon={faUser}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
-                />
-                <input
-                  id="register-phone"
-                  {...registerForm.register("phone")}
-                  placeholder="Phone Number"
-                  maxLength={10}
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-                />
-              </div>
-              {renderFieldError(registerForm.formState.errors.phone?.message)}
-            </div>
-            {/* Date of Birth */}
-            <div className="mb-2">
-              <label
-                htmlFor="register-date_of_birth"
-                className="block text-xs font-semibold text-gray-700 mb-1"
-              >
-                Date of Birth
-              </label>
-              <div className="relative group">
-                <FontAwesomeIcon
-                  icon={faUser}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
-                />
-                <input
-                  id="register-date_of_birth"
-                  {...registerForm.register("date_of_birth")}
-                  type="date"
-                  placeholder="Date of Birth"
-                  pattern="\d{4}-\d{2}-\d{2}"
-                  onInvalid={(e) => e.preventDefault()}
-                  autoComplete="off"
-                  className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base"
-                />
-              </div>
-              {renderFieldError(
-                registerForm.formState.errors.date_of_birth?.message
-              )}
-            </div>
-            {/* Gender Selection */}
-            <div className="mb-2">
-              <label
-                htmlFor="register-gender"
-                className="block text-xs font-semibold text-gray-700 mb-1"
-              >
-                Gender
-              </label>
-              <div className="relative group">
-                <FontAwesomeIcon
-                  icon={faUser}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-blue-600 transition-colors pointer-events-none"
-                />
-                <Select
-                  value={registerForm.watch("gender")}
-                  onValueChange={(v) => registerForm.setValue("gender", v)}
-                >
-                  <SelectTrigger className="w-full min-w-0 pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white/80 shadow focus:outline-none focus:ring-2 focus:ring-blue-600/60 focus:shadow-lg transition-all placeholder:text-gray-400 text-sm sm:text-base">
-                    <SelectValue placeholder="Select Gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {/* <SelectItem value="">Select Gender</SelectItem> */}
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {renderFieldError(registerForm.formState.errors.gender?.message)}
-            </div>
+
             {/* Role Selection */}
             <div className="mb-2">
               <label className="block text-xs font-semibold text-gray-700 mb-1">
@@ -688,38 +535,7 @@ const LoginModal = ({ onClose }) => {
               </div>
               {renderFieldError(registerForm.formState.errors.role?.message)}
             </div>
-            {/* Terms and Conditions */}
-            <div className="flex items-start space-x-2 mt-2 sm:mt-4 animate-fade-in mb-2">
-              <input
-                id="register-terms"
-                type="checkbox"
-                checked={registerForm.watch("terms")}
-                onChange={(e) =>
-                  registerForm.setValue("terms", e.target.checked)
-                }
-                className="mt-1 accent-blue-600 focus:ring-2 focus:ring-blue-600 transition-all"
-              />
-              <label
-                htmlFor="register-terms"
-                className="text-xs sm:text-sm text-gray-600"
-              >
-                I agree to the{" "}
-                <a
-                  href="#"
-                  className="text-blue-600 hover:underline transition-colors"
-                >
-                  Terms & Conditions
-                </a>{" "}
-                and acknowledge the{" "}
-                <a
-                  href="#"
-                  className="text-blue-600 hover:underline transition-colors"
-                >
-                  Privacy Policy
-                </a>
-              </label>
-            </div>
-            {renderFieldError(registerForm.formState.errors.terms?.message)}
+
             {/* Error Message */}
             {error && (
               <div className="text-red-600 text-center mb-2 animate-fade-in">

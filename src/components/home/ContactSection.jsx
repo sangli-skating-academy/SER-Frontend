@@ -106,8 +106,10 @@ const ContactSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold font-montserrat mb-3 bg-gradient-to-r from-blue-400 via-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x drop-shadow-xl">
             Contact Us
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto animate-fade-in">
-            Have questions about our events? Get in touch with our team.
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in">
+            We would love to hear from you! Whether you have a question about
+            events, registration, or anything else, our team is ready to answer
+            all your questions.
           </p>
         </div>
         <div
@@ -128,8 +130,8 @@ const ContactSection = () => {
                 <div>
                   <h4 className="font-medium mb-1">Address</h4>
                   <p className="text-gray-600">
-                    Shivaji Stadium Skating Rink, Near Ambrai Garden , Sangli
-                    416416{" "}
+                    Chatrapati Shivaji Stadium Skating Rink, Near Ambrai Garden
+                    , Sangli 416416{" "}
                   </p>
                 </div>
               </div>
@@ -139,7 +141,10 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-medium mb-1">Phone</h4>
-                  <p className="text-gray-600">+91 9595893434</p>
+                  <p className="text-gray-600">
+                    +91 9595893434 (Suraj A. Shinde)
+                  </p>
+                  <p className="text-gray-600">+91 1111111111 (XYZ)</p>
                 </div>
               </div>
               <div className="flex items-start animate-fade-in delay-200">

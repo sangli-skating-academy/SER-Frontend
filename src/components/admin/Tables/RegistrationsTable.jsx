@@ -77,6 +77,9 @@ export default function RegistrationsTable({ data, rowLimit, onRowClick }) {
               Status
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+              Amount Paid
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
               Coach
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -120,6 +123,9 @@ export default function RegistrationsTable({ data, rowLimit, onRowClick }) {
                     {statusIcon(reg.status)}
                     {reg.status}
                   </Badge>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  {reg.payment_amount || reg.amount || "-"}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   {reg.coachName || reg.coach_name || "-"}

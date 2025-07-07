@@ -107,14 +107,6 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/rules"
-                  className="text-gray-300 hover:text-blue-400 transition-colors"
-                >
-                  Rules & Regulations
-                </Link>
-              </li>
-              <li>
-                <Link
                   to="/privacy"
                   className="text-gray-300 hover:text-blue-400 transition-colors"
                 >
@@ -129,6 +121,14 @@ export default function Footer() {
                   Terms of Service
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/Refund"
+                  className="text-gray-300 hover:text-blue-400 transition-colors"
+                >
+                  Cancellation/ Refund Policy
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="animate-fade-in-up delay-300">
@@ -137,7 +137,8 @@ export default function Footer() {
             </h3>
             <address className="not-italic text-gray-300 space-y-2">
               <p>
-                Shivaji Stadium Skating Rink, Near Ambrai Garden , Sangli 416416{" "}
+                Chatrapati Shivaji Stadium Skating Rink, Near Ambrai Garden ,
+                Sangli 416416{" "}
               </p>
               <p>
                 Email:{" "}
@@ -151,10 +152,10 @@ export default function Footer() {
               <p>
                 Phone:{" "}
                 <a
-                  href="tel:+911234567890"
+                  href="tel:+9595893434"
                   className="hover:text-blue-400 transition-colors"
                 >
-                  +91 9595893434
+                  +91 9595893434 (Suraj A. Shinde)
                 </a>
               </p>
             </address>

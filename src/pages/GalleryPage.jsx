@@ -201,7 +201,13 @@ export default function GalleryPage() {
                 <div className="flex items-end w-full sm:w-auto">
                   <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-full sm:w-43 h-[40px]"
+                    className={`flex items-center gap-2 w-full sm:w-43 h-[40px] ${
+                      searchTerm !== "" ||
+                      categoryFilter !== "all" ||
+                      yearFilter !== "all"
+                        ? "border-red-300 bg-red-50 text-red-500"
+                        : ""
+                    }`}
                     onClick={() => {
                       setSearchTerm("");
                       setCategoryFilter("all");

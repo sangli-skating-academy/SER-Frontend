@@ -46,12 +46,11 @@ const initialForm = {
   last_name: "",
   dob: "",
   district: "",
+  state: "",
   category: "",
   aadhaar_number: "",
   team_name: "",
-  team_members: [
-    { full_name: "", age: "", gender: "", experience: "beginner" },
-  ],
+  team_members: [{ full_name: "", age: "", gender: "" }],
 };
 
 const RegistrationPage = () => {
@@ -66,6 +65,8 @@ const RegistrationPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [registeredDetails, setRegisteredDetails] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -85,7 +86,6 @@ const RegistrationPage = () => {
                   full_name: "",
                   age: "",
                   gender: "",
-                  experience: "beginner",
                 }))
               : f.team_members,
         }));
@@ -102,15 +102,6 @@ const RegistrationPage = () => {
       setError("No event selected");
     }
   }, [id]);
-
-  useEffect(() => {
-    if (success) {
-      const timeout = setTimeout(() => {
-        navigate("/dashboard");
-      }, 1800);
-      return () => clearTimeout(timeout);
-    }
-  }, [success, navigate]);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -137,10 +128,7 @@ const RegistrationPage = () => {
   const addTeamMember = () => {
     setForm((f) => ({
       ...f,
-      team_members: [
-        ...f.team_members,
-        { full_name: "", age: "", gender: "", experience: "beginner" },
-      ],
+      team_members: [...f.team_members, { full_name: "", age: "", gender: "" }],
     }));
   };
   const removeTeamMember = (idx) => {
@@ -160,7 +148,7 @@ const RegistrationPage = () => {
     if (event.is_team_event) {
       for (let i = 0; i < form.team_members.length; i++) {
         const m = form.team_members[i];
-        if (!m.full_name || !m.age || !m.gender || !m.experience) {
+        if (!m.full_name || !m.age || !m.gender) {
           setError(`Please fill all fields for team member ${i + 1}`);
           setSubmitting(false);
           return;
@@ -202,6 +190,18 @@ const RegistrationPage = () => {
       );
       if (aadhaarImage) fd.append("aadhaarImage", aadhaarImage);
       await apiFetch("/api/registrations", { method: "POST", body: fd });
+      setRegisteredDetails({
+        first_name: form.first_name,
+        middle_name: form.middle_name,
+        last_name: form.last_name,
+        district: form.district,
+        state: form.state,
+        coach_name: form.coach_name,
+        age_group: form.age_group,
+        category: form.category,
+        team_name: form.team_name,
+      });
+      setShowSuccessModal(true);
       setSuccess(true);
       toast({
         title: "Registration Successful",
@@ -261,19 +261,56 @@ const RegistrationPage = () => {
       </div>
     );
 
-  if (success)
+  if (success && showSuccessModal && registeredDetails)
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow py-10 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto bg-green-100 text-green-700 p-6 rounded-lg text-center mt-10">
-              Registration successful! Redirecting to your dashboard...
+      window.screenTop && (
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-grow py-10 bg-gray-50">
+            <div className="container mx-auto px-4">
+              <div className="max-w-2xl mx-auto bg-white border border-green-300 p-8 rounded-lg text-center mt-10 shadow-lg">
+                <h2 className="text-2xl font-bold text-green-700 mb-4">
+                  Registration Successful!
+                </h2>
+                <div className="text-left text-gray-700 space-y-2 mb-6">
+                  <div>
+                    <b>Player Name:</b> {registeredDetails.first_name}{" "}
+                    {registeredDetails.middle_name}{" "}
+                    {registeredDetails.last_name}
+                  </div>
+                  <div>
+                    <b>District:</b> {registeredDetails.district}
+                  </div>
+                  <div>
+                    <b>State:</b> {registeredDetails.state}
+                  </div>
+                  <div>
+                    <b>Coach Name:</b> {registeredDetails.coach_name}
+                  </div>
+                  <div>
+                    <b>Age Group:</b> {registeredDetails.age_group}
+                  </div>
+                  <div>
+                    <b>Category:</b> {registeredDetails.category}
+                  </div>
+                  {event.is_team_event && (
+                    <div>
+                      <b>Team Name:</b> {registeredDetails.team_name}
+                    </div>
+                  )}
+                </div>
+                <Button
+                  className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Continue to Pay
+                </Button>
+              </div>
             </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
+          </main>
+          <Footer />
+        </div>
+      )
     );
 
   return (
@@ -419,37 +456,40 @@ const RegistrationPage = () => {
                         required
                         placeholder="YYYY-MM-DD"
                       />
-                      {!event.is_team_event && (
-                        <div>
-                          <label
-                            htmlFor="age_group"
-                            className="block text-sm font-semibold mb-1 text-black"
-                          >
-                            Age Group*
-                          </label>
-                          <Select
-                            name="age_group"
-                            value={form.age_group}
-                            onValueChange={(val) =>
-                              setForm((f) => ({ ...f, age_group: val }))
-                            }
-                            required
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select age group" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="under 8">Under 8</SelectItem>
-                              <SelectItem value="under 10">Under 10</SelectItem>
-                              <SelectItem value="under 12">Under 12</SelectItem>
-                              <SelectItem value="under 14">Under 14</SelectItem>
-                              <SelectItem value="under 16">Under 16</SelectItem>
-                              <SelectItem value="under 18">Under 18</SelectItem>
-                              <SelectItem value="18+">18+</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )}
+
+                      <div>
+                        <label
+                          htmlFor="age_group"
+                          className="block text-sm font-semibold mb-1 text-black"
+                        >
+                          Age Group*
+                        </label>
+                        <Select
+                          name="age_group"
+                          placeholder="Select age group"
+                          aria-label="Age Group"
+                          value={form.age_group}
+                          onValueChange={(val) =>
+                            setForm((f) => ({ ...f, age_group: val }))
+                          }
+                          required
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select age group" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="under 8">Under 8</SelectItem>
+                            <SelectItem value="under 10">Under 10</SelectItem>
+                            <SelectItem value="under 12">Under 12</SelectItem>
+                            <SelectItem value="under 14">Under 14</SelectItem>
+                            <SelectItem value="under 16">Under 16</SelectItem>
+                            <SelectItem value="under 18">Under 18</SelectItem>
+                            <SelectItem value="under 20">Under 20</SelectItem>
+                            <SelectItem value="under 22">Under 22</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
                       <div>
                         <label
                           htmlFor="gender"
@@ -484,6 +524,30 @@ const RegistrationPage = () => {
                         required
                         placeholder="Enter district"
                       />
+                      <Input
+                        label="State*"
+                        name="state"
+                        value={form.state}
+                        onChange={handleChange}
+                        required
+                        placeholder="Enter state"
+                      />
+                      <Input
+                        label="Coach Name*"
+                        name="coach_name"
+                        value={form.coach_name}
+                        onChange={handleChange}
+                        required
+                        placeholder="Enter coach name"
+                      />
+                      <Input
+                        label="Club Name*"
+                        name="club_name"
+                        value={form.club_name}
+                        onChange={handleChange}
+                        required
+                        placeholder="Enter club name"
+                      />
                       <div>
                         <label
                           htmlFor="category"
@@ -506,37 +570,10 @@ const RegistrationPage = () => {
                           <SelectContent>
                             <SelectItem value="quad">Quad</SelectItem>
                             <SelectItem value="inline">Inline</SelectItem>
+                            <SelectItem value="Fancy-Inline">
+                              Fancy Inline
+                            </SelectItem>
                             <SelectItem value="beginner">Beginner</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="experience"
-                          className="block text-sm font-semibold mb-1 text-black"
-                        >
-                          Experience*
-                        </label>
-                        <Select
-                          name="experience"
-                          aria-label="Experience"
-                          value={form.experience || "beginner"}
-                          onValueChange={(val) =>
-                            setForm((f) => ({ ...f, experience: val }))
-                          }
-                          required
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select experience" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="beginner">
-                              Beginner (0-1 years)
-                            </SelectItem>
-                            <SelectItem value="intermediate">
-                              Intermediate (1-3 years)
-                            </SelectItem>
-                            <SelectItem value="pro">Pro (3+ years)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -568,20 +605,7 @@ const RegistrationPage = () => {
                         )}
                       </div>
                     </div>
-                    <Input
-                      label="Coach Name"
-                      name="coach_name"
-                      value={form.coach_name}
-                      onChange={handleChange}
-                      placeholder="Enter coach name (optional)"
-                    />
-                    <Input
-                      label="Club Name"
-                      name="club_name"
-                      value={form.club_name}
-                      onChange={handleChange}
-                      placeholder="Enter club name (optional)"
-                    />
+
                     {event.is_team_event && (
                       <>
                         <Input
@@ -666,31 +690,6 @@ const RegistrationPage = () => {
                                       </SelectItem>
                                       <SelectItem value="other">
                                         Other
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  <Select
-                                    value={member.experience}
-                                    onValueChange={(val) =>
-                                      handleTeamMemberChange(
-                                        idx,
-                                        "experience",
-                                        val
-                                      )
-                                    }
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select experience" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="beginner">
-                                        Beginner (0-1 years)
-                                      </SelectItem>
-                                      <SelectItem value="intermediate">
-                                        Intermediate (1-3 years)
-                                      </SelectItem>
-                                      <SelectItem value="pro">
-                                        Pro (3+ years)
                                       </SelectItem>
                                     </SelectContent>
                                   </Select>

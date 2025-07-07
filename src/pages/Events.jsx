@@ -14,6 +14,8 @@ import {
   SelectItem,
 } from "../components/ui/select";
 import Button from "../components/ui/button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
 
 const EventsPage = () => {
   const [filter, setFilter] = useState({
@@ -218,9 +220,16 @@ const EventsPage = () => {
                   </Select>
                 </div>
                 <div className="flex items-end">
+                  {/* Change color of filter button when filter are active */}
                   <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-full sm:w-43 h-[40px]"
+                    className={`flex items-center gap-2 w-full sm:w-43 h-[40px] ${
+                      filter.hashtag !== "all" ||
+                      filter.ageGroup !== "all" ||
+                      filter.gender !== "all"
+                        ? "border-red-300 bg-red-50 text-red-500"
+                        : ""
+                    }`}
                     onClick={() =>
                       setFilter({
                         hashtag: "all",
@@ -229,6 +238,7 @@ const EventsPage = () => {
                       })
                     }
                   >
+                    <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />{" "}
                     Clear Filters
                   </Button>
                 </div>

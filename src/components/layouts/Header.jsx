@@ -54,152 +54,150 @@ const Header = () => {
           isScrolled ? "shadow-lg" : ""
         } transition-shadow duration-300 animate-fade-in`}
       >
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center py-3">
-            <div className="flex items-center">
-              {/* Logo */}
-              <Link to="/" className="flex items-center space-x-2 group">
-                <div className="w-12 h-12 rounded-full  flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 animate-spin-slow">
-                  <img
-                    src="/logo-header.png"
-                    alt="Sai Skating Academy"
-                    loading="lazy"
-                  />
-                </div>
-                <span className="text-2xl font-montserrat text-dark hidden md:inline tracking-tight group-hover:text-primary transition-colors duration-300 animate-gradient-x">
-                  Sai Skating
-                </span>
-              </Link>
-            </div>
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8 items-center">
+        <div className="flex justify-between items-center py-3 px-5 mx-auto">
+          <div className="flex items-center">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2 group">
+              <div className="w-12 h-12 rounded-full  flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 animate-spin-slow">
+                <img
+                  src="/logo-header.png"
+                  alt="Sai Skating Academy"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-2xl font-montserrat text-dark hidden md:inline tracking-tight group-hover:text-primary transition-colors duration-300 animate-gradient-x">
+                Sai Skating
+              </span>
+            </Link>
+          </div>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-8 items-center">
+            <Link
+              to="/"
+              className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
+                location.pathname === "/"
+                  ? "text-pink-400 font-bold"
+                  : "hover:text-blue-400"
+              }`}
+            >
+              <FontAwesomeIcon icon={faHome} /> Home
+            </Link>
+            <Link
+              to="/events"
+              className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
+                location.pathname === "/events"
+                  ? "text-pink-400 font-bold"
+                  : "hover:text-blue-400"
+              }`}
+            >
+              <FontAwesomeIcon icon={faCalendarAlt} /> Events
+            </Link>
+            <Link
+              to="/gallery"
+              className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
+                location.pathname === "/gallery"
+                  ? "text-pink-400 font-bold"
+                  : "hover:text-blue-400"
+              }`}
+            >
+              <FontAwesomeIcon icon={faImages} /> Gallery
+            </Link>
+            <Link
+              to="/about"
+              className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
+                location.pathname === "/about"
+                  ? "text-pink-400 font-bold"
+                  : "hover:text-blue-400"
+              }`}
+            >
+              <FontAwesomeIcon icon={faInfoCircle} /> About Us
+            </Link>
+            <Link
+              to="/contact"
+              className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
+                location.pathname === "/contact"
+                  ? "text-pink-400 font-bold"
+                  : "hover:text-blue-400"
+              }`}
+            >
+              <FontAwesomeIcon icon={faEnvelope} /> Contact
+            </Link>
+          </nav>
+          <div className="flex items-center space-x-4">
+            {/* Dashboard button always visible (desktop and mobile) */}
+            {user && (
               <Link
-                to="/"
-                className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
-                  location.pathname === "/"
+                to="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                style={{ minWidth: 110 }}
+                className={
+                  location.pathname === "/dashboard"
                     ? "text-pink-400 font-bold"
-                    : "hover:text-blue-400"
-                }`}
+                    : ""
+                }
               >
-                <FontAwesomeIcon icon={faHome} /> Home
-              </Link>
-              <Link
-                to="/events"
-                className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
-                  location.pathname === "/events"
-                    ? "text-pink-400 font-bold"
-                    : "hover:text-blue-400"
-                }`}
-              >
-                <FontAwesomeIcon icon={faCalendarAlt} /> Events
-              </Link>
-              <Link
-                to="/gallery"
-                className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
-                  location.pathname === "/gallery"
-                    ? "text-pink-400 font-bold"
-                    : "hover:text-blue-400"
-                }`}
-              >
-                <FontAwesomeIcon icon={faImages} /> Gallery
-              </Link>
-              <Link
-                to="/about"
-                className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
-                  location.pathname === "/about"
-                    ? "text-pink-400 font-bold"
-                    : "hover:text-blue-400"
-                }`}
-              >
-                <FontAwesomeIcon icon={faInfoCircle} /> About Us
-              </Link>
-              <Link
-                to="/contact"
-                className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
-                  location.pathname === "/contact"
-                    ? "text-pink-400 font-bold"
-                    : "hover:text-blue-400"
-                }`}
-              >
-                <FontAwesomeIcon icon={faEnvelope} /> Contact
-              </Link>
-            </nav>
-            <div className="flex items-center space-x-4">
-              {/* Dashboard button always visible (desktop and mobile) */}
-              {user && (
-                <Link
-                  to="/dashboard"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  style={{ minWidth: 110 }}
-                  className={
-                    location.pathname === "/dashboard"
-                      ? "text-pink-400 font-bold"
-                      : ""
-                  }
-                >
-                  <Button
-                    variant="outline"
-                    className={`px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in "${
-                      location.pathname === "/dashboard"
-                        ? "border-blue-400 bg-blue-50 text-blue-500"
-                        : ""
-                    }`}
-                  >
-                    <FontAwesomeIcon icon={faUserCircle} /> Dashboard
-                  </Button>
-                </Link>
-              )}
-              {user ? (
-                <>
-                  {/* Desktop only: Dashboard and Logout side by side */}
-                  <div className="hidden md:flex flex-row gap-4">
-                    <Button
-                      variant="ghost"
-                      className="px-4 py-2 text-gray-600 hover:text-primary flex items-center gap-2 hover:text-red-400 hover:scale-105 border-1 transition-colors duration-200 animate-fade-in"
-                      onClick={handleLogoutClick}
-                    >
-                      <FontAwesomeIcon icon={faSignOutAlt} /> Logout
-                    </Button>
-                  </div>
-                </>
-              ) : (
                 <Button
                   variant="outline"
-                  className="px-4 py-2 text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in"
-                  onClick={handleLoginClick}
+                  className={`px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in "${
+                    location.pathname === "/dashboard"
+                      ? "border-blue-400 bg-blue-50 text-blue-500"
+                      : ""
+                  }`}
                 >
-                  <FontAwesomeIcon icon={faSignInAlt} /> Login
+                  <FontAwesomeIcon icon={faUserCircle} /> Dashboard
                 </Button>
-              )}
-              {/* Animated Hamburger/Cross Icon */}
-              <button
-                aria-label="Toggle menu"
-                className="md:hidden text-dark focus:outline-none hover:text-primary transition-colors duration-200 animate-fade-in relative w-10 h-10 flex items-center justify-center"
-                onClick={toggleMobileMenu}
-              >
-                <div className="w-8 h-7 flex flex-col justify-center items-center relative">
-                  <span
-                    className={`block absolute h-1 w-7 bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 rounded transition-all duration-300 ease-in-out ${
-                      isMobileMenuOpen
-                        ? "rotate-45 top-4 bg-pink-500 shadow-lg"
-                        : "-translate-y-2 top-2"
-                    }`}
-                  ></span>
-                  <span
-                    className={`block absolute h-1 w-7 bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 rounded transition-all duration-300 ease-in-out ${
-                      isMobileMenuOpen ? "opacity-0" : "opacity-100 top-3"
-                    }`}
-                  ></span>
-                  <span
-                    className={`block absolute h-1 w-7 bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 rounded transition-all duration-300 ease-in-out ${
-                      isMobileMenuOpen
-                        ? "-rotate-45 top-4 bg-pink-500 shadow-lg"
-                        : "translate-y-2 top-4"
-                    }`}
-                  ></span>
+              </Link>
+            )}
+            {user ? (
+              <>
+                {/* Desktop only: Dashboard and Logout side by side */}
+                <div className="hidden md:flex flex-row gap-4">
+                  <Button
+                    variant="ghost"
+                    className="px-4 py-2 text-gray-600 hover:text-primary flex items-center gap-2 hover:text-red-400 hover:scale-105 border-1 transition-colors duration-200 animate-fade-in"
+                    onClick={handleLogoutClick}
+                  >
+                    <FontAwesomeIcon icon={faSignOutAlt} /> Logout
+                  </Button>
                 </div>
-              </button>
-            </div>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                className="px-4 py-2 text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in"
+                onClick={handleLoginClick}
+              >
+                <FontAwesomeIcon icon={faSignInAlt} /> Login
+              </Button>
+            )}
+            {/* Animated Hamburger/Cross Icon */}
+            <button
+              aria-label="Toggle menu"
+              className="md:hidden text-dark focus:outline-none hover:text-primary transition-colors duration-200 animate-fade-in relative w-10 h-10 flex items-center justify-center"
+              onClick={toggleMobileMenu}
+            >
+              <div className="w-8 h-7 flex flex-col justify-center items-center relative">
+                <span
+                  className={`block absolute h-1 w-7 bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 rounded transition-all duration-300 ease-in-out ${
+                    isMobileMenuOpen
+                      ? "rotate-45 top-4 bg-pink-500 shadow-lg"
+                      : "-translate-y-2 top-2"
+                  }`}
+                ></span>
+                <span
+                  className={`block absolute h-1 w-7 bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 rounded transition-all duration-300 ease-in-out ${
+                    isMobileMenuOpen ? "opacity-0" : "opacity-100 top-3"
+                  }`}
+                ></span>
+                <span
+                  className={`block absolute h-1 w-7 bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400 rounded transition-all duration-300 ease-in-out ${
+                    isMobileMenuOpen
+                      ? "-rotate-45 top-4 bg-pink-500 shadow-lg"
+                      : "translate-y-2 top-4"
+                  }`}
+                ></span>
+              </div>
+            </button>
           </div>
         </div>
       </header>

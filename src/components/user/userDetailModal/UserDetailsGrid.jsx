@@ -345,6 +345,7 @@ const UserDetailsGrid = ({
                 className="border rounded px-2 py-1 w-full"
               />
             </div>
+
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
                 Category
@@ -403,6 +404,18 @@ const UserDetailsGrid = ({
                     </span>
                   </div>
                 )}
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">
+                State
+              </label>
+              <input
+                name="state"
+                value={editDetails.state || ""}
+                onChange={handleEditDetailsChange}
+                className="border rounded px-2 py-1 w-full"
+                required
+              />
             </div>
           </div>
           <div className="flex gap-2 justify-end mt-6">
@@ -499,6 +512,14 @@ const UserDetailsGrid = ({
                 icon={faClipboardList}
                 className="text-blue-400"
               />
+              <b>State:</b>{" "}
+              <span className="ml-1">{userDetails.state || "N/A"}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon
+                icon={faClipboardList}
+                className="text-blue-400"
+              />
               <b>Aadhaar Number:</b>{" "}
               <span className="ml-1">
                 {userDetails.aadhaar_number || "N/A"}
@@ -546,6 +567,7 @@ const UserDetailsGrid = ({
                 )}
               </span>
             </div>
+
             <div className="col-span-1 sm:col-span-2 flex gap-2 justify-end mt-4">
               <Button
                 variant="outline"

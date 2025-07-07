@@ -23,20 +23,6 @@ const ContactPage = () => {
         <Header />
         <main className="flex-grow py-10">
           <div className="container mx-auto px-4">
-            {/* Hero Section */}
-            <div
-              className="mb-12 text-center animate-fade-in-up"
-              data-aos="fade-up"
-            >
-              <h1 className="text-4xl md:text-5xl font-bold font-montserrat mb-4 bg-gradient-to-r from-blue-400 via-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x drop-shadow-xl">
-                Get in Touch
-              </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in">
-                We would love to hear from you! Whether you have a question
-                about events, registration, or anything else, our team is ready
-                to answer all your questions.
-              </p>
-            </div>
             {/* Contact Section (Form + Info) */}
             <ContactSection />
             {/* Map Section */}

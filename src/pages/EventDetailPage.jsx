@@ -198,139 +198,44 @@ const EventDetailPage = () => {
             data-aos="fade-up"
             data-aos-delay="100"
           >
-            <Tabs defaultValue="overview" className="w-full">
+            <Tabs defaultValue="rules" className="w-full">
               <TabsList className="w-full justify-start border-b rounded-none mb-6 overflow-x-auto flex-nowrap">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="rules">Rules & Guidelines</TabsTrigger>
                 <TabsTrigger value="location">Location</TabsTrigger>
               </TabsList>
-              <TabsContent value="overview">
-                <h2 className="text-2xl font-bold mb-4">Event Overview</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  {/* Competition */}
-                  <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
-                    <CardHeader className="pb-2 flex flex-row items-center gap-3">
-                      <span className="rounded-full bg-blue-200 p-2">
-                        <FontAwesomeIcon
-                          icon={faMedal}
-                          className="w-6 h-6 text-blue-600"
-                        />
-                      </span>
-                      <CardTitle className="text-lg">Competition</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription>
-                        Challenge yourself against fellow sports enthusiasts in
-                        a friendly but competitive environment.
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
-                  {/* Community */}
-                  <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-100">
-                    <CardHeader className="pb-2 flex flex-row items-center gap-3">
-                      <span className="rounded-full bg-pink-200 p-2">
-                        <FontAwesomeIcon
-                          icon={faUsers}
-                          className="w-6 h-6 text-pink-600"
-                        />
-                      </span>
-                      <CardTitle className="text-lg text-pink-600">
-                        Community
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription>
-                        Connect with others who share your passion and expand
-                        your network.
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
-                  {/* Professional Timing */}
-                  <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up delay-200">
-                    <CardHeader className="pb-2 flex flex-row items-center gap-3">
-                      <span className="rounded-full bg-blue-100 p-2">
-                        <FontAwesomeIcon
-                          icon={faClock}
-                          className="w-6 h-6 text-blue-500"
-                        />
-                      </span>
-                      <CardTitle className="text-lg">
-                        Professional Timing
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription>
-                        All performances are timed using professional equipment
-                        for accurate results.
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
-                  {/* Expert Coaches */}
-                  <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up delay-300">
-                    <CardHeader className="pb-2 flex flex-row items-center gap-3">
-                      <span className="rounded-full bg-pink-100 p-2">
-                        <FontAwesomeIcon
-                          icon={faInfoCircle}
-                          className="w-6 h-6 text-pink-500"
-                        />
-                      </span>
-                      <CardTitle className="text-lg text-pink-500">
-                        Expert Coaches
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription>
-                        Qualified coaches will be present to provide guidance
-                        and feedback.
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
-                </div>
-                <h3 className="text-xl font-bold mb-3">Event Highlights</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  {[
-                    {
-                      icon: faMedal,
-                      color: "bg-yellow-100 text-yellow-600",
-                      text: "Professional equipment and facilities",
-                    },
-                    {
-                      icon: faMedal,
-                      color: "bg-green-100 text-green-600",
-                      text: "Medals and certificates for top performers",
-                    },
-                    {
-                      icon: faClock,
-                      color: "bg-blue-100 text-blue-600",
-                      text: "Refreshments available throughout the event",
-                    },
-                    {
-                      icon: faUsers,
-                      color: "bg-pink-100 text-pink-600",
-                      text: "Photo opportunities and professional event photography",
-                    },
-                    {
-                      icon: faInfoCircle,
-                      color: "bg-purple-100 text-purple-600",
-                      text: "Networking opportunities with coaches and other participants",
-                    },
-                  ].map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 bg-white/80 rounded-lg shadow p-4 animate-fade-in-up"
-                    >
-                      <span className={`rounded-full p-2 ${item.color}`}>
-                        <FontAwesomeIcon icon={item.icon} className="w-5 h-5" />
-                      </span>
-                      <span className="text-base font-medium text-gray-700">
-                        {item.text}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
               <TabsContent value="rules">
                 <div className="space-y-8">
+                  {/* <h2 className="text-2xl font-bold mb-4">Event Overview</h2> */}
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
+                    {/* Competition */}
+                    <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
+                      <CardHeader className="pb-2 flex flex-row items-center gap-3">
+                        <span className="rounded-full bg-yellow-200 p-2">
+                          <FontAwesomeIcon
+                            icon={faMedal}
+                            className="w-6 h-6 text-yellow-600"
+                          />
+                        </span>
+                        <CardTitle className="text-lg text-yellow-400">
+                          Event Overview
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <span className="text-black-500 flex items-start gap-2">
+                          <span className="mt-1">
+                            <FontAwesomeIcon
+                              className="text-yellow-400"
+                              icon={faInfoCircle}
+                            />
+                          </span>
+                          <span>
+                            Challenge yourself against fellow sports enthusiasts
+                            in a friendly but competitive environment.
+                          </span>
+                        </span>
+                      </CardContent>
+                    </Card>
+                  </div>
                   {/* General Rules */}
                   {event.rules_and_guidelines?.general_rules?.length > 0 && (
                     <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">

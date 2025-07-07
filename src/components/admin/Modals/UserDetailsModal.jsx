@@ -81,6 +81,12 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
                 <b>Coach Name:</b> {selectedReg.coach_name || "-"}
               </div>
               <div>
+                <b>District:</b> {selectedReg.district || "-"}
+              </div>
+              <div>
+                <b>State:</b> {selectedReg.state || "-"}
+              </div>
+              <div>
                 <b>Club Name:</b> {selectedReg.club_name || "-"}
               </div>
               <div>

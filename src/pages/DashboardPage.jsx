@@ -29,7 +29,7 @@ const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
-  const { auth } = useAuth();
+  const { auth, setUser } = useAuth();
   const user = auth.user;
   const { toast } = useToast();
   const [registrations, setRegistrations] = useState([]);
@@ -47,19 +47,10 @@ const DashboardPage = () => {
   });
   const cancelButtonRef = useRef();
   const [profileEditMode, setProfileEditMode] = useState(false);
-  const [profileEdit, setProfileEdit] = useState({});
+  const [profileEdit, setProfileEdit] = useState(user);
   const [profileLoading, setProfileLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate("/");
-      toast({
-        title: "Authentication required",
-        description: "Please login to access the dashboard",
-        variant: "destructive",
-      });
-      return;
-    }
     document.title = "Dashboard | SSAS";
     const fetchData = async () => {
       setLoading(true);
@@ -80,6 +71,12 @@ const DashboardPage = () => {
     };
     fetchData();
   }, [user, navigate, toast]);
+
+  const fetchUser = async () => {
+    const data = await apiFetch("/api/users/me", { credentials: "include" });
+    setUser(data.user);
+    setProfileEdit(data.user); // Optionally update edit state too
+  };
 
   const handlePaymentClick = (registration) => {
     const event = events.find((e) => e.id === registration.event_id);
@@ -226,6 +223,7 @@ const DashboardPage = () => {
       if (auth && auth.setUser) auth.setUser(updated);
       toast({ title: "Profile Updated", variant: "success" });
       setProfileEditMode(false);
+      window.location.reload(); // Reload the page after successful save
     } catch (err) {
       toast({
         title: "Error",
@@ -306,6 +304,7 @@ const DashboardPage = () => {
                     profileEditMode={profileEditMode}
                     profileEdit={profileEdit}
                     profileLoading={profileLoading}
+                    // handleProfileEditClick={() => setProfileEditMode(true)}
                     handleProfileEditClick={handleProfileEditClick}
                     handleProfileEditChange={handleProfileEditChange}
                     handleProfileSave={handleProfileSave}

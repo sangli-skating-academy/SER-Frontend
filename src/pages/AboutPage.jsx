@@ -1,5 +1,6 @@
 import Button from "../components/ui/button";
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Card } from "../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
@@ -46,31 +47,6 @@ const achievements = [
   },
 ];
 
-const vision = {
-  statement:
-    "To inspire and empower every skater in our region to reach their full potential, fostering a culture of excellence, inclusivity, and sportsmanship.",
-  values: [
-    {
-      icon: Award,
-      title: "Excellence",
-      description:
-        "We strive for the highest standards in everything we do, from event organization to athlete support.",
-    },
-    {
-      icon: Users,
-      title: "Community",
-      description:
-        "We believe in building a strong, supportive, and inclusive skating community.",
-    },
-    {
-      icon: Clock,
-      title: "Innovation",
-      description:
-        "We embrace new ideas and technology to keep skating exciting and accessible.",
-    },
-  ],
-};
-
 export default function AboutPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -80,6 +56,13 @@ export default function AboutPage() {
 
   return (
     <>
+      <Helmet>
+        <title>Sangli Skating | About Us</title>
+        <meta name="description" content="About Us" />
+        <meta property="og:title" content="Sangli Skating About Us" />
+        <meta property="og:description" content="Sangli Skating | About Us" />
+        <meta property="og:type" content="About Us" />
+      </Helmet>
       <Header />
       <motion.div
         initial={{ opacity: 0 }}
@@ -127,8 +110,8 @@ export default function AboutPage() {
               Our Mission
             </h2>
             <p className="text-gray-700  mb-3">
-              SCERS was founded to make sports event management effortless and
-              accessible. We believe every skater deserves a fair, fun, and
+              The Website is created to make sports event management effortless
+              and accessible. We believe every skater deserves a fair, fun, and
               memorable competition experience.
             </p>
             <p className="text-gray-700  mb-3">
@@ -143,10 +126,9 @@ export default function AboutPage() {
         </div>
 
         <Tabs defaultValue="team" className="mb-16">
-          <TabsList className="grid w-full grid-cols-3 mb-8 bg-blue-100/70">
+          <TabsList className="grid w-full grid-cols-2 mb-8 bg-blue-100/70">
             <TabsTrigger value="team">Team</TabsTrigger>
             <TabsTrigger value="achievements">Achievements</TabsTrigger>
-            <TabsTrigger value="vision">Vision & Values</TabsTrigger>
           </TabsList>
           <TabsContent value="team">
             <h2 className="text-2xl font-bold mb-8 text-center">
@@ -208,42 +190,6 @@ export default function AboutPage() {
                     <h3 className="text-xl font-bold mb-2">{a.title}</h3>
                     <p className="text-gray-600 ">{a.description}</p>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </TabsContent>
-          <TabsContent value="vision">
-            <h2 className="text-2xl font-bold mb-8 text-center">
-              Our Vision & Values
-            </h2>
-            <div className="max-w-2xl mx-auto mb-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true }}
-                className="bg-blue-50 rounded-lg p-6 text-center shadow"
-              >
-                <p className="text-lg text-blue-800 font-semibold">
-                  {vision.statement}
-                </p>
-              </motion.div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {vision.values.map((val, i) => (
-                <motion.div
-                  key={val.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: i * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-white rounded-lg p-6 text-center shadow"
-                >
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 mb-4 mx-auto">
-                    <val.icon className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{val.title}</h3>
-                  <p className="text-gray-600 ">{val.description}</p>
                 </motion.div>
               ))}
             </div>

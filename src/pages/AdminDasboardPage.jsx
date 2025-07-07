@@ -266,7 +266,7 @@ const AdminDasboardPage = () => {
               },
               {
                 label: "Total Revenue",
-                value: `$${totalRevenue.toLocaleString()}`,
+                value: `RS. ${totalRevenue.toLocaleString()}`,
                 icon: faMoneyBillWave,
                 color: "from-green-400 to-blue-400",
                 sub: `${

@@ -68,7 +68,6 @@ export default function AddEvent() {
   const [preview, setPreview] = useState("");
   const [generalRules, setGeneralRules] = useState([""]);
   const [equipmentRequirements, setEquipmentRequirements] = useState([""]);
-  const [scoringSystem, setScoringSystem] = useState([{ title: "", desc: "" }]);
   const [customHashtagInput, setCustomHashtagInput] = useState("");
 
   // Populate form if editing
@@ -108,11 +107,6 @@ export default function AddEvent() {
         eventToEdit.rules_and_guidelines?.equipment_requirements?.length > 0
           ? eventToEdit.rules_and_guidelines.equipment_requirements
           : [""]
-      );
-      setScoringSystem(
-        eventToEdit.rules_and_guidelines?.scoring_system?.length > 0
-          ? eventToEdit.rules_and_guidelines.scoring_system
-          : [{ title: "", desc: "" }]
       );
     }
   }, [eventToEdit]);
@@ -198,24 +192,6 @@ export default function AddEvent() {
       eq.length > 1 ? eq.filter((_, i) => i !== idx) : eq
     );
 
-  // Scoring System
-  const handleScoringChange = (idx, field, value) => {
-    // Capitalize first letter for both title and desc
-    const capitalized =
-      value.length > 0 ? value.charAt(0).toUpperCase() + value.slice(1) : value;
-    setScoringSystem((ss) =>
-      ss.map((item, i) =>
-        i === idx ? { ...item, [field]: capitalized } : item
-      )
-    );
-  };
-  const addScoring = () =>
-    setScoringSystem((ss) => [...ss, { title: "", desc: "" }]);
-  const removeScoring = (idx) =>
-    setScoringSystem((ss) =>
-      ss.length > 1 ? ss.filter((_, i) => i !== idx) : ss
-    );
-
   // Hashtags multi-select handler
   const handleHashtagsChange = (e) => {
     const options = Array.from(e.target.selectedOptions).map((o) => o.value);
@@ -262,9 +238,6 @@ export default function AddEvent() {
         JSON.stringify({
           general_rules: generalRules.filter((r) => r.trim()),
           equipment_requirements: equipmentRequirements.filter((e) => e.trim()),
-          scoring_system: scoringSystem.filter(
-            (s) => s.title.trim() || s.desc.trim()
-          ),
         })
       );
 
@@ -422,7 +395,7 @@ export default function AddEvent() {
                   <input
                     type="text"
                     className="w-full mt-2 rounded-md border px-3 py-2 text-black"
-                    placeholder="Type hashtag and press Enter or comma (e.g. fun, summer, open)"
+                    placeholder="Type hashtag and press Enter or comma"
                     value={customHashtagInput}
                     onChange={(e) =>
                       setCustomHashtagInput(
@@ -623,56 +596,6 @@ export default function AddEvent() {
                     </div>
                   ))}
                 </div>
-                {/* Scoring System */}
-                <div className="mb-6 w-full">
-                  <div className="flex items-center mb-2">
-                    <span className="font-semibold text-black mr-2">
-                      Scoring System
-                    </span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="xs"
-                      onClick={addScoring}
-                    >
-                      ＋
-                    </Button>
-                  </div>
-                  {scoringSystem.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-2 mb-2 w-full"
-                    >
-                      <Input
-                        value={item.title}
-                        onChange={(e) =>
-                          handleScoringChange(idx, "title", e.target.value)
-                        }
-                        placeholder={`Title #${idx + 1}`}
-                        className="w-1xl"
-                        style={{ minWidth: 0, flex: 1 }}
-                      />
-                      <Input
-                        value={item.desc}
-                        onChange={(e) =>
-                          handleScoringChange(idx, "desc", e.target.value)
-                        }
-                        placeholder="Description"
-                        className="w-xl"
-                        style={{ minWidth: 0, flex: 2 }}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeScoring(idx)}
-                        disabled={scoringSystem.length === 1}
-                      >
-                        ✕
-                      </Button>
-                    </div>
-                  ))}
-                </div>
               </div>
               {/* Event Image Upload Section */}
               <div>
@@ -690,9 +613,7 @@ export default function AddEvent() {
                       🖼️
                     </div>
                   )}
-                  <p className="mt-2 text-sm text-gray-500">
-                    Drag and drop an image, or click to browse
-                  </p>
+                  <p className="mt-2 text-sm text-gray-500">Click to browse</p>
                   <p className="text-xs text-gray-400 mt-1">
                     Recommended size: 1200 x 600 pixels (16:9 ratio)
                   </p>

@@ -261,11 +261,7 @@ export default function EventsTable({
                       className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-2 text-xs font-semibold shadow"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (onEditEvent) {
-                          onEditEvent(event);
-                        } else {
-                          navigate("/admin/addevent", { state: { event } });
-                        }
+                        navigate("/admin/addevent", { state: { event } });
                       }}
                     >
                       Edit

@@ -1,12 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEnvelope,
-  faPhone,
-  faBirthdayCake,
-  faVenusMars,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faPhone, faUser } from "@fortawesome/free-solid-svg-icons";
 import Badge from "../ui/badge";
 import Button from "../ui/button";
 
@@ -23,8 +17,8 @@ const MyProfileTab = ({
   <div className="shadow-2xl border-2 border-blue-900 bg-white/80 rounded-3xl animate-fade-in-up">
     <div className="flex flex-col items-center gap-2 pb-0 p-6 border-b">
       <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-blue-200 via-pink-100 to-blue-100 flex items-center justify-center text-5xl font-extrabold text-blue-600 border-4 border-blue-300 mb-2 animate-fade-in-up shadow-lg">
-        {user.full_name
-          ? user.full_name
+        {user.username
+          ? user.username
               .split(" ")
               .map((n) => n[0])
               .join("")
@@ -32,9 +26,6 @@ const MyProfileTab = ({
               .slice(0, 2)
           : user.username?.slice(0, 2).toUpperCase() || "U"}
       </div>
-      <span className="text-3xl font-extrabold text-blue-700 animate-fade-in-up">
-        {user.full_name || "N/A"}
-      </span>
       <p className="text-gray-500 text-lg animate-fade-in-up">
         @{user.username || "N/A"}
       </p>
@@ -50,18 +41,6 @@ const MyProfileTab = ({
             }}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">
-                  Full Name
-                </label>
-                <input
-                  name="full_name"
-                  value={profileEdit.full_name}
-                  onChange={handleProfileEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                  required
-                />
-              </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1">
                   Username
@@ -98,36 +77,6 @@ const MyProfileTab = ({
                   className="border rounded px-2 py-1 w-full"
                   required
                 />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">
-                  Date of Birth
-                </label>
-                <input
-                  name="date_of_birth"
-                  type="date"
-                  value={profileEdit.date_of_birth}
-                  onChange={handleProfileEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1">
-                  Gender
-                </label>
-                <select
-                  name="gender"
-                  value={profileEdit.gender}
-                  onChange={handleProfileEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
               </div>
             </div>
             <div className="flex gap-2 justify-end mt-6">
@@ -177,36 +126,7 @@ const MyProfileTab = ({
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <FontAwesomeIcon
-                icon={faBirthdayCake}
-                className="text-blue-400 text-xl"
-              />
-              <div>
-                <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
-                  Date of Birth
-                </h3>
-                <p className="font-medium text-gray-800">
-                  {user.date_of_birth
-                    ? new Date(user.date_of_birth).toLocaleDateString()
-                    : "N/A"}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <FontAwesomeIcon
-                icon={faVenusMars}
-                className="text-blue-400 text-xl"
-              />
-              <div>
-                <h3 className="text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
-                  Gender
-                </h3>
-                <p className="font-medium text-gray-800">
-                  {user.gender || "N/A"}
-                </p>
-              </div>
-            </div>
+
             <div className="flex items-center gap-2">
               <FontAwesomeIcon
                 icon={faUser}
