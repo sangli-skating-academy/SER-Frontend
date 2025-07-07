@@ -31,12 +31,12 @@ const Hero = () => {
                 />
               </span>
               <span className="text-lg md:text-4xl font-semibold bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x sm:text-left text-center">
-                Sai Skating Academy
+                Sangli Miraj Kupwad Roller Skating Association
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 tracking-tight animate-gradient-x bg-gradient-to-r from-blue-400 via-blue-400 to-pink-400 bg-clip-text text-transparent drop-shadow-xl sm:text-left text-center w-full">
               <span className="text-blue-600 drop-shadow-lg">
-                Sangli Miraj Kupwad Roller Skating Academy
+                Sai Skating Academy
               </span>
             </h1>
             <p className="text-lg md:text-xl mb-8 max-w-2xl text-gray-700 animate-fade-in delay-200 sm:text-left text-center w-full">
