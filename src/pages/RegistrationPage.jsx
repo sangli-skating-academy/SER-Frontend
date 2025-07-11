@@ -44,7 +44,7 @@ const initialForm = {
   first_name: "",
   middle_name: "",
   last_name: "",
-  dob: "",
+  date_of_birth: "",
   district: "",
   state: "",
   category: "",
@@ -177,14 +177,18 @@ const RegistrationPage = () => {
       if (aadhaarImage) fd.append("aadhaarImage", aadhaarImage);
       await apiFetch("/api/registrations", { method: "POST", body: fd });
       setRegisteredDetails({
+        coach_name: form.coach_name,
+        club_name: form.club_name,
+        gender: form.gender,
+        age_group: form.age_group,
         first_name: form.first_name,
         middle_name: form.middle_name,
         last_name: form.last_name,
         district: form.district,
         state: form.state,
-        coach_name: form.coach_name,
-        age_group: form.age_group,
+        date_of_birth: form.date_of_birth,
         category: form.category,
+        aadhaar_number: form.aadhaar_number,
         team_name: form.team_name,
       });
       setShowSuccessModal(true);
@@ -436,9 +440,9 @@ const RegistrationPage = () => {
                       />
                       <Input
                         label="Date of Birth*"
-                        name="dob"
+                        name="date_of_birth"
                         type="date"
-                        value={form.dob}
+                        value={form.date_of_birth}
                         onChange={handleChange}
                         required
                         placeholder="YYYY-MM-DD"
@@ -567,6 +571,10 @@ const RegistrationPage = () => {
                       <Input
                         label="Aadhaar Number*"
                         name="aadhaar_number"
+                        type="number"
+                        minLength={12}
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         value={form.aadhaar_number}
                         onChange={handleChange}
                         required

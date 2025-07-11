@@ -118,7 +118,7 @@ const PaymentModal = ({ selectedRegistration, isOpen, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg p-8 shadow-lg max-w-md w-full animate-fade-in-up"
+        className="bg-white rounded-lg p-8 shadow-lg max-w-md w-full animate-fade-in-up transition-transform transform md:scale-100 scale-95"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold mb-4 text-blue-700 flex items-center gap-2">
