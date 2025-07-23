@@ -43,9 +43,12 @@ const statusIcon = (status) => {
 };
 
 export default function RegistrationsTable({ data, rowLimit, onRowClick }) {
-  // Filter out registrations for events that have already started
+  // Only show registrations for events where live is true
   const today = new Date();
   const filteredData = data.filter((reg) => {
+    // Assume reg.event_live or reg.eventLive is the live flag
+    const isLive = reg.live ?? reg.live ?? false;
+    if (!isLive) return false;
     const eventStart = reg.event_start_date || reg.eventStartDate;
     if (!eventStart) return true; // If no date, include by default
     return new Date(eventStart) >= today.setHours(0, 0, 0, 0);

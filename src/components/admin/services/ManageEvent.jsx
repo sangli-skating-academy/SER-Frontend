@@ -19,7 +19,7 @@ const initialForm = {
   start_time: "", // <-- add this field
   location: "",
   hashtags: [], // for category/tags (array)
-  age_group: "",
+  age_group: [], // now array for multi-select
   gender: "",
   price_per_person: "",
   price_per_team: "", // <-- add this field
@@ -31,6 +31,7 @@ const initialForm = {
   is_team_event: false,
   is_featured: false,
   file: null, // for image upload
+  live: false, // for live status
 };
 
 const hashtagOptions = [
@@ -43,7 +44,7 @@ const hashtagOptions = [
   "team",
   // Add more as needed
 ];
-const ageGroups = ["Under 10", "Under 12", "Under 18", "Adult", "All Ages"];
+const ageGroups = ["10", "12", "17", "Adult", "All Ages"];
 const genders = ["Male", "Female", "Mixed"];
 
 // Helper to convert UTC/ISO date string to local yyyy-mm-dd for input type="date"
@@ -73,6 +74,7 @@ export default function AddEvent() {
   const [generalRules, setGeneralRules] = useState([""]);
   const [equipmentRequirements, setEquipmentRequirements] = useState([""]);
   const [customHashtagInput, setCustomHashtagInput] = useState("");
+  const [customAgeInput, setCustomAgeInput] = useState("");
 
   // Populate form if editing
   useEffect(() => {
@@ -98,6 +100,17 @@ export default function AddEvent() {
                   Number(eventToEdit.max_team_size)
                 ).toFixed(2)
               : ""),
+          age_group: Array.isArray(eventToEdit.age_group)
+            ? eventToEdit.age_group
+            : typeof eventToEdit.age_group === "string"
+            ? (() => {
+                try {
+                  return JSON.parse(eventToEdit.age_group);
+                } catch {
+                  return [eventToEdit.age_group];
+                }
+              })()
+            : [],
         };
       });
       setPreview(eventToEdit.image_url || "");
@@ -142,17 +155,24 @@ export default function AddEvent() {
           name !== "hashtags" &&
           name !== "price_per_person" &&
           name !== "price_per_team" &&
-          name !== "max_team_size"
+          name !== "max_team_size" &&
+          name !== "age_group"
         ) {
           newValue = newValue.charAt(0).toUpperCase() + newValue.slice(1);
         }
         let updated = { ...prev, [name]: newValue };
         // If price_per_person or max_team_size changes, recalc team fee
-        if (name === "price_per_person" || name === "max_team_size") {
-          updateTeamFee(
-            name === "price_per_person" ? newValue : prev.price_per_person,
-            name === "max_team_size" ? newValue : prev.max_team_size
-          );
+        if (name === "max_team_size" || name === "price_per_person") {
+          const person =
+            name === "price_per_person" ? newValue : prev.price_per_person;
+          const teamSize =
+            name === "max_team_size" ? newValue : prev.max_team_size;
+          updated.price_per_team =
+            !isNaN(Number(person)) &&
+            !isNaN(Number(teamSize)) &&
+            Number(teamSize) > 0
+              ? (Number(person) * Number(teamSize)).toFixed(2)
+              : "";
         }
         // If max_team_size changes and is > 1, set is_team_event true
         if (name === "max_team_size") {
@@ -166,6 +186,35 @@ export default function AddEvent() {
         return updated;
       });
     }
+  };
+
+  // Age group tick handler
+  const handleAgeGroupTick = (ag, checked) => {
+    setForm((f) => ({
+      ...f,
+      age_group: checked
+        ? [...f.age_group, ag]
+        : f.age_group.filter((g) => g !== ag),
+    }));
+  };
+
+  // Custom age group add handler
+  const handleCustomAgeKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const age = customAgeInput.trim();
+      if (
+        age &&
+        !form.age_group.includes(age) &&
+        (/^\d+$/.test(age) || ageGroups.includes(age))
+      ) {
+        setForm((f) => ({ ...f, age_group: [...f.age_group, age] }));
+      }
+      setCustomAgeInput("");
+    }
+  };
+  const handleRemoveCustomAge = (age) => {
+    setForm((f) => ({ ...f, age_group: f.age_group.filter((g) => g !== age) }));
   };
 
   // General Rules
@@ -228,12 +277,13 @@ export default function AddEvent() {
       formData.append("start_date", form.start_date);
       formData.append("start_time", form.start_time);
       formData.append("gender", form.gender);
-      formData.append("age_group", form.age_group);
+      formData.append("age_group", JSON.stringify(form.age_group));
       formData.append("is_team_event", form.is_team_event);
       formData.append("price_per_person", form.price_per_person);
       formData.append("price_per_team", form.price_per_team);
       formData.append("max_team_size", form.max_team_size);
       formData.append("is_featured", form.is_featured);
+      formData.append("live", form.live);
       if (form.file) formData.append("file", form.file);
       if (form.hashtags && form.hashtags.length > 0)
         formData.append("hashtags", JSON.stringify(form.hashtags));
@@ -413,29 +463,64 @@ export default function AddEvent() {
                     add custom hashtags. No spaces allowed in hashtags.
                   </span>
                 </div>
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-semibold mb-1 text-black">
-                    Age Group
+                    Age Group (tick to select, add custom numbers)
                   </label>
-                  <Select
-                    value={form.age_group}
-                    onValueChange={(v) =>
-                      handleChange({ target: { name: "age_group", value: v } })
-                    }
-                  >
-                    <SelectTrigger className="w-full h-10 rounded-md border px-3 py-2 text-black">
-                      <SelectValue placeholder="Select age group" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ageGroups.map((ag) => (
-                        <SelectItem key={ag} value={ag}>
-                          {ag}
-                        </SelectItem>
+                  <div className="flex flex-row flex-wrap gap-2 mb-2">
+                    {ageGroups.map((ag) => (
+                      <label
+                        key={ag}
+                        className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          value={ag}
+                          checked={form.age_group.includes(ag)}
+                          onChange={(e) =>
+                            handleAgeGroupTick(ag, e.target.checked)
+                          }
+                          className="accent-blue-500"
+                        />
+                        <span className="text-xs">{ag}</span>
+                      </label>
+                    ))}
+                    {/* Custom age chips */}
+                    {form.age_group
+                      .filter((g) => !ageGroups.includes(g))
+                      .map((age) => (
+                        <span
+                          key={age}
+                          className="flex items-center gap-1 bg-pink-100 text-pink-700 px-2 py-1 rounded-full text-xs font-semibold shadow-sm border border-pink-200"
+                        >
+                          {age}
+                          <button
+                            type="button"
+                            className="ml-1 text-pink-500 hover:text-pink-700"
+                            onClick={() => handleRemoveCustomAge(age)}
+                            aria-label="Remove age group"
+                          >
+                            ×
+                          </button>
+                        </span>
                       ))}
-                    </SelectContent>
-                  </Select>
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full mt-2 rounded-md border px-3 py-2 text-black"
+                    placeholder="Type age (number) and press Enter or comma"
+                    value={customAgeInput}
+                    onChange={(e) =>
+                      setCustomAgeInput(e.target.value.replace(/[^\d]/g, ""))
+                    }
+                    onKeyDown={handleCustomAgeKeyDown}
+                  />
+                  <span className="text-xs text-gray-400">
+                    Tick to select age groups. Type and press Enter or comma to
+                    add custom numeric age groups.
+                  </span>
                 </div>
-                <div>
+                <div className="md:col-span-2 ">
                   <label className="block text-sm font-semibold mb-1 text-black">
                     Gender
                   </label>
@@ -473,7 +558,7 @@ export default function AddEvent() {
                   value={form.price_per_team}
                   onChange={handleChange}
                   placeholder=""
-                  readOnly
+                  // readOnly
                 />
                 <Input
                   label="Maximum Team Size"
@@ -485,31 +570,20 @@ export default function AddEvent() {
                   required
                 />
                 <div className="flex items-center gap-2 mt-2"></div>
-                <div className="flex items-center gap-2 mt-2">
+                <div className=" items-center gap-2 mt-2 hidden">
                   <input
                     type="checkbox"
                     id="is_team_event"
                     name="is_team_event"
                     checked={!!form.is_team_event}
                     onChange={handleChange}
-                    className="h-4 w-4 rounded border-gray-300"
+                    className="h-4 w-4 rounded border-gray-300 "
                   />
                   <label
                     htmlFor="is_team_event"
-                    className="text-sm font-medium"
+                    className="text-sm font-medium "
                   >
                     Team Event
-                  </label>
-                  <input
-                    type="checkbox"
-                    id="is_featured"
-                    name="is_featured"
-                    checked={!!form.is_featured}
-                    onChange={handleChange}
-                    className="h-4 w-4 rounded border-gray-300"
-                  />
-                  <label htmlFor="is_featured" className="text-sm font-medium">
-                    Featured Event
                   </label>
                 </div>
               </div>
@@ -640,6 +714,42 @@ export default function AddEvent() {
                   >
                     Upload Image
                   </Button>
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="checkbox"
+                    id="is_featured"
+                    name="is_featured"
+                    checked={!!form.is_featured}
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <label htmlFor="is_featured" className="text-sm font-medium">
+                    Featured Event{" "}
+                    <span className="text-xs text-gray-500">
+                      *If checked, this event will be highlighted in the
+                      featured section.*
+                    </span>
+                  </label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="live"
+                    name="live"
+                    checked={!!form.live}
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <label htmlFor="live" className="text-sm font-medium">
+                    Make Live{" "}
+                    <span className="text-xs text-gray-500">
+                      *If checked, this event will be visible to all users.*
+                    </span>
+                  </label>
                 </div>
               </div>
               <Button

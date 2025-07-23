@@ -4,7 +4,11 @@ import Button from "../../ui/button";
 import Skeleton from "../../ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSyncAlt, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSyncAlt,
+  faPlusCircle,
+  faFilter,
+} from "@fortawesome/free-solid-svg-icons";
 import { apiFetch } from "../../../services/api";
 import GalleryTable from "../Tables/GalleryTable";
 import EditGallery from "../Modals/EditGallery";
@@ -174,12 +178,17 @@ export default function AllGallery() {
                 <div className="flex items-end w-full sm:w-auto">
                   <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-full sm:w-43 h-[40px]"
+                    className={`flex items-center gap-2 w-full sm:w-43 h-[40px] ${
+                      eventFilter !== "all" || yearFilter !== "all"
+                        ? "border-red-300 bg-red-50 text-red-500"
+                        : ""
+                    }`}
                     onClick={() => {
                       setEventFilter("all");
                       setYearFilter("all");
                     }}
                   >
+                    <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
                     Clear Filters
                   </Button>
                 </div>

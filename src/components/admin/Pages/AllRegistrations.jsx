@@ -51,14 +51,18 @@ export default function AllRegistrations() {
       .finally(() => setLoading(false));
   };
 
-  // Compute unique values for dropdowns
-  const eventTitles = useMemo(
-    () =>
-      Array.from(
-        new Set(registrations.map((r) => r.event_title).filter(Boolean))
-      ),
-    [registrations]
-  );
+  // Compute unique event titles for live events only
+  const eventTitles = useMemo(() => {
+    // Only include event titles where the event is live
+    return Array.from(
+      new Set(
+        registrations
+          .filter((r) => r.live === true || r.live === "TRUE")
+          .map((r) => r.event_title)
+          .filter(Boolean)
+      )
+    );
+  }, [registrations]);
   const types = useMemo(
     () =>
       Array.from(
@@ -249,7 +253,15 @@ export default function AllRegistrations() {
                 <div className="flex items-end w-full sm:w-auto">
                   <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-full sm:w-43 h-[40px]"
+                    className={`flex items-center gap-2 w-full sm:w-43 h-[40px]
+                    ${
+                      searchTerm !== "" ||
+                      eventFilter !== "all" ||
+                      typeFilter !== "all"
+                        ? "border-red-300 bg-red-50 text-red-500"
+                        : ""
+                    }
+                    `}
                     onClick={() => {
                       setSearchTerm("");
                       setEventFilter("all");

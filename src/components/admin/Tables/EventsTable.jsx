@@ -134,6 +134,9 @@ export default function EventsTable({
                 Amount Collected
               </th>
               <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Live Status
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                 Action
               </th>
             </tr>
@@ -213,7 +216,11 @@ export default function EventsTable({
                     {event.gender || "-"}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    {event.age_group || "-"}
+                    {Array.isArray(event.age_group)
+                      ? event.age_group.join(", ")
+                      : typeof event.age_group === "string"
+                      ? event.age_group
+                      : "-"}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     {event.is_team_event ? "Team" : "Individual"}
@@ -252,6 +259,13 @@ export default function EventsTable({
                     {regCount *
                       (event.price_per_person || 0) *
                       (event.max_team_size || 1)}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {event.live === true || event.live === "TRUE" ? (
+                      <span className="text-green-600 font-bold">Live</span>
+                    ) : (
+                      <span className="text-gray-400">Not Live</span>
+                    )}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <Button

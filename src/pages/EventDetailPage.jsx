@@ -503,7 +503,13 @@ const EventDetailPage = () => {
                     <span className="text-muted-foreground flex-1">
                       Age Group
                     </span>
-                    <span className="font-medium">{event.age_group}</span>
+                    <span className="font-medium">
+                      {Array.isArray(event.age_group)
+                        ? event.age_group.join(", ")
+                        : typeof event.age_group === "string"
+                        ? event.age_group
+                        : "-"}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-200">
                     <span className="rounded-full bg-purple-100 p-2">
@@ -660,7 +666,9 @@ const EventDetailPage = () => {
                       <span className="text-muted-foreground flex-1">
                         Phone
                       </span>
-                      <span className="font-medium">(+91) 9595893434</span>
+                      <span className="font-medium">
+                        +91 9595893434 (Suraj A. Shinde)
+                      </span>
                     </div>
                   </div>
                 </div>

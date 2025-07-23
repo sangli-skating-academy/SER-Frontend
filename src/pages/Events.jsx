@@ -36,7 +36,15 @@ const EventsPage = () => {
       // Always fetch all events, filtering client-side for now
       const data = await fetchEvents();
       const eventsArr = Array.isArray(data) ? data : data.events || [];
-      setEvents(eventsArr);
+      // Only show events where live is true
+      const liveEventsArr = eventsArr.filter(
+        (ev) =>
+          ev.live === true ||
+          ev.live === "true" ||
+          ev.is_live === true ||
+          ev.is_live === "true"
+      );
+      setEvents(liveEventsArr);
       // Collect all unique hashtags
       const allTags = new Set();
       const allAgeGroups = new Set();
@@ -46,8 +54,18 @@ const EventsPage = () => {
         Array.isArray(ev.hashtags)
           ? ev.hashtags.forEach((tag) => allTags.add(tag))
           : null;
-        // Age Groups
-        if (ev.age_group) allAgeGroups.add(ev.age_group);
+        // Age Groups (only add string/number, skip objects)
+        if (Array.isArray(ev.age_group)) {
+          ev.age_group.forEach((ag) => {
+            if (typeof ag === "string" || typeof ag === "number")
+              allAgeGroups.add(ag);
+          });
+        } else if (
+          typeof ev.age_group === "string" ||
+          typeof ev.age_group === "number"
+        ) {
+          allAgeGroups.add(ev.age_group);
+        }
         // Genders
         if (ev.gender) allGenders.add(ev.gender);
       });
@@ -81,7 +99,12 @@ const EventsPage = () => {
     )
       return false;
     // Age group filter (API: event.age_group)
-    if (filter.ageGroup !== "all" && event.age_group !== filter.ageGroup)
+    if (
+      filter.ageGroup !== "all" &&
+      (!Array.isArray(event.age_group)
+        ? event.age_group !== filter.ageGroup
+        : !event.age_group.includes(filter.ageGroup))
+    )
       return false;
     // Gender filter (API: event.gender)
     if (
@@ -187,8 +210,8 @@ const EventsPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {ageGroups.map((group) => (
-                        <SelectItem key={group} value={group}>
-                          {group === "all" ? "All Age Groups" : group}
+                        <SelectItem key={String(group)} value={String(group)}>
+                          {group === "all" ? "All Age Groups" : String(group)}
                         </SelectItem>
                       ))}
                     </SelectContent>

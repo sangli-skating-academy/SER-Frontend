@@ -61,6 +61,7 @@ const RegistrationPage = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(initialForm);
+  const [ageGroupOptions, setAgeGroupOptions] = useState([]);
   const [aadhaarImage, setAadhaarImage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -76,9 +77,22 @@ const RegistrationPage = () => {
       try {
         const evt = await fetchEventById(id);
         setEvent(evt);
+        // Age group options from event
+        let agOpts = [];
+        if (Array.isArray(evt.age_group)) {
+          agOpts = evt.age_group.filter(
+            (ag) => typeof ag === "string" || typeof ag === "number"
+          );
+        } else if (
+          typeof evt.age_group === "string" ||
+          typeof evt.age_group === "number"
+        ) {
+          agOpts = [evt.age_group];
+        }
+        setAgeGroupOptions(agOpts);
         setForm((f) => ({
           ...f,
-          age_group: evt.age_group || "",
+          age_group: agOpts.length > 0 ? agOpts[0] : "",
           gender: evt.gender || "",
           team_members:
             evt.is_team_event && evt.max_team_size
@@ -469,14 +483,15 @@ const RegistrationPage = () => {
                             <SelectValue placeholder="Select age group" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="under 8">Under 8</SelectItem>
-                            <SelectItem value="under 10">Under 10</SelectItem>
-                            <SelectItem value="under 12">Under 12</SelectItem>
-                            <SelectItem value="under 14">Under 14</SelectItem>
-                            <SelectItem value="under 16">Under 16</SelectItem>
-                            <SelectItem value="under 18">Under 18</SelectItem>
-                            <SelectItem value="under 20">Under 20</SelectItem>
-                            <SelectItem value="under 22">Under 22</SelectItem>
+                            {ageGroupOptions.length > 0 ? (
+                              ageGroupOptions.map((ag) => (
+                                <SelectItem key={String(ag)} value={String(ag)}>
+                                  {String(ag)}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="">No age groups</SelectItem>
+                            )}
                           </SelectContent>
                         </Select>
                       </div>

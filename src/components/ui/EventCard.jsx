@@ -52,7 +52,12 @@ const EventCard = ({ event, className = "", style = {} }) => {
             {event.gender?.charAt(0).toUpperCase() + event.gender?.slice(1)}
           </Badge>
           <Badge className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-xs font-semibold shadow">
-            Age Group: {event.age_group}
+            Age Group:{" "}
+            {Array.isArray(event.age_group)
+              ? event.age_group.join(", ")
+              : typeof event.age_group === "string"
+              ? event.age_group
+              : "-"}
           </Badge>
         </div>
         <h3 className="font-extrabold text-xl font-montserrat bg-gradient-to-r from-blue-500 via-blue-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x drop-shadow">

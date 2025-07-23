@@ -120,61 +120,59 @@ const AdminDasboardPage = () => {
   const playerCount = users.filter((u) => u.role === "player").length;
   const coachCount = users.filter((u) => u.role === "coach").length;
   const adminCount = users.filter((u) => u.role === "admin").length;
-  const totalEvents = events.length;
-  // Only count registrations for events that are happening today or upcoming
-  const activeEventIds = new Set([
-    ...happeningToday.map((e) => e.id),
-    ...upcomingEvents.map((e) => e.id),
-  ]);
+  // ...existing code...
+  // Only count live events for stats
+  const liveEvents = events.filter((e) => e.live === true || e.live === "TRUE");
+  const totalEvents = liveEvents.length;
+  // Only payments for live events
+  const liveEventIds = new Set(liveEvents.map((e) => e.id));
   const totalRegistrations = registrations.filter((r) =>
-    activeEventIds.has(r.event_id)
+    liveEventIds.has(r.event_id)
   ).length;
-  const totalRevenue = payments.reduce(
-    (sum, p) => (p.status === "success" ? sum + Number(p.amount) : sum),
-    0
-  );
-  const activeEvents = events.filter(
+  const totalRevenue = payments
+    .filter((p) => liveEventIds.has(p.event_id))
+    .reduce(
+      (sum, p) => (p.status === "success" ? sum + Number(p.amount) : sum),
+      0
+    );
+  const activeEvents = liveEvents.filter(
     (e) => !e.is_archived && new Date(e.start_date) >= new Date()
   ).length;
   const pendingRegistrations = registrations.filter(
-    (r) => r.status === "pending" && activeEventIds.has(r.event_id)
+    (r) => r.status === "pending" && liveEventIds.has(r.event_id)
   ).length;
   const overEvents = events.filter(
     (e) => new Date(e.start_date) < new Date()
   ).length;
   const happeningTodayCount = happeningToday.length;
 
-  // Filter out registrations for events that have already started
-  const today = new Date();
-  const filteredRegistrations = registrations.filter((r) => {
-    const eventStart =
-      r.event_start_date || r.eventStartDate || r.event_start || r.start_date;
-    // only status confirmed events
-    if (!eventStart) return false; // Skip if no start date
-    if (r.status !== "confirmed") return false; // Only confirmed registrations
-    if (!eventStart && r.status === "confirmed") return true;
-    return new Date(eventStart) >= today.setHours(0, 0, 0, 0);
-  });
-
-  // Recent registrations (latest 5, only for upcoming/ongoing events)
-  const recentRegs = filteredRegistrations
-    .slice()
+  // Recent registrations (latest 5, payment status 'success', for live events only)
+  const recentRegs = registrations
+    .filter((r) => {
+      if (r.payment_status !== "success") return false;
+      const event = events.find((e) => e.id === r.event_id);
+      return event && (event.live === true || event.live === "TRUE");
+    })
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 5)
-    .map((r) => ({
-      id: r.id,
-      userName: r.full_name || r.username || "-",
-      userRole: r.user_role || "-",
-      eventTitle: r.event_title || "-",
-      registrationType: r.registration_type,
-      registrationDate: r.created_at,
-      amount: r.payment_amount || 0,
-      status: r.status?.charAt(0).toUpperCase() + r.status?.slice(1),
-      coachName: r.coach_name,
-      clubName: r.club_name,
-      ageGroup: r.age_group,
-      details: r,
-    }));
+    .map((r) => {
+      const event = events.find((e) => e.id === r.event_id);
+      return {
+        id: r.id,
+        userName: r.full_name || r.username || "-",
+        userRole: r.user_role || "-",
+        eventTitle: r.event_title || "-",
+        registrationType: r.registration_type,
+        registrationDate: r.created_at,
+        amount: r.payment_amount || 0,
+        status: r.status?.charAt(0).toUpperCase() + r.status?.slice(1),
+        coachName: r.coach_name,
+        clubName: r.club_name,
+        ageGroup: r.age_group,
+        live: true,
+        details: r,
+      };
+    });
 
   // Upcoming events (latest 5, all event details mapped)
   const upcomingEvts = events
@@ -243,49 +241,57 @@ const AdminDasboardPage = () => {
 
           {/* Stat cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10 animate-fade-in-up">
-            {[
-              {
-                label: "Total Users",
-                value: totalUsers,
-                icon: faUsers,
-                color: "from-blue-400 to-blue-600",
-                sub: `Players: ${playerCount} | Coaches: ${coachCount} | Admins: ${adminCount}`,
-              },
-              {
-                label: "Total Events",
-                value: totalEvents,
-                icon: faCalendarAlt,
-                color: "from-pink-400 to-pink-600",
-                sub: `${activeEvents} active | ${happeningTodayCount} today | ${overEvents} over | ${totalEvents} total`,
-              },
-              {
-                label: "Total Registrations",
-                value: totalRegistrations,
-                icon: faClipboardList,
-                color: "from-purple-400 to-blue-400",
-                sub: `${pendingRegistrations} pending | ${
-                  totalRegistrations - pendingRegistrations
-                } completed`,
-              },
-              {
-                label: "Total Revenue",
-                value: `RS. ${totalRevenue.toLocaleString()}`,
-                icon: faMoneyBillWave,
-                color: "from-green-400 to-blue-400",
-                sub: `${
-                  payments
-                    .filter((p) => p.status === "pending")
-                    .reduce((sum, p) => sum + Number(p.amount), 0)
-                    ? "$" +
-                      payments
-                        .filter((p) => p.status === "pending")
-                        .reduce((sum, p) => sum + Number(p.amount), 0)
-                        .toLocaleString() +
-                      " pending"
-                    : "All paid"
-                }`,
-              },
-            ].map((stat, i) => (
+            {(() => {
+              // Only payments for live events
+              const liveEventIds = new Set(liveEvents.map((e) => e.id));
+              const livePayments = payments.filter((p) =>
+                liveEventIds.has(p.event_id)
+              );
+              const totalLiveRevenue = livePayments.reduce(
+                (sum, p) =>
+                  p.status === "success" ? sum + Number(p.amount) : sum,
+                0
+              );
+              const pendingLiveAmount = livePayments
+                .filter((p) => p.status === "pending")
+                .reduce((sum, p) => sum + Number(p.amount), 0);
+              return [
+                {
+                  label: "Total Users",
+                  value: totalUsers,
+                  icon: faUsers,
+                  color: "from-blue-400 to-blue-600",
+                  sub: `Players: ${playerCount} | Coaches: ${coachCount} | Admins: ${adminCount}`,
+                },
+                {
+                  label: "Total Events",
+                  value: totalEvents,
+                  icon: faCalendarAlt,
+                  color: "from-pink-400 to-pink-600",
+                  sub: `${activeEvents} active | ${happeningTodayCount} today | ${overEvents} over`,
+                },
+                {
+                  label: "Total Registrations",
+                  value: totalRegistrations,
+                  icon: faClipboardList,
+                  color: "from-purple-400 to-blue-400",
+                  sub: `${pendingRegistrations} pending | ${
+                    totalRegistrations - pendingRegistrations
+                  } completed`,
+                },
+                {
+                  label: "Total Revenue",
+                  value: `RS. ${totalLiveRevenue.toLocaleString()}`,
+                  icon: faMoneyBillWave,
+                  color: "from-green-400 to-blue-400",
+                  sub: `${
+                    pendingLiveAmount
+                      ? "Rs." + pendingLiveAmount.toLocaleString() + " pending"
+                      : "All paid"
+                  }`,
+                },
+              ];
+            })().map((stat, i) => (
               <Card
                 key={stat.label}
                 className={`group p-0 overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 bg-white/90 backdrop-blur-md animate-fade-in-up`}
