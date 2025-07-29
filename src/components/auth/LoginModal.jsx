@@ -92,7 +92,7 @@ const LoginModal = ({ onClose }) => {
       email: "",
       phone: "",
       password: "",
-      role: "player",
+      role: "coach",
     },
     resolver: yupResolver(registerSchema),
   });
@@ -479,7 +479,7 @@ const LoginModal = ({ onClose }) => {
             </div>
 
             {/* Role Selection */}
-            <div className="mb-2">
+            <div className="mb-2 hidden">
               <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Role
               </label>
