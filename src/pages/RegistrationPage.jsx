@@ -51,6 +51,7 @@ const initialForm = {
   aadhaar_number: "",
   team_name: "",
   team_members: [{ full_name: "", age: "", gender: "" }],
+  event_categories: [],
 };
 
 const RegistrationPage = () => {
@@ -62,6 +63,7 @@ const RegistrationPage = () => {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(initialForm);
   const [ageGroupOptions, setAgeGroupOptions] = useState([]);
+  const [eventCategoryOptions, setEventCategoryOptions] = useState([]);
   const [aadhaarImage, setAadhaarImage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -90,10 +92,18 @@ const RegistrationPage = () => {
           agOpts = [evt.age_group];
         }
         setAgeGroupOptions(agOpts);
+        // Extract event categories from event.event_category (object format)
+        let catOpts = [];
+        if (evt.event_category && typeof evt.event_category === "object") {
+          // Flatten all values into a single array for dropdown
+          catOpts = Object.values(evt.event_category).flat();
+        }
+        setEventCategoryOptions(catOpts);
         setForm((f) => ({
           ...f,
           age_group: agOpts.length > 0 ? agOpts[0] : "",
           gender: evt.gender || "",
+          event_categories: [],
           team_members:
             evt.is_team_event && evt.max_team_size
               ? Array.from({ length: evt.max_team_size }, () => ({
@@ -119,8 +129,20 @@ const RegistrationPage = () => {
 
   // Handle input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    if (name === "event_categories") {
+      setForm((f) => {
+        let updated = f.event_categories;
+        if (checked) {
+          updated = [...updated, value];
+        } else {
+          updated = updated.filter((v) => v !== value);
+        }
+        return { ...f, event_categories: updated };
+      });
+    } else {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
   };
 
   // Handle Aadhaar image
@@ -176,8 +198,19 @@ const RegistrationPage = () => {
       }
       // Prepare form data
       const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => {
-        if (k === "team_members") {
+      // Ensure event_category is sent as array
+      const formToSend = {
+        ...form,
+        event_category: form.event_category_select
+          ? [form.event_category_select]
+          : form.event_categories || [],
+      };
+      Object.entries(formToSend).forEach(([k, v]) => {
+        if (
+          k === "team_members" ||
+          k === "event_categories" ||
+          k === "event_category"
+        ) {
           fd.append(k, JSON.stringify(v));
         } else {
           fd.append(k, v);
@@ -429,6 +462,66 @@ const RegistrationPage = () => {
                     encType="multipart/form-data"
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                      {eventCategoryOptions &&
+                        Object.keys(eventCategoryOptions).length > 0 && (
+                          <div>
+                            <label
+                              htmlFor="event_category_select"
+                              className="block text-sm font-semibold mb-1 text-black"
+                            >
+                              Event Category*
+                            </label>
+                            <Select
+                              name="event_category_select"
+                              placeholder="Select category"
+                              aria-label="Event Category"
+                              value={form.event_category_select || ""}
+                              onValueChange={(val) =>
+                                setForm((f) => ({
+                                  ...f,
+                                  event_category_select: val,
+                                }))
+                              }
+                              required
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select category" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {eventCategoryOptions.map((cat) => (
+                                  <SelectItem key={cat} value={cat}>
+                                    {cat}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
+                      {/* {eventCategoryOptions.length > 0 && (
+                        <div>
+                          <label className="block text-sm font-semibold mb-1 text-black">
+                            Event Categories*
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            {eventCategoryOptions.map((cat) => (
+                              <label
+                                key={cat}
+                                className="flex items-center gap-2"
+                              >
+                                <input
+                                  type="checkbox"
+                                  name="event_categories"
+                                  value={cat}
+                                  checked={form.event_categories.includes(cat)}
+                                  onChange={handleChange}
+                                />
+                                <span>{cat}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      )} */}
                       <Input
                         label="First Name*"
                         name="first_name"
@@ -559,7 +652,7 @@ const RegistrationPage = () => {
                           htmlFor="category"
                           className="block text-sm font-semibold mb-1 text-black"
                         >
-                          Category*
+                          Skate Category*
                         </label>
                         <Select
                           name="category"
@@ -574,12 +667,18 @@ const RegistrationPage = () => {
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="quad">Quad</SelectItem>
-                            <SelectItem value="inline">Inline</SelectItem>
-                            <SelectItem value="Fancy-Inline">
-                              Fancy Inline
-                            </SelectItem>
-                            <SelectItem value="beginner">Beginner</SelectItem>
+                            {Array.isArray(event?.skate_category) &&
+                            event.skate_category.length > 0 ? (
+                              event.skate_category.map((cat) => (
+                                <SelectItem key={cat} value={cat}>
+                                  {cat}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="">
+                                No skate categories
+                              </SelectItem>
+                            )}
                           </SelectContent>
                         </Select>
                       </div>

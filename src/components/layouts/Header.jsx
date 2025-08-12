@@ -54,24 +54,33 @@ const Header = () => {
           isScrolled ? "shadow-lg" : ""
         } transition-shadow duration-300 animate-fade-in`}
       >
-        <div className="flex justify-between items-center py-3 px-5 mx-auto">
-          <div className="flex items-center">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 group">
-              <div className="w-12 h-12 rounded-full  flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 animate-spin-slow">
+        <div className="flex flex-row items-center justify-between py-3 px-5 mx-auto w-full gap-2">
+          {/* Logo and Name always visible, now in a single row */}
+          <Link to="/" className="flex flex-row items-center group space-x-3">
+            <div className="flex items-center space-x-2">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 animate-spin-slow">
                 <img
-                  src="/logo-header.png"
+                  className="rounded-full h-12 w-18"
+                  src="/logo.jpg"
                   alt="Sai Skating Academy"
                   loading="lazy"
                 />
               </div>
-              <span className="text-2xl font-montserrat text-dark hidden md:inline tracking-tight group-hover:text-primary transition-colors duration-300 animate-gradient-x">
-                Sai Skating
-              </span>
-            </Link>
-          </div>
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8 items-center">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 animate-spin-slow">
+                <img
+                  className="rounded-full h-12 w-12"
+                  src="/logo2.jpeg"
+                  alt="Sai Skating Academy"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <span className="hidden sm:inline text-sm md:text-base font-montserrat text-dark text-left tracking-tight group-hover:text-primary transition-colors duration-300 animate-gradient-x whitespace-nowrap">
+              Sai Skating Academy, Sangli
+            </span>
+          </Link>
+          {/* Desktop Navigation - centered */}
+          <nav className="hidden md:flex flex-1 justify-center space-x-8 items-center">
             <Link
               to="/"
               className={`flex items-center gap-2 transition-colors duration-200 animate-fade-in ${
@@ -123,45 +132,34 @@ const Header = () => {
               <FontAwesomeIcon icon={faEnvelope} /> Contact
             </Link>
           </nav>
-          <div className="flex items-center space-x-4">
-            {/* Dashboard button always visible (desktop and mobile) */}
+          <div className="flex items-center gap-3">
+            {/* Dashboard/Login button */}
             {user && (
-              <Link
-                to="/dashboard"
-                onClick={() => setIsMobileMenuOpen(false)}
-                style={{ minWidth: 110 }}
-                className={
-                  location.pathname === "/dashboard"
-                    ? "text-pink-400 font-bold"
-                    : ""
-                }
-              >
-                <Button
-                  variant="outline"
-                  className={`px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in "${
-                    location.pathname === "/dashboard"
-                      ? "border-blue-400 bg-blue-50 text-blue-500"
-                      : ""
-                  }`}
-                >
-                  <FontAwesomeIcon icon={faUserCircle} /> Dashboard
-                </Button>
-              </Link>
-            )}
-            {user ? (
               <>
-                {/* Desktop only: Dashboard and Logout side by side */}
-                <div className="hidden md:flex flex-row gap-4">
+                <Link
+                  to="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  style={{ minWidth: 110 }}
+                  className={
+                    location.pathname === "/dashboard"
+                      ? "text-pink-400 font-bold"
+                      : ""
+                  }
+                >
                   <Button
-                    variant="ghost"
-                    className="px-4 py-2 text-gray-600 hover:text-primary flex items-center gap-2 hover:text-red-400 hover:scale-105 border-1 transition-colors duration-200 animate-fade-in"
-                    onClick={handleLogoutClick}
+                    variant="outline"
+                    className={`px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in "${
+                      location.pathname === "/dashboard"
+                        ? "border-blue-400 bg-blue-50 text-blue-500"
+                        : ""
+                    }`}
                   >
-                    <FontAwesomeIcon icon={faSignOutAlt} /> Logout
+                    <FontAwesomeIcon icon={faUserCircle} /> Dashboard
                   </Button>
-                </div>
+                </Link>
               </>
-            ) : (
+            )}
+            {!user && (
               <Button
                 variant="outline"
                 className="px-4 py-2 text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in"
@@ -170,10 +168,10 @@ const Header = () => {
                 <FontAwesomeIcon icon={faSignInAlt} /> Login
               </Button>
             )}
-            {/* Animated Hamburger/Cross Icon */}
+            {/* Hamburger always at end in row */}
             <button
               aria-label="Toggle menu"
-              className="md:hidden text-dark focus:outline-none hover:text-primary transition-colors duration-200 animate-fade-in relative w-10 h-10 flex items-center justify-center"
+              className="md:hidden text-dark focus:outline-none hover:text-primary transition-colors duration-200 animate-fade-in w-10 h-10 flex items-center justify-center"
               onClick={toggleMobileMenu}
             >
               <div className="w-8 h-7 flex flex-col justify-center items-center relative">
@@ -198,6 +196,18 @@ const Header = () => {
                 ></span>
               </div>
             </button>
+            {/* Desktop only: Dashboard and Logout side by side */}
+            {user && (
+              <div className="hidden md:flex flex-row gap-4">
+                <Button
+                  variant="ghost"
+                  className="px-4 py-2 text-gray-600 hover:text-primary flex items-center gap-2 hover:text-red-400 hover:scale-105 border-1 transition-colors duration-200 animate-fade-in"
+                  onClick={handleLogoutClick}
+                >
+                  <FontAwesomeIcon icon={faSignOutAlt} /> Logout
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -210,7 +220,7 @@ const Header = () => {
             onClick={() => setIsMobileMenuOpen(false)}
           ></div>
           {/* Centered Menu */}
-          <div className="relative z-10 flex flex-col items-center justify-center w-[90vw] max-w-md h-[80vh]  rounded-3xl shadow-2xl border border-white/40 backdrop-blur-2xl p-10 animate-fade-in">
+          <div className="relative z-10 flex flex-col items-center justify-center w-[90vw] max-w-md h-[80vh] rounded-3xl shadow-2xl border border-white/40 backdrop-blur-2xl p-10 animate-fade-in">
             {/* Decorative Top Line */}
             <div className="h-1 w-2/3 bg-gradient-to-r from-blue-400 via-blue-300 to-pink-200 rounded-full mb-8 animate-pulse"></div>
             <nav className="flex flex-col items-center space-y-8 text-xl font-semibold">

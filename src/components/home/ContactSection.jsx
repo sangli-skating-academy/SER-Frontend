@@ -11,12 +11,7 @@ import {
   faPaperPlane,
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  faFacebookF,
-  faTwitter,
-  faInstagram,
-  faYoutube,
-} from "@fortawesome/free-brands-svg-icons";
+import { faYoutube } from "@fortawesome/free-brands-svg-icons";
 import { toast } from "../../hooks/use-toasts";
 import Button from "../ui/button";
 import Input from "../ui/input";
@@ -144,7 +139,9 @@ const ContactSection = () => {
                   <p className="text-gray-600">
                     +91 9595893434 (Suraj A. Shinde)
                   </p>
-                  <p className="text-gray-600">+91 1111111111 (XYZ)</p>
+                  <p className="text-gray-600">
+                    +91 9595473434 (Parvind Shinde)
+                  </p>
                 </div>
               </div>
               <div className="flex items-start animate-fade-in delay-200">
@@ -153,10 +150,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-medium mb-1">Email</h4>
-                  <p className="text-gray-600">
-                    {" "}
-                    sangliskatingacademy@gmail.com
-                  </p>
+                  <p className="text-gray-600"> saiskating2200@gmail.com</p>
                 </div>
               </div>
               <div className="flex items-start animate-fade-in delay-300">
@@ -166,39 +160,25 @@ const ContactSection = () => {
                 <div>
                   <h4 className="font-medium mb-1">Office Hours</h4>
                   <p className="text-gray-600">
-                    Monday-Friday: 9:00 AM - 5:00 PM
+                    Monday-Saturday: 5:00 PM - 7:00 PM
                   </p>
                 </div>
               </div>
             </div>
-            <div className="mt-8">
-              <h4 className="font-medium mb-3">Follow Us</h4>
-              <div className="flex space-x-4">
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white hover:bg-blue-600 transition-colors shadow-lg "
-                >
-                  <FontAwesomeIcon icon={faFacebookF} />
-                </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-blue-400 flex items-center justify-center text-white hover:bg-blue-500 transition-colors shadow-lg  delay-100"
-                >
-                  <FontAwesomeIcon icon={faTwitter} />
-                </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-pink-400 flex items-center justify-center text-white hover:bg-pink-500 transition-colors shadow-lg  delay-200"
-                >
-                  <FontAwesomeIcon icon={faInstagram} />
-                </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-lg  delay-300"
-                >
-                  <FontAwesomeIcon icon={faYoutube} />
-                </a>
-              </div>
+            <div className="flex items-center space-x-3 mt-10">
+              <span className="text-black-300 font-medium">Follow us on</span>
+              <a
+                href="https://www.youtube.com/@sangliskatingacademy"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Sai Skating Academy YouTube Channel"
+                className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-lg delay-300 text-2xl"
+              >
+                <FontAwesomeIcon icon={faYoutube} />
+              </a>
+              <span className="text-black-300 font-medium hidden sm:inline">
+                YouTube
+              </span>
             </div>
           </div>
           {/* Contact Form */}

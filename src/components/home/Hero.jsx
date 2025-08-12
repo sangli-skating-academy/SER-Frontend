@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSkating } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faSkating } from "@fortawesome/free-solid-svg-icons";
 import Button from "../ui/button";
 
 const Hero = () => {
@@ -36,7 +36,7 @@ const Hero = () => {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 tracking-tight animate-gradient-x bg-gradient-to-r from-blue-400 via-blue-400 to-pink-400 bg-clip-text text-transparent drop-shadow-xl sm:text-left text-center w-full">
               <span className="text-blue-600 drop-shadow-lg">
-                Sai Skating Academy
+                Sai Skating Academy, Sangli
               </span>
             </h1>
             <p className="text-lg md:text-xl mb-8 max-w-2xl text-gray-700 animate-fade-in delay-200 sm:text-left text-center w-full">
@@ -58,6 +58,21 @@ const Hero = () => {
                     className="text-lg md:text-xl"
                   />
                   Explore Events
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                className="px-8 py-3 bg-gradient-to-r from-pink-400 to-blue-400 hover:from-blue-500 hover:to-pink-500 rounded-full font-bold font-montserrat shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl animate-fade-in w-11/12 sm:w-auto mx-auto sm:mx-0"
+              >
+                <Link
+                  to="/joinacademy"
+                  className="flex items-center gap-2 justify-center"
+                >
+                  <FontAwesomeIcon
+                    icon={faAdd}
+                    className="text-lg md:text-xl"
+                  />
+                  Join Academy/Classes
                 </Link>
               </Button>
             </div>

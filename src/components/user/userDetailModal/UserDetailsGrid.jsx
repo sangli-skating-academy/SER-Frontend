@@ -54,10 +54,40 @@ const UserDetailsGrid = ({
   const [editMode, setEditMode] = useState(false);
   const [editDetails, setEditDetails] = useState(userDetails);
   const [saving, setSaving] = useState(false);
+  const [eventCategoryOptions, setEventCategoryOptions] = useState([]);
+  const [skateCategoryOptions, setSkateCategoryOptions] = useState([]);
 
-  // Update editDetails when userDetails changes (e.g., when modal opens for a new user)
+  // Update editDetails and fetch event/skate category options if missing
   React.useEffect(() => {
     setEditDetails(userDetails);
+    // If options missing, fetch from event DB (assume userDetails.event_id available)
+    async function fetchEventOptions() {
+      if (userDetails.event_id) {
+        try {
+          const res = await apiFetch(`/api/events/${userDetails.event_id}`);
+          // Event category
+          let catOpts = [];
+          if (res.event_category && typeof res.event_category === "object") {
+            catOpts = Object.values(res.event_category).flat();
+          }
+          setEventCategoryOptions(catOpts);
+          // Skate category
+          let skateOpts = [];
+          if (Array.isArray(res.skate_category)) {
+            skateOpts = res.skate_category;
+          }
+          setSkateCategoryOptions(skateOpts);
+        } catch {}
+      }
+    }
+    if (
+      !userDetails.event_category_options ||
+      userDetails.event_category_options.length === 0 ||
+      !userDetails.event_skate_category_options ||
+      userDetails.event_skate_category_options.length === 0
+    ) {
+      fetchEventOptions();
+    }
   }, [userDetails]);
 
   const handleEditDetailsChange = (e) => {
@@ -348,23 +378,79 @@ const UserDetailsGrid = ({
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
-                Category
+                Event Category
               </label>
               <Select
-                name="category"
-                value={editDetails?.category || ""}
+                name="event_category"
+                value={editDetails?.event_category || ""}
                 onValueChange={(value) =>
-                  setEditDetails((prev) => ({ ...prev, category: value }))
+                  setEditDetails((prev) => ({ ...prev, event_category: value }))
                 }
                 className="border rounded px-2 py-1 w-full"
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder="Select event category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="quad">Quad</SelectItem>
-                  <SelectItem value="inline">Inline</SelectItem>
-                  <SelectItem value="beginner">Beginner</SelectItem>
+                  {/* Dynamically fetch event category options from userDetails or fallback to eventCategoryOptions */}
+                  {(Array.isArray(userDetails?.event_category_options) &&
+                  userDetails.event_category_options.length > 0
+                    ? userDetails.event_category_options
+                    : eventCategoryOptions
+                  ).length > 0 ? (
+                    (userDetails.event_category_options &&
+                    userDetails.event_category_options.length > 0
+                      ? userDetails.event_category_options
+                      : eventCategoryOptions
+                    ).map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-event-category" disabled>
+                      No event categories
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">
+                Skate Category
+              </label>
+              <Select
+                name="skate_category"
+                value={editDetails?.skate_category || ""}
+                onValueChange={(value) =>
+                  setEditDetails((prev) => ({ ...prev, skate_category: value }))
+                }
+                className="border rounded px-2 py-1 w-full"
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select skate category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* Dynamically fetch skate category options from userDetails or fallback to skateCategoryOptions */}
+                  {(Array.isArray(userDetails?.event_skate_category_options) &&
+                  userDetails.event_skate_category_options.length > 0
+                    ? userDetails.event_skate_category_options
+                    : skateCategoryOptions
+                  ).length > 0 ? (
+                    (userDetails.event_skate_category_options &&
+                    userDetails.event_skate_category_options.length > 0
+                      ? userDetails.event_skate_category_options
+                      : skateCategoryOptions
+                    ).map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-skate-category" disabled>
+                      No skate categories
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -504,8 +590,20 @@ const UserDetailsGrid = ({
                 icon={faClipboardList}
                 className="text-blue-400"
               />
-              <b>Category:</b>{" "}
-              <span className="ml-1">{userDetails.category || "N/A"}</span>
+              <b>Event Category:</b>{" "}
+              <span className="ml-1">
+                {userDetails.event_category || "N/A"}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon
+                icon={faClipboardList}
+                className="text-blue-400"
+              />
+              <b>Skate Category:</b>{" "}
+              <span className="ml-1">
+                {userDetails.skate_category || "N/A"}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <FontAwesomeIcon

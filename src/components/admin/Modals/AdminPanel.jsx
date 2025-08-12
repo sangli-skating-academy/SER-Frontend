@@ -7,85 +7,84 @@ import {
   faImage,
   faMessage,
   faSignOutAlt,
-  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
 const navLinks = [
-  {
-    to: "/admin",
-    label: "Dashboard",
-    icon: faTachometerAlt,
-  },
-  {
-    to: "/admin/events",
-    label: "Events",
-    icon: faCalendarAlt,
-  },
-  {
-    to: "/admin/registrations",
-    label: "Registrations",
-    icon: faClipboardList,
-  },
-  {
-    to: "/admin/gallery",
-    label: "Gallery",
-    icon: faImage,
-  },
-  {
-    to: "/admin/allcontactmessages",
-    label: "Contact Messages",
-    icon: faMessage,
-  },
-  {
-    to: "/admin/profile",
-    label: "Profile",
-    icon: faUser,
-  },
+  { to: "/admin", label: "Dashboard", icon: faTachometerAlt },
+  { to: "/admin/events", label: "Events", icon: faCalendarAlt },
+  { to: "/admin/registrations", label: "Registrations", icon: faClipboardList },
+  { to: "/admin/gallery", label: "Gallery", icon: faImage },
+  { to: "/admin/allcontactmessages", label: "Messages", icon: faMessage },
 ];
 
 export default function AdminPanel() {
   const location = useLocation();
+
   return (
-    <aside className="fixed left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3 bg-white/90 border shadow-xl rounded-2xl p-2 md:p-3 animate-fade-in w-44 md:w-56 items-center transition-all duration-300 group">
-      <div className="mb-2 text-center w-full">
-        <h2 className="text-lg font-extrabold bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
-          Admin
-        </h2>
-      </div>
-      <nav className="flex flex-col gap-2 w-full">
-        {navLinks.map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            title={link.label}
-            className={`flex items-center gap-3 px-2 py-2 rounded-lg font-semibold text-gray-700 hover:bg-gradient-to-r hover:from-blue-100 hover:to-pink-100 transition-all duration-150 shadow-sm w-full ${
-              location.pathname === link.to
-                ? "bg-gradient-to-r from-blue-400 to-pink-400 text-white shadow-lg"
-                : ""
-            }`}
-          >
-            <FontAwesomeIcon icon={link.icon} className="w-6 h-6" />
-            <span className="inline-block transition-all duration-200">
-              {link.label}
-            </span>
-          </Link>
-        ))}
-      </nav>
-      <div className="mt-2 w-full">
+    <aside
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center 
+                 bg-white/90 backdrop-blur-lg border-t border-gray-200 shadow-xl 
+                 rounded-t-3xl px-2 sm:px-4 py-2 transition-all duration-300"
+      style={{
+        paddingBottom: "env(safe-area-inset-bottom)",
+        WebkitPaddingBottom: "env(safe-area-inset-bottom)",
+      }}
+      role="navigation"
+      aria-label="Admin Navigation"
+    >
+      <nav className="flex flex-1 justify-evenly max-w-3xl">
+        {navLinks.map((link) => {
+          const active = location.pathname === link.to;
+          return (
+            <Link
+              key={link.to}
+              to={link.to}
+              title={link.label}
+              className={`group flex flex-col items-center justify-center gap-1 px-2 py-1 sm:px-4 sm:py-2 
+                         rounded-xl transition-all duration-300 relative
+                         ${
+                           active
+                             ? "text-blue-600"
+                             : "text-gray-600 hover:text-blue-500"
+                         }`}
+              aria-current={active ? "page" : undefined}
+            >
+              <div
+                className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300
+                ${
+                  active
+                    ? "bg-gradient-to-r from-blue-500 to-pink-500 text-white shadow-lg scale-110"
+                    : "bg-gray-100 group-hover:bg-blue-100"
+                }`}
+              >
+                <FontAwesomeIcon icon={link.icon} className="w-5 h-5" />
+              </div>
+              <span
+                className={`text-[11px] sm:text-xs font-medium transition-all duration-300 ${
+                  active ? "text-blue-600" : "text-gray-500"
+                }`}
+              >
+                {link.label}
+              </span>
+            </Link>
+          );
+        })}
+
+        {/* Logout Button */}
         <button
-          className="w-full flex items-center justify-center gap-2 px-2 py-2 rounded-lg bg-red-100 text-red-600 font-bold hover:bg-red-200 transition-all duration-150 shadow"
+          className="group flex flex-col items-center justify-center gap-1 px-2 py-1 sm:px-4 sm:py-2
+                     rounded-xl transition-all duration-300 text-red-500 hover:text-red-600"
           title="Logout"
           onClick={() => {
-            // TODO: Implement logout logic
             window.location.href = "/";
           }}
         >
-          <FontAwesomeIcon icon={faSignOutAlt} className="w-6 h-6" />
-          <span className="inline-block transition-all duration-200">
-            Logout
-          </span>
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 group-hover:bg-red-200 transition-all duration-300">
+            <FontAwesomeIcon icon={faSignOutAlt} className="w-5 h-5" />
+          </div>
+          <span className="text-[11px] sm:text-xs font-medium">Logout</span>
         </button>
-      </div>
+      </nav>
     </aside>
   );
 }

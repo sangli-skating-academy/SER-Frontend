@@ -8,6 +8,30 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function AllContactMessage() {
+  const [deleteConfirm, setDeleteConfirm] = useState({
+    show: false,
+    message: null,
+  });
+
+  const handleDelete = (message) => {
+    setDeleteConfirm({ show: true, message });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm.message) return;
+    try {
+      await apiFetch(`/api/admin/contact/${deleteConfirm.message.id}`, {
+        method: "DELETE",
+      });
+      setDeleteConfirm({ show: false, message: null });
+      fetchMessages();
+    } catch {
+      setDeleteConfirm({ show: false, message: null });
+      alert("Failed to delete message.");
+    }
+  };
+
+  const cancelDelete = () => setDeleteConfirm({ show: false, message: null });
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -84,6 +108,9 @@ export default function AllContactMessage() {
                       <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Message
                       </th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        Edit
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -104,8 +131,40 @@ export default function AllContactMessage() {
                         <td className="px-4 py-3 text-sm text-black">
                           {message.message}
                         </td>
+                        <td className="px-4 py-3 text-sm text-black">
+                          <Button
+                            size="sm"
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold shadow"
+                            onClick={() => handleDelete(message)}
+                          >
+                            Delete
+                          </Button>
+                        </td>
                       </tr>
                     ))}
+                    {deleteConfirm.show && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                        <div className="bg-white rounded-xl shadow-xl p-8 flex flex-col items-center gap-4">
+                          <h3 className="text-lg font-bold text-red-600 mb-2">
+                            Confirm Delete
+                          </h3>
+                          <p className="text-gray-700 mb-4">
+                            Are you sure you want to delete this message?
+                          </p>
+                          <div className="flex gap-4">
+                            <Button
+                              className="bg-red-500 text-white"
+                              onClick={confirmDelete}
+                            >
+                              Delete
+                            </Button>
+                            <Button variant="outline" onClick={cancelDelete}>
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -10,6 +10,7 @@ import DashboardPage from "./pages/DashboardPage";
 import GalleryPage from "./pages/GalleryPage";
 import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
+import ClubForm from "./pages/ClubForm";
 
 // Admin Components
 import AdminDashboardPage from "./pages/AdminDasboardPage";
@@ -35,6 +36,7 @@ function App() {
         <Route path="/register/:id?" element={<RegistrationPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/joinacademy" element={<ClubForm />} />
         <Route
           path="/admin"
           element={

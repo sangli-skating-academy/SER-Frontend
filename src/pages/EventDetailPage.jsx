@@ -40,6 +40,12 @@ import {
   faUtensils,
   faFirstAid,
   faCheckCircle,
+  faSkating,
+  faTrophy,
+  faMoneyCheck,
+  faGenderless,
+  faUser,
+  faInbox,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useAuth from "../hooks/useAuth";
@@ -198,44 +204,82 @@ const EventDetailPage = () => {
             data-aos="fade-up"
             data-aos-delay="100"
           >
-            <Tabs defaultValue="rules" className="w-full">
+            <Tabs defaultValue="overview" className="w-full">
               <TabsList className="w-full justify-start border-b rounded-none mb-6 overflow-x-auto flex-nowrap">
-                <TabsTrigger value="rules">Rules & Guidelines</TabsTrigger>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="location">Location</TabsTrigger>
               </TabsList>
-              <TabsContent value="rules">
+              <TabsContent value="overview">
                 <div className="space-y-8">
-                  {/* <h2 className="text-2xl font-bold mb-4">Event Overview</h2> */}
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
-                    {/* Competition */}
-                    <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
-                      <CardHeader className="pb-2 flex flex-row items-center gap-3">
-                        <span className="rounded-full bg-yellow-200 p-2">
-                          <FontAwesomeIcon
-                            icon={faMedal}
-                            className="w-6 h-6 text-yellow-600"
-                          />
-                        </span>
-                        <CardTitle className="text-lg text-yellow-400">
-                          Event Overview
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <span className="text-black-500 flex items-start gap-2">
-                          <span className="mt-1">
+                  {/* Event Categories */}
+                  {event.event_category &&
+                    Object.keys(event.event_category).length > 0 && (
+                      <Card className="bg-gradient-to-tr from-green-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up">
+                        <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                          <span className="rounded-full bg-green-200 p-2">
                             <FontAwesomeIcon
-                              className="text-yellow-400"
-                              icon={faInfoCircle}
+                              icon={faTrophy}
+                              className="w-6 h-6 text-green-600"
                             />
                           </span>
-                          <span>
-                            Challenge yourself against fellow sports enthusiasts
-                            in a friendly but competitive environment.
+                          <CardTitle className="text-lg text-green-400">
+                            Event Categories
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ul className="list-none space-y-3 mt-2">
+                            {Object.entries(event.event_category).map(
+                              ([key, value], i) => (
+                                <li key={i} className="flex items-start gap-2">
+                                  <span className="mt-1 text-green-400">
+                                    <FontAwesomeIcon icon={faCheckCircle} />
+                                  </span>
+                                  <span className="text-gray-700 font-semibold">
+                                    {key}:
+                                  </span>
+                                  <span className="text-gray-700">
+                                    {Array.isArray(value)
+                                      ? value.join(", ")
+                                      : value}
+                                  </span>
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                  {Array.isArray(event.skate_category) &&
+                    event.skate_category.length > 0 && (
+                      <Card className="bg-gradient-to-tr from-pink-50 via-white to-blue-50 border-0 shadow-lg animate-fade-in-up mt-4">
+                        <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                          <span className="rounded-full bg-pink-200 p-2">
+                            <FontAwesomeIcon
+                              icon={faSkating}
+                              className="w-6 h-6 text-pink-600"
+                            />
                           </span>
-                        </span>
-                      </CardContent>
-                    </Card>
-                  </div>
+                          <CardTitle className="text-lg text-pink-600">
+                            Skate Categories
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ul className="list-none space-y-3 mt-2">
+                            {event.skate_category.map((cat, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <span className="mt-1 text-pink-400">
+                                  <FontAwesomeIcon icon={faCheckCircle} />
+                                </span>
+                                <span className="text-gray-700 font-semibold">
+                                  {cat}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    )}
                   {/* General Rules */}
                   {event.rules_and_guidelines?.general_rules?.length > 0 && (
                     <Card className="bg-gradient-to-tr from-blue-50 via-white to-pink-50 border-0 shadow-lg animate-fade-in-up">
@@ -478,7 +522,7 @@ const EventDetailPage = () => {
                   <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up">
                     <span className="rounded-full bg-yellow-100 p-2">
                       <FontAwesomeIcon
-                        icon={faMedal}
+                        icon={faMoneyCheck}
                         className="w-5 h-5 text-yellow-600"
                       />
                     </span>
@@ -514,7 +558,7 @@ const EventDetailPage = () => {
                   <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-200">
                     <span className="rounded-full bg-purple-100 p-2">
                       <FontAwesomeIcon
-                        icon={faInfoCircle}
+                        icon={faUser}
                         className="w-5 h-5 text-purple-600"
                       />
                     </span>
@@ -627,7 +671,7 @@ const EventDetailPage = () => {
               <CardHeader className="flex flex-row items-center gap-3 pb-2">
                 <span className="rounded-full bg-pink-200 p-2">
                   <FontAwesomeIcon
-                    icon={faInfoCircle}
+                    icon={faInbox}
                     className="w-6 h-6 text-pink-600"
                   />
                 </span>
@@ -653,7 +697,7 @@ const EventDetailPage = () => {
                         Email
                       </span>
                       <span className="font-medium break-all text-sm sm:text-base">
-                        saiskatingacademy@gmail.com
+                        saiskating2200@gmail.com
                       </span>
                     </div>
                     <div className="flex items-center gap-3 bg-white/80 rounded-lg p-3 shadow animate-fade-in-up delay-50">
@@ -668,6 +712,8 @@ const EventDetailPage = () => {
                       </span>
                       <span className="font-medium">
                         +91 9595893434 (Suraj A. Shinde)
+                        <br />
+                        +91 9595473434 (Parvind Shinde)
                       </span>
                     </div>
                   </div>

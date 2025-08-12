@@ -92,6 +92,12 @@ export default function EventsTable({
                 Title
               </th>
               <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Event Category
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Skate Category
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                 Description
               </th>
               <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -158,6 +164,70 @@ export default function EventsTable({
                 >
                   <td className="px-4 py-4 whitespace-nowrap">{idx + 1}</td>
                   <td className="px-4 py-4 whitespace-nowrap">{event.title}</td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {(() => {
+                      const cat = event.event_category;
+                      if (!cat) return <span className="text-gray-400">-</span>;
+                      let obj = cat;
+                      if (typeof obj === "string") {
+                        try {
+                          obj = JSON.parse(obj);
+                        } catch {
+                          return <span className="text-gray-400">{obj}</span>;
+                        }
+                      }
+                      if (typeof obj === "object" && obj !== null) {
+                        return (
+                          <ul className="list-disc pl-4">
+                            {Object.entries(obj).map(([key, arr], i) => (
+                              <li key={i}>
+                                <strong>{key}:</strong>{" "}
+                                {Array.isArray(arr) ? arr.join(", ") : arr}
+                              </li>
+                            ))}
+                          </ul>
+                        );
+                      }
+                      return <span className="text-gray-400">-</span>;
+                    })()}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    {(() => {
+                      const skate = event.skate_category;
+                      if (
+                        !skate ||
+                        (Array.isArray(skate) && skate.length === 0)
+                      )
+                        return <span className="text-gray-400">-</span>;
+                      if (typeof skate === "string") {
+                        try {
+                          const arr = JSON.parse(skate);
+                          if (Array.isArray(arr)) {
+                            return (
+                              <ul className="list-disc pl-4">
+                                {arr.map((cat, i) => (
+                                  <li key={i}>{cat}</li>
+                                ))}
+                              </ul>
+                            );
+                          }
+                          return <span className="text-gray-400">{skate}</span>;
+                        } catch {
+                          return <span className="text-gray-400">{skate}</span>;
+                        }
+                      }
+                      if (Array.isArray(skate)) {
+                        return (
+                          <ul className="list-disc pl-4">
+                            {skate.map((cat, i) => (
+                              <li key={i}>{cat}</li>
+                            ))}
+                          </ul>
+                        );
+                      }
+                      return <span className="text-gray-400">-</span>;
+                    })()}
+                  </td>
                   <td className="px-4 py-4 whitespace-nowrap max-w-xs truncate">
                     {event.description}
                   </td>

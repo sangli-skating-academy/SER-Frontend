@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import Header from "../components/layouts/Header";
+import Curosal from "../components/home/curosal";
 import Hero from "../components/home/Hero";
 import EventsSection from "../components/home/EventSection";
 import TimelineSection from "../components/home/TimelineSection";
@@ -30,6 +31,7 @@ const HomePage = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-grow">
+          <Curosal />
           <Hero />
           <EventsSection />
           <TimelineSection />

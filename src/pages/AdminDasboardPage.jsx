@@ -261,7 +261,7 @@ const AdminDasboardPage = () => {
                   value: totalUsers,
                   icon: faUsers,
                   color: "from-blue-400 to-blue-600",
-                  sub: `Players: ${playerCount} | Coaches: ${coachCount} | Admins: ${adminCount}`,
+                  sub: `Players: ${coachCount} | Admins: ${adminCount}`,
                 },
                 {
                   label: "Total Events",

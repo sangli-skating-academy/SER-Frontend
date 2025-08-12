@@ -1,10 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebookF,
-  faInstagram,
-  faTwitter,
-  faYoutube,
-} from "@fortawesome/free-brands-svg-icons";
+import { faYoutube } from "@fortawesome/free-brands-svg-icons";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
@@ -22,35 +17,20 @@ export default function Footer() {
               The ultimate platform for skating competition registrations and
               event management.
             </p>
-            <div className="flex space-x-4 mt-4">
+            <div className="flex items-center space-x-3 mt-4">
+              <span className="text-gray-300 font-medium">Follow us on</span>
               <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white hover:bg-blue-600 transition-colors shadow-lg "
-              >
-                <FontAwesomeIcon icon={faFacebookF} />
-                <span className="sr-only">Facebook</span>
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-blue-400 flex items-center justify-center text-white hover:bg-blue-500 transition-colors shadow-lg  delay-100"
-              >
-                <FontAwesomeIcon icon={faTwitter} />
-                <span className="sr-only">Twitter</span>
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-pink-400 flex items-center justify-center text-white hover:bg-pink-500 transition-colors shadow-lg  delay-200"
-              >
-                <FontAwesomeIcon icon={faInstagram} />
-                <span className="sr-only">Instagram</span>
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-lg  delay-300"
+                href="https://www.youtube.com/@sangliskatingacademy"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Sai Skating Academy YouTube Channel"
+                className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-lg delay-300 text-2xl"
               >
                 <FontAwesomeIcon icon={faYoutube} />
-                <span className="sr-only">YouTube</span>
               </a>
+              <span className="text-gray-300 font-medium hidden sm:inline">
+                YouTube
+              </span>
             </div>
           </div>
           <div className="animate-fade-in-up delay-100">
@@ -135,10 +115,10 @@ export default function Footer() {
               <p>
                 Email:{" "}
                 <a
-                  href="mailto: sangliskatingacademy@gmail.com"
+                  href="mailto: saiskating2200@gmail.com"
                   className="hover:text-blue-400 transition-colors"
                 >
-                  sangliskatingacademy@gmail.com
+                  saiskating2200@gmail.com
                 </a>
               </p>
               <p>
@@ -148,6 +128,8 @@ export default function Footer() {
                   className="hover:text-blue-400 transition-colors"
                 >
                   +91 9595893434 (Suraj A. Shinde)
+                  <br />
+                  +91 9595473434 (Parvind Shinde)
                 </a>
               </p>
             </address>

@@ -28,6 +28,7 @@ const initialForm = {
     general_rules: [""],
     equipment_requirements: [""],
   },
+  event_category: { 1: [""] }, // NEW: event categories object
   is_team_event: false,
   is_featured: false,
   file: null, // for image upload
@@ -46,6 +47,7 @@ const hashtagOptions = [
 ];
 const ageGroups = ["10", "12", "17", "Adult", "All Ages"];
 const genders = ["Male", "Female", "Mixed"];
+const skateCategories = ["Inline", "Quad", "Fancy"];
 
 // Helper to convert UTC/ISO date string to local yyyy-mm-dd for input type="date"
 function toLocalYYYYMMDD(dateStringOrDate) {
@@ -61,6 +63,52 @@ function toLocalYYYYMMDD(dateStringOrDate) {
 }
 
 export default function AddEvent() {
+  // Custom skate category input state and handlers
+  const [customSkateInput, setCustomSkateInput] = useState("");
+  const handleCustomSkateKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const cat = customSkateInput.trim();
+      if (cat && !form.skate_category?.includes(cat)) {
+        setForm((f) => ({
+          ...f,
+          skate_category: [...(f.skate_category || []), cat],
+        }));
+      }
+      setCustomSkateInput("");
+    }
+  };
+  const handleRemoveCustomSkate = (cat) => {
+    setForm((f) => ({
+      ...f,
+      skate_category: (f.skate_category || []).filter((c) => c !== cat),
+    }));
+  };
+  // Event Categories state
+  const [eventCategories, setEventCategories] = useState([
+    { key: 1, value: "" },
+  ]);
+
+  // Event Categories handlers
+  const handleCategoryChange = (idx, value) => {
+    setEventCategories((prev) =>
+      prev.map((cat, i) => (i === idx ? { ...cat, value } : cat))
+    );
+  };
+  const addCategoryField = () => {
+    setEventCategories((prev) => [
+      ...prev,
+      { key: prev.length + 1, value: "" },
+    ]);
+  };
+  const removeCategoryField = (idx) => {
+    setEventCategories((prev) => {
+      if (prev.length <= 1) return prev;
+      const filtered = prev.filter((_, i) => i !== idx);
+      // Reassign keys to be sequential (1,2,3...)
+      return filtered.map((cat, i) => ({ ...cat, key: i + 1 }));
+    });
+  };
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -68,13 +116,14 @@ export default function AddEvent() {
   const eventToEdit = location.state?.event;
 
   // State
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState({ ...initialForm, skate_category: [] });
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState("");
   const [generalRules, setGeneralRules] = useState([""]);
   const [equipmentRequirements, setEquipmentRequirements] = useState([""]);
   const [customHashtagInput, setCustomHashtagInput] = useState("");
   const [customAgeInput, setCustomAgeInput] = useState("");
+  // const [customSkateInput, setCustomSkateInput] = useState("");
 
   // Populate form if editing
   useEffect(() => {
@@ -125,6 +174,26 @@ export default function AddEvent() {
           ? eventToEdit.rules_and_guidelines.equipment_requirements
           : [""]
       );
+      // Event Categories: populate from eventToEdit.event_category
+      let catObj = eventToEdit.event_category;
+      if (catObj && typeof catObj === "string") {
+        try {
+          catObj = JSON.parse(catObj);
+        } catch {}
+      }
+      if (
+        catObj &&
+        typeof catObj === "object" &&
+        Object.keys(catObj).length > 0
+      ) {
+        const cats = Object.entries(catObj).map(([key, arr]) => ({
+          key: Number(key),
+          value: Array.isArray(arr) ? arr[0] : "",
+        }));
+        setEventCategories(cats);
+      } else {
+        setEventCategories([{ key: 1, value: "" }]);
+      }
     }
   }, [eventToEdit]);
 
@@ -195,6 +264,16 @@ export default function AddEvent() {
       age_group: checked
         ? [...f.age_group, ag]
         : f.age_group.filter((g) => g !== ag),
+    }));
+  };
+
+  // Skate category tick handler
+  const handleSkateCategoryTick = (cat, checked) => {
+    setForm((f) => ({
+      ...f,
+      skate_category: checked
+        ? [...(f.skate_category || []), cat]
+        : (f.skate_category || []).filter((c) => c !== cat),
     }));
   };
 
@@ -294,6 +373,14 @@ export default function AddEvent() {
           equipment_requirements: equipmentRequirements.filter((e) => e.trim()),
         })
       );
+      // Add event_category to formData as object { 1: ["100m"], 2: ["200"], ... }
+      const event_category_obj = {};
+      eventCategories.forEach((cat) => {
+        if (cat.value && cat.value.trim()) {
+          event_category_obj[cat.key] = [cat.value.trim()];
+        }
+      });
+      formData.append("event_category", JSON.stringify(event_category_obj));
 
       if (eventToEdit && eventToEdit.id) {
         // PATCH for editing
@@ -384,6 +471,52 @@ export default function AddEvent() {
                   required
                 />
               </div>
+
+              {/* Event Categories Section */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold mb-1 text-black">
+                  <span className="font-semibold text-black mr-2">
+                    Event Categories
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="xs"
+                    onClick={addCategoryField}
+                  >
+                    ＋
+                  </Button>
+                </label>
+                <div className="flex flex-col gap-2 w-full">
+                  {eventCategories.map((cat, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 mb-2 w-full"
+                    >
+                      <span className="font-semibold">{idx + 1}:</span>
+                      <Input
+                        value={cat.value}
+                        onChange={(e) =>
+                          handleCategoryChange(idx, e.target.value)
+                        }
+                        placeholder={`Category ${idx + 1}`}
+                        className="w-2xl"
+                        style={{ minWidth: 0, flex: 1 }}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeCategoryField(idx)}
+                        disabled={eventCategories.length === 1}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="mb-6">
                 <label className="block text-sm font-semibold mb-1 text-black">
                   Event Description
@@ -518,6 +651,62 @@ export default function AddEvent() {
                   <span className="text-xs text-gray-400">
                     Tick to select age groups. Type and press Enter or comma to
                     add custom numeric age groups.
+                  </span>
+                </div>
+                {/* Skate Category Section */}
+                <div className="md:col-span-2 mt-4">
+                  <label className="block text-sm font-semibold mb-1 text-black">
+                    Skate Category (tick to select, add custom)
+                  </label>
+                  <div className="flex flex-row flex-wrap gap-2 mb-2">
+                    {skateCategories.map((cat) => (
+                      <label
+                        key={cat}
+                        className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          value={cat}
+                          checked={form.skate_category?.includes(cat)}
+                          onChange={(e) =>
+                            handleSkateCategoryTick(cat, e.target.checked)
+                          }
+                          className="accent-blue-500"
+                        />
+                        <span className="text-xs">{cat}</span>
+                      </label>
+                    ))}
+                    {/* Custom skate chips */}
+                    {form.skate_category
+                      ?.filter((c) => !skateCategories.includes(c))
+                      .map((cat) => (
+                        <span
+                          key={cat}
+                          className="flex items-center gap-1 bg-pink-100 text-pink-700 px-2 py-1 rounded-full text-xs font-semibold shadow-sm border border-pink-200"
+                        >
+                          {cat}
+                          <button
+                            type="button"
+                            className="ml-1 text-pink-500 hover:text-pink-700"
+                            onClick={() => handleRemoveCustomSkate(cat)}
+                            aria-label="Remove skate category"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full mt-2 rounded-md border px-3 py-2 text-black"
+                    placeholder="Type skate category and press Enter or comma"
+                    value={customSkateInput}
+                    onChange={(e) => setCustomSkateInput(e.target.value)}
+                    onKeyDown={handleCustomSkateKeyDown}
+                  />
+                  <span className="text-xs text-gray-400">
+                    Tick to select skate categories. Type and press Enter or
+                    comma to add custom categories.
                   </span>
                 </div>
                 <div className="md:col-span-2 ">

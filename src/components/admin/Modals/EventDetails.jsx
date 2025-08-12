@@ -33,11 +33,80 @@ export default function EventDetails({ event, onClose }) {
             {event.title}
           </h2>
           <div className="mb-2 text-gray-600 text-base leading-relaxed whitespace-pre-line">
-            {event.description || (
-              <span className="italic text-gray-400">
-                No description provided.
-              </span>
-            )}
+            <span className="font-semibold text-gray-700">
+              Event Description
+            </span>
+            <div>
+              {event.description || (
+                <span className="italic text-gray-400">
+                  No description provided.
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-row gap-8">
+              <div className="bg-white border border-blue-100 rounded-xl shadow p-4 mb-2 w-full">
+                <span className="font-semibold text-gray-700 block mb-2">
+                  Event Categories
+                </span>
+                <ul className="list-disc list-inside text-gray-800 ml-4">
+                  {(() => {
+                    const cat = event.event_category;
+                    if (!cat) return [<li key="none">-</li>];
+                    let obj = cat;
+                    if (typeof obj === "string") {
+                      try {
+                        obj = JSON.parse(obj);
+                      } catch {
+                        return [<li key="str">{obj}</li>];
+                      }
+                    }
+                    if (typeof obj === "object" && obj !== null) {
+                      return Object.entries(obj).map(([key, arr]) => (
+                        <li key={key}>
+                          <span className="font-semibold">{key}:</span>{" "}
+                          {Array.isArray(arr) ? arr.join(", ") : arr}
+                        </li>
+                      ));
+                    }
+                    return [<li key="none">-</li>];
+                  })()}
+                </ul>
+              </div>
+            </div>
+            <div className="flex flex-row gap-8">
+              <div className="bg-white border border-pink-100 rounded-xl shadow p-4 mb-2 w-full">
+                <span className="font-semibold text-gray-700 block mb-2">
+                  Skate Categories
+                </span>
+                <ul className="list-disc list-inside text-gray-800 ml-4">
+                  {(() => {
+                    let arr = event.skate_category;
+                    if (!arr) return [<li key="none">-</li>];
+                    if (Array.isArray(arr)) {
+                      return arr.length > 0
+                        ? arr.map((cat, i) => <li key={i}>{cat}</li>)
+                        : [<li key="none">-</li>];
+                    }
+                    if (typeof arr === "string") {
+                      try {
+                        const parsed = JSON.parse(arr);
+                        if (Array.isArray(parsed)) {
+                          return parsed.length > 0
+                            ? parsed.map((cat, i) => <li key={i}>{cat}</li>)
+                            : [<li key="none">-</li>];
+                        }
+                        return [<li key="str">{arr}</li>];
+                      } catch {
+                        return [<li key="str">{arr}</li>];
+                      }
+                    }
+                    return [<li key="none">-</li>];
+                  })()}
+                </ul>
+              </div>
+            </div>
           </div>
           {/* Event Image */}
           <div className="w-full flex justify-center">
@@ -77,7 +146,13 @@ export default function EventDetails({ event, onClose }) {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="font-semibold text-gray-700">Age Group</span>
-                <span className="text-gray-800">{event.age_group || "-"}</span>
+                <span className="text-gray-800">
+                  {Array.isArray(event.age_group)
+                    ? event.age_group.join(", ")
+                    : typeof event.age_group === "string"
+                    ? event.age_group
+                    : "-"}
+                </span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="font-semibold text-gray-700">
