@@ -24,6 +24,7 @@ import UserDetailsGrid from "../components/user/userDetailModal/UserDetailsGrid"
 import PaymentModal from "../components/user/Pay/PaymentModal";
 import RegistrationsTab from "../components/user/RegistrationsTab";
 import MyProfileTab from "../components/user/MyProfileTab";
+import MembershipTab from "../components/user/MembershipTab";
 
 const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -281,6 +282,11 @@ const DashboardPage = () => {
                     <FontAwesomeIcon icon={faClipboardList} className="mr-2" />{" "}
                     My Registrations
                   </TabsTrigger>
+
+                  <TabsTrigger value="memberships">
+                    <FontAwesomeIcon icon={faUser} className="mr-2" /> My
+                    Memberships
+                  </TabsTrigger>
                   <TabsTrigger value="profile">
                     <FontAwesomeIcon icon={faUser} className="mr-2" /> My
                     Profile
@@ -310,6 +316,9 @@ const DashboardPage = () => {
                     handleProfileSave={handleProfileSave}
                     setProfileEditMode={setProfileEditMode}
                   />
+                </TabsContent>
+                <TabsContent value="memberships">
+                  <MembershipTab userId={user?.id} />
                 </TabsContent>
               </Tabs>
             </div>

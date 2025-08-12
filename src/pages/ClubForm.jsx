@@ -16,6 +16,10 @@ import { apiFetch } from "../services/api";
 import Button from "../components/ui/button";
 import Input from "../components/ui/input";
 import useAuth from "../hooks/useAuth";
+import LoginModal from "../components/auth/LoginModal";
+import Header from "../components/layouts/Header";
+import Footer from "../components/layouts/Footer";
+import axios from "axios";
 
 const FEE_AMOUNT = 500; // You can set this dynamically if needed
 
@@ -41,12 +45,23 @@ export default function ClubForm() {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [razorpayOrder, setRazorpayOrder] = useState(null);
   const [paymentId, setPaymentId] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [hasMembership, setHasMembership] = useState(false);
+  const isLoggedIn = !!user;
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
+    if (!user?.id) return;
+    axios
+      .get(`/api/club/membership/${user.id}`)
+      .then((res) => {
+        if (res.data && res.data.status === "success") {
+          setHasMembership(true);
+        } else {
+          setHasMembership(false);
+        }
+      })
+      .catch(() => setHasMembership(false));
+  }, [user]);
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -184,95 +199,154 @@ export default function ClubForm() {
     }
   };
 
+  // Show login modal if needed
+  {
+    showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />;
+  }
+
+  // After successful payment and registration
+  useEffect(() => {
+    if (success) {
+      navigate("/dashboard");
+    }
+  }, [success, navigate]);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-pink-50 to-blue-50 animate-fade-in">
-      <div className="max-w-lg w-full bg-white rounded-xl shadow-xl p-8 mt-8">
-        <h2 className="text-2xl font-bold mb-6 text-blue-700 text-center">
-          Join Academy / Classes
-        </h2>
-        {error && <div className="text-red-600 mb-4 text-center">{error}</div>}
-        {success ? (
-          <div className="text-green-700 text-center font-bold text-lg">
-            Registration successful!
-            <br />
-            Payment ID: {paymentId}
+    <>
+      <Header />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-pink-50 to-blue-50 animate-fade-in">
+        <div className="max-w-lg w-full bg-white rounded-xl shadow-xl p-8 mt-8">
+          <div className="mb-4">
+            <button
+              type="button"
+              className="flex items-center gap-2 text-blue-600 hover:underline"
+              onClick={() => navigate(-1)}
+            >
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back
+            </button>
           </div>
-        ) : (
-          <form className="space-y-6" onSubmit={handlePayment}>
-            <Input
-              label="Full Name*"
-              name="full_name"
-              value={form.full_name}
-              onChange={handleChange}
-              required
-              placeholder="Enter your full name"
-            />
-            <Input
-              label="Phone Number*"
-              name="phone_number"
-              value={form.phone_number}
-              onChange={handleChange}
-              required
-              placeholder="Enter your phone number"
-              type="tel"
-              pattern="[0-9]{10,}"
-            />
-            <Input
-              label="Email*"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              placeholder="Enter your email"
-              type="email"
-            />
-            <Input
-              label="Age*"
-              name="age"
-              value={form.age}
-              onChange={handleChange}
-              required
-              placeholder="Enter your age"
-              type="number"
-              min={1}
-            />
-            <div>
-              <label className="block text-sm font-semibold mb-1 text-black">
-                Gender*
-              </label>
-              <select
-                name="gender"
-                value={form.gender}
+          <h2 className="text-2xl font-bold mb-6 text-blue-700 text-center">
+            Join Academy / Classes
+          </h2>
+          {error && (
+            <div className="text-red-600 mb-4 text-center">{error}</div>
+          )}
+          {success ? (
+            <div className="text-green-700 text-center font-bold text-lg">
+              Registration successful!
+              <br />
+              Payment ID: {paymentId}
+            </div>
+          ) : (
+            <form className="space-y-6" onSubmit={handlePayment}>
+              <Input
+                label="Full Name*"
+                name="full_name"
+                value={form.full_name}
                 onChange={handleChange}
                 required
-                className="w-full border rounded px-3 py-2"
-              >
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <Input
-              label="Fees (₹)"
-              name="amount"
-              value={form.amount}
-              onChange={handleChange}
-              required
-              type="number"
-              min={0}
-              disabled
-            />
-            <Button
-              type="submit"
-              className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform w-full"
-              disabled={submitting || paymentSuccess}
-            >
-              {submitting ? "Processing..." : "Pay & Register"}
-            </Button>
-          </form>
-        )}
+                placeholder="Enter your full name"
+              />
+              <Input
+                label="Phone Number*"
+                name="phone_number"
+                value={form.phone_number}
+                onChange={handleChange}
+                required
+                placeholder="Enter your phone number"
+                type="tel"
+                pattern="[0-9]{10,}"
+              />
+              <Input
+                label="Email*"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                placeholder="Enter your email"
+                type="email"
+              />
+              <Input
+                label="Age*"
+                name="age"
+                value={form.age}
+                onChange={handleChange}
+                required
+                placeholder="Enter your age"
+                type="number"
+                min={1}
+              />
+              <div>
+                <label className="block text-sm font-semibold mb-1 text-black">
+                  Gender*
+                </label>
+                <select
+                  name="gender"
+                  value={form.gender}
+                  onChange={handleChange}
+                  required
+                  className="w-full border rounded px-3 py-2"
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <Input
+                label="Fees (₹)"
+                name="amount"
+                value={form.amount}
+                onChange={handleChange}
+                required
+                type="number"
+                min={0}
+                disabled
+              />
+              {!isLoggedIn ? (
+                <Button
+                  type="button"
+                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform w-full"
+                  onClick={() => setShowLoginModal(true)}
+                >
+                  Login First
+                </Button>
+              ) : hasMembership ? (
+                <Button
+                  type="button"
+                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform w-full"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Go to Dashboard
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform w-full"
+                  disabled={submitting || paymentSuccess}
+                >
+                  {submitting ? "Processing..." : "Pay & Register"}
+                </Button>
+              )}
+            </form>
+          )}
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

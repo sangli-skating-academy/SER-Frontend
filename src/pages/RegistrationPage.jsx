@@ -47,7 +47,8 @@ const initialForm = {
   date_of_birth: "",
   district: "",
   state: "",
-  category: "",
+  // category: "",
+  skate_category: "",
   aadhaar_number: "",
   team_name: "",
   team_members: [{ full_name: "", age: "", gender: "" }],
@@ -212,6 +213,10 @@ const RegistrationPage = () => {
           k === "event_category"
         ) {
           fd.append(k, JSON.stringify(v));
+        } else if (k === "skate_category") {
+          fd.append("skate_category", v);
+        } else if (k === "category") {
+          // Do not send old category field
         } else {
           fd.append(k, v);
         }
@@ -649,22 +654,22 @@ const RegistrationPage = () => {
                       />
                       <div>
                         <label
-                          htmlFor="category"
+                          htmlFor="skate_category"
                           className="block text-sm font-semibold mb-1 text-black"
                         >
                           Skate Category*
                         </label>
                         <Select
-                          name="category"
-                          aria-label="Category"
-                          value={form.category}
+                          name="skate_category"
+                          aria-label="Skate Category"
+                          value={form.skate_category}
                           onValueChange={(val) =>
-                            setForm((f) => ({ ...f, category: val }))
+                            setForm((f) => ({ ...f, skate_category: val }))
                           }
                           required
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
+                            <SelectValue placeholder="Select skate category" />
                           </SelectTrigger>
                           <SelectContent>
                             {Array.isArray(event?.skate_category) &&
@@ -675,7 +680,7 @@ const RegistrationPage = () => {
                                 </SelectItem>
                               ))
                             ) : (
-                              <SelectItem value="">
+                              <SelectItem value="no-skate-category" disabled>
                                 No skate categories
                               </SelectItem>
                             )}
