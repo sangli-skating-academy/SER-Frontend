@@ -20,7 +20,7 @@ export default function Footer() {
             <div className="flex items-center space-x-3 mt-4">
               <span className="text-gray-300 font-medium">Follow us on</span>
               <a
-                href="https://www.youtube.com/@sangliskatingacademy"
+                href="https://www.youtube.com/@surajshinde8554"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Sai Skating Academy YouTube Channel"
@@ -109,7 +109,7 @@ export default function Footer() {
             </h3>
             <address className="not-italic text-gray-300 space-y-2">
               <p>
-                Chatrapati Shivaji Stadium Skating Rink, Near Ambrai Garden ,
+                Chatrapati Shivaji Stadium Skating Rink, Near Amrai Garden ,
                 Sangli 416416{" "}
               </p>
               <p>
@@ -122,14 +122,19 @@ export default function Footer() {
                 </a>
               </p>
               <p>
-                Phone:{" "}
+                Phone: <br />
                 <a
                   href="tel:+9595893434"
                   className="hover:text-blue-400 transition-colors"
                 >
-                  +91 9595893434 (Suraj A. Shinde)
-                  <br />
-                  +91 9595473434 (Parvind Shinde)
+                  +91 9595893434 (Mr. Suraj A. Shinde)
+                </a>
+                <br />
+                <a
+                  href="tel:+919595473434"
+                  className="hover:text-blue-400 transition-colors"
+                >
+                  +91 9595473434 (Mrs. Parveen S. Shinde)
                 </a>
               </p>
             </address>

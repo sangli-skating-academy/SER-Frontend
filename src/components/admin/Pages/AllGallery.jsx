@@ -8,6 +8,7 @@ import {
   faSyncAlt,
   faPlusCircle,
   faFilter,
+  faArrowLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { apiFetch } from "../../../services/api";
 import GalleryTable from "../Tables/GalleryTable";
@@ -88,6 +89,11 @@ export default function AllGallery() {
     return matchesEvent && matchesYear;
   });
 
+  const homeScreenGallery = gallery.filter(
+    (g) => g.image_location === "home_screen"
+  );
+  const galleryItems = gallery.filter((g) => g.image_location === "gallery");
+
   return (
     <AdminLayout>
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-pink-50 to-blue-50 animate-fade-in">
@@ -95,12 +101,14 @@ export default function AllGallery() {
           <div className="container mx-auto px-2 md:px-6">
             <button
               onClick={() => navigate(-1)}
-              className="mr-4 px-4 py-2 rounded bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold shadow transition"
+              className="mr-4 px-4 py-2 rounded bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold shadow transition mb-3"
             >
-              &larr; Back
+              <FontAwesomeIcon icon={faArrowLeft} className="mr-2" /> Back
             </button>
             <div className="flex items-center mb-6 gap-2">
-              <h1 className="text-3xl font-bold mr-4">All Gallery Items</h1>
+              <h1 className="text-32 sm:text-3xl font-bold mr-4">
+                All Gallery Items
+              </h1>
               <div className="flex-1" />
               <Button
                 variant="outline"
@@ -199,11 +207,25 @@ export default function AllGallery() {
             ) : error ? (
               <div className="text-red-500">{error}</div>
             ) : (
-              <GalleryTable
-                data={filteredGallery}
-                rowLimit={null}
-                onRefresh={refreshData}
-              />
+              <>
+                <h2 className="text-xl font-semibold mb-4">
+                  Home Screen Items
+                </h2>
+                <GalleryTable
+                  data={homeScreenGallery}
+                  rowLimit={null}
+                  onRefresh={refreshData}
+                />
+
+                <h2 className="text-xl font-semibold mt-8 mb-4">
+                  Gallery Items
+                </h2>
+                <GalleryTable
+                  data={galleryItems}
+                  rowLimit={null}
+                  onRefresh={refreshData}
+                />
+              </>
             )}
           </div>
           {/* Add Gallery Modal */}

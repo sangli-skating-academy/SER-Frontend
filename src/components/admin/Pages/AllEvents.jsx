@@ -5,7 +5,11 @@ import Button from "../../ui/button";
 import Skeleton from "../../ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSyncAlt, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSyncAlt,
+  faPlusCircle,
+  faArrowLeft,
+} from "@fortawesome/free-solid-svg-icons";
 import { apiFetch } from "../../../services/api";
 import EventsTable from "../Tables/EventsTable";
 import EventDetails from "../Modals/EventDetails";
@@ -111,12 +115,12 @@ export default function AllEvents() {
           <div className="container mx-auto px-2 md:px-6">
             <button
               onClick={() => navigate(-1)}
-              className="mr-4 px-4 py-2 rounded bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold shadow transition"
+              className="mr-4 px-4 py-2 rounded bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold shadow transition mb-3"
             >
-              &larr; Back
+              <FontAwesomeIcon icon={faArrowLeft} className="mr-2" /> Back
             </button>
             <div className="flex items-center mb-6 gap-2">
-              <h1 className="text-3xl font-bold mr-4">All Events</h1>
+              <h1 className="text-32 sm:text-3xl font-bold mr-4">All Events</h1>
               <div className="flex-1" />
               <Button
                 variant="outline"

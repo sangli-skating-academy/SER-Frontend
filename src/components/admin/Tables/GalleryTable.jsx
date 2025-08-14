@@ -62,6 +62,9 @@ export default function GalleryTable({
               Uploaded At
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+              Location
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
               Action
             </th>
           </tr>
@@ -117,6 +120,9 @@ export default function GalleryTable({
                   {item.uploaded_at
                     ? new Date(item.uploaded_at).toLocaleString()
                     : "-"}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  {item.image_location || "-"}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <Button

@@ -12,7 +12,16 @@ import {
 const navLinks = [
   { to: "/admin", label: "Dashboard", icon: faTachometerAlt },
   { to: "/admin/events", label: "Events", icon: faCalendarAlt },
-  { to: "/admin/registrations", label: "Registrations", icon: faClipboardList },
+  {
+    to: "/admin/registrations",
+    label: "Event Registrations",
+    icon: faClipboardList,
+  },
+  {
+    to: "/admin/class-registrations",
+    label: "Class Registrations",
+    icon: faClipboardList,
+  },
   { to: "/admin/gallery", label: "Gallery", icon: faImage },
   { to: "/admin/allcontactmessages", label: "Messages", icon: faMessage },
 ];
@@ -22,7 +31,7 @@ export default function AdminPanel() {
 
   return (
     <aside
-      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center 
+      className="fixed bottom-0 left-0 right-0 z-50 flex flex-wrap items-center justify-around
                  bg-white/90 backdrop-blur-lg border-t border-gray-200 shadow-xl 
                  rounded-t-3xl px-2 sm:px-4 py-2 transition-all duration-300"
       style={{
@@ -32,7 +41,7 @@ export default function AdminPanel() {
       role="navigation"
       aria-label="Admin Navigation"
     >
-      <nav className="flex flex-1 justify-evenly max-w-3xl">
+      <nav className="flex flex-wrap flex-1 justify-evenly">
         {navLinks.map((link) => {
           const active = location.pathname === link.to;
           return (

@@ -120,7 +120,6 @@ const AdminDasboardPage = () => {
   const playerCount = users.filter((u) => u.role === "player").length;
   const coachCount = users.filter((u) => u.role === "coach").length;
   const adminCount = users.filter((u) => u.role === "admin").length;
-  // ...existing code...
   // Only count live events for stats
   const liveEvents = events.filter((e) => e.live === true || e.live === "TRUE");
   const totalEvents = liveEvents.length;
@@ -319,33 +318,26 @@ const AdminDasboardPage = () => {
 
           {/* Tabs */}
           <Tabs defaultValue="registrations" className="animate-fade-in-up">
-            <TabsList className="grid w-full grid-cols-4 md:w-auto md:inline-flex mb-4">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 md:w-auto md:inline-flex mb-4">
               <TabsTrigger
                 value="registrations"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-lg font-semibold transition-all duration-200"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-sm sm:text-lg font-semibold transition-all duration-200"
               >
                 <FontAwesomeIcon icon={faClipboardList} className="mr-2" />{" "}
                 Registrations
               </TabsTrigger>
               <TabsTrigger
                 value="events"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-lg font-semibold transition-all duration-200"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-sm sm:text-lg font-semibold transition-all duration-200"
               >
-                <FontAwesomeIcon icon={faCalendarAlt} className="mr-2" />
-                Events
-              </TabsTrigger>
-              <TabsTrigger
-                value="gallery"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-lg font-semibold transition-all duration-200"
-              >
-                <FontAwesomeIcon icon={faImage} className="mr-2" /> Gallery
+                <FontAwesomeIcon icon={faCalendarAlt} className="mr-2" /> Events
               </TabsTrigger>
               <TabsTrigger
                 value="Contact-Messages"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-lg font-semibold transition-all duration-200"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-400 data-[state=active]:to-pink-400 data-[state=active]:text-white data-[state=active]:shadow-lg text-sm sm:text-lg font-semibold transition-all duration-200"
               >
-                <FontAwesomeIcon icon={faMessage} className="mr-2" />
-                Contact Messages
+                <FontAwesomeIcon icon={faMessage} className="mr-2" /> Contact
+                Messages
               </TabsTrigger>
             </TabsList>
 
@@ -412,26 +404,6 @@ const AdminDasboardPage = () => {
                 registrations={registrations}
                 label="Upcoming Events"
               />
-            </TabsContent>
-
-            {/* Gallery Tab */}
-            <TabsContent
-              value="gallery"
-              className="space-y-4 animate-fade-in-up"
-            >
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Gallery</h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                  className="transition-all hover:scale-105"
-                >
-                  <Link to="/admin/gallery">Manage Gallery</Link>
-                </Button>
-              </div>
-              <GalleryTable data={galleryItems} rowLimit={5} />
-              {/* GalleryItemModal can be implemented for details view */}
             </TabsContent>
 
             {/* Contact Messages Tab */}

@@ -17,6 +17,7 @@ import {
   faUser,
   faClipboardList,
   faTimesCircle,
+  faIdCard,
 } from "@fortawesome/free-solid-svg-icons";
 import { Helmet } from "react-helmet-async";
 import TeamDetails from "../components/user/userDetailModal/TeamDetails";
@@ -270,61 +271,113 @@ const DashboardPage = () => {
                   Your Dashboard
                 </h1>
                 <p className="text-gray-600 text-lg animate-fade-in-up delay-100">
-                  Manage your event registrations and profile
+                  Manage your event registrations, Membership details, and
+                  profile
                 </p>
               </div>
               <Tabs
                 defaultValue="registrations"
                 className="w-full animate-fade-in-up delay-200"
               >
-                <TabsList className="mb-6 justify-center bg-white/70 shadow rounded-xl p-2">
-                  <TabsTrigger value="registrations">
-                    <FontAwesomeIcon icon={faClipboardList} className="mr-2" />{" "}
-                    My Registrations
+                {/* Beautiful bottom nav bar for mobile, styled like admin panel */}
+                <TabsList
+                  className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-white/90 backdrop-blur-lg border-t border-gray-200 shadow-xl rounded-t-3xl px-2 sm:px-4 py-2 transition-all duration-300 h-23 "
+                  style={{
+                    paddingBottom: "env(safe-area-inset-bottom)",
+                    WebkitPaddingBottom: "env(safe-area-inset-bottom)",
+                  }}
+                  role="navigation"
+                  aria-label="User Navigation"
+                >
+                  <TabsTrigger
+                    value="registrations"
+                    className="group flex flex-col items-center justify-center gap-2 px-2 py-1 sm:px-4 sm:py-2 
+               rounded-xl transition-all duration-300 relative
+               data-[state=active]:text-blue-600 text-gray-600 hover:text-blue-500"
+                  >
+                    <div
+                      className="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300
+                 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-110
+                 bg-gray-100 group-hover:bg-blue-100"
+                    >
+                      <FontAwesomeIcon
+                        icon={faClipboardList}
+                        className="w-5 h-5"
+                      />
+                    </div>
+                    <span className="text-[12px] sm:text-sm font-medium transition-all duration-300">
+                      My Registrations
+                    </span>
                   </TabsTrigger>
-
-                  <TabsTrigger value="memberships">
-                    <FontAwesomeIcon icon={faUser} className="mr-2" /> My
-                    Memberships
+                  <TabsTrigger
+                    value="memberships"
+                    className="group flex flex-col items-center justify-center gap-2 px-2 py-1 sm:px-4 sm:py-2 
+               rounded-xl transition-all duration-300 relative
+               data-[state=active]:text-pink-600 text-gray-600 hover:text-pink-500"
+                  >
+                    <div
+                      className="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300
+                 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-110
+                 bg-gray-100 group-hover:bg-pink-100"
+                    >
+                      <FontAwesomeIcon icon={faIdCard} className="w-5 h-5" />
+                    </div>
+                    <span className="text-[12px] sm:text-sm font-medium transition-all duration-300">
+                      My Memberships
+                    </span>
                   </TabsTrigger>
-                  <TabsTrigger value="profile">
-                    <FontAwesomeIcon icon={faUser} className="mr-2" /> My
-                    Profile
+                  <TabsTrigger
+                    value="profile"
+                    className="group flex flex-col items-center justify-center gap-2 px-2 py-1 sm:px-4 sm:py-2 
+               rounded-xl transition-all duration-300 relative
+               data-[state=active]:text-purple-600 text-gray-600 hover:text-purple-500"
+                  >
+                    <div
+                      className="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300
+                 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-110
+                 bg-gray-100 group-hover:bg-purple-100"
+                    >
+                      <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
+                    </div>
+                    <span className="text-[12px] sm:text-sm font-medium transition-all duration-300">
+                      My Profile
+                    </span>
                   </TabsTrigger>
                 </TabsList>
-                <TabsContent value="registrations">
-                  <RegistrationsTab
-                    loading={loading}
-                    registrations={registrations}
-                    events={events} // pass events prop
-                    getEventName={getEventName}
-                    handlePaymentClick={handlePaymentClick}
-                    handleViewDetails={handleViewDetails}
-                    handleCancelRegistration={handleCancelRegistration}
-                    cancelButtonRef={cancelButtonRef}
-                  />
-                </TabsContent>
-                <TabsContent value="profile">
-                  <MyProfileTab
-                    user={user}
-                    profileEditMode={profileEditMode}
-                    profileEdit={profileEdit}
-                    profileLoading={profileLoading}
-                    // handleProfileEditClick={() => setProfileEditMode(true)}
-                    handleProfileEditClick={handleProfileEditClick}
-                    handleProfileEditChange={handleProfileEditChange}
-                    handleProfileSave={handleProfileSave}
-                    setProfileEditMode={setProfileEditMode}
-                  />
-                </TabsContent>
-                <TabsContent value="memberships">
-                  <MembershipTab userId={user?.id} />
-                </TabsContent>
+                <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 pb-16 sm:pb-0 overflow-x-auto">
+                  <TabsContent value="registrations">
+                    <RegistrationsTab
+                      loading={loading}
+                      registrations={registrations}
+                      events={events}
+                      getEventName={getEventName}
+                      handlePaymentClick={handlePaymentClick}
+                      handleViewDetails={handleViewDetails}
+                      handleCancelRegistration={handleCancelRegistration}
+                      cancelButtonRef={cancelButtonRef}
+                    />
+                  </TabsContent>
+                  <TabsContent value="profile">
+                    <MyProfileTab
+                      user={user}
+                      profileEditMode={profileEditMode}
+                      profileEdit={profileEdit}
+                      profileLoading={profileLoading}
+                      handleProfileEditClick={handleProfileEditClick}
+                      handleProfileEditChange={handleProfileEditChange}
+                      handleProfileSave={handleProfileSave}
+                      setProfileEditMode={setProfileEditMode}
+                    />
+                  </TabsContent>
+                  <TabsContent value="memberships">
+                    <MembershipTab userId={user?.id} />
+                  </TabsContent>
+                </div>
               </Tabs>
             </div>
           </div>
         </main>
-        <Footer />
+
         <PaymentModal
           selectedRegistration={selectedRegistration}
           isOpen={isPaymentModalOpen}

@@ -125,8 +125,8 @@ const ContactSection = () => {
                 <div>
                   <h4 className="font-medium mb-1">Address</h4>
                   <p className="text-gray-600">
-                    Chatrapati Shivaji Stadium Skating Rink, Near Ambrai Garden
-                    , Sangli 416416{" "}
+                    Chatrapati Shivaji Stadium Skating Rink, Near Amrai Garden ,
+                    Sangli 416416{" "}
                   </p>
                 </div>
               </div>
@@ -137,10 +137,10 @@ const ContactSection = () => {
                 <div>
                   <h4 className="font-medium mb-1">Phone</h4>
                   <p className="text-gray-600">
-                    +91 9595893434 (Suraj A. Shinde)
+                    +91 9595893434 (Mr. Suraj A. Shinde)
                   </p>
                   <p className="text-gray-600">
-                    +91 9595473434 (Parvind Shinde)
+                    +91 9595473434 (Mrs. Parveen S. Shinde)
                   </p>
                 </div>
               </div>
@@ -160,7 +160,7 @@ const ContactSection = () => {
                 <div>
                   <h4 className="font-medium mb-1">Office Hours</h4>
                   <p className="text-gray-600">
-                    Monday-Saturday: 5:00 PM - 7:00 PM
+                    Monday-Saturday: 5:00 PM - 8:00 PM
                   </p>
                 </div>
               </div>
@@ -168,7 +168,7 @@ const ContactSection = () => {
             <div className="flex items-center space-x-3 mt-10">
               <span className="text-black-300 font-medium">Follow us on</span>
               <a
-                href="https://www.youtube.com/@sangliskatingacademy"
+                href="https://www.youtube.com/@surajshinde8554"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Sai Skating Academy YouTube Channel"

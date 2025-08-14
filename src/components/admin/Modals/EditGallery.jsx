@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import Button from "../../ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+} from "../../ui/select";
 
 export default function EditGallery({ open, onClose, gallery, onSave }) {
   const [form, setForm] = useState({
@@ -8,6 +14,7 @@ export default function EditGallery({ open, onClose, gallery, onSave }) {
     image_url: "",
     date: "",
     file: null,
+    image_location: "",
   });
   const [preview, setPreview] = useState("");
   const [saving, setSaving] = useState(false);
@@ -21,6 +28,7 @@ export default function EditGallery({ open, onClose, gallery, onSave }) {
         image_url: gallery.image_url || "",
         date: gallery.date ? gallery.date.slice(0, 10) : "",
         file: null,
+        image_location: gallery.image_location || "",
       });
       setPreview(gallery.image_url || "");
     }
@@ -45,6 +53,7 @@ export default function EditGallery({ open, onClose, gallery, onSave }) {
       formData.append("title", form.title);
       formData.append("event_name", form.event_name);
       formData.append("date", form.date);
+      formData.append("image_location", form.image_location);
       if (form.file) formData.append("file", form.file);
       // Use /api/admin/gallery/:id for PATCH
       await onSave(formData, gallery.id);
@@ -124,6 +133,25 @@ export default function EditGallery({ open, onClose, gallery, onSave }) {
                 Current image shown above
               </div>
             )}
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">
+              Image Location
+            </label>
+            <Select
+              value={form.image_location || ""}
+              onValueChange={(value) =>
+                setForm((f) => ({ ...f, image_location: value }))
+              }
+            >
+              <SelectTrigger className="w-full border rounded px-3 py-2">
+                <span>{form.image_location || "Select location"}</span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="home_screen">Home Screen</SelectItem>
+                <SelectItem value="gallery">Gallery</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           {error && <div className="text-red-500 text-sm">{error}</div>}
           <div className="flex gap-2 justify-end">

@@ -19,7 +19,14 @@ import useAuth from "../hooks/useAuth";
 import LoginModal from "../components/auth/LoginModal";
 import Header from "../components/layouts/Header";
 import Footer from "../components/layouts/Footer";
-import axios from "axios";
+import Modal from "../components/ui/Modal";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../components/ui/select";
 
 const FEE_AMOUNT = 500; // You can set this dynamically if needed
 
@@ -47,20 +54,29 @@ export default function ClubForm() {
   const [paymentId, setPaymentId] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [hasMembership, setHasMembership] = useState(false);
+  const [membershipInfo, setMembershipInfo] = useState(null);
+  const [showMembershipModal, setShowMembershipModal] = useState(false);
   const isLoggedIn = !!user;
 
   useEffect(() => {
     if (!user?.id) return;
-    axios
-      .get(`/api/club/membership/${user.id}`)
+    apiFetch(`/api/club/membership/${user.id}`)
       .then((res) => {
-        if (res.data && res.data.status === "success") {
+        if (res && res.status === "success") {
           setHasMembership(true);
+          setMembershipInfo(res);
+          setShowMembershipModal(true);
         } else {
           setHasMembership(false);
+          setMembershipInfo(null);
+          setShowMembershipModal(false);
         }
       })
-      .catch(() => setHasMembership(false));
+      .catch(() => {
+        setHasMembership(false);
+        setMembershipInfo(null);
+        setShowMembershipModal(false);
+      });
   }, [user]);
 
   const handlePayment = async (e) => {
@@ -259,7 +275,7 @@ export default function ClubForm() {
                 value={form.full_name}
                 onChange={handleChange}
                 required
-                placeholder="Enter your full name"
+                placeholder="Enter Student full name"
               />
               <Input
                 label="Phone Number*"
@@ -294,18 +310,23 @@ export default function ClubForm() {
                 <label className="block text-sm font-semibold mb-1 text-black">
                   Gender*
                 </label>
-                <select
+                <Select
                   name="gender"
                   value={form.gender}
-                  onChange={handleChange}
+                  onValueChange={(val) =>
+                    setForm((f) => ({ ...f, gender: val }))
+                  }
                   required
-                  className="w-full border rounded px-3 py-2"
                 >
-                  <option value="">Select gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Input
                 label="Fees (₹)"
@@ -325,14 +346,6 @@ export default function ClubForm() {
                 >
                   Login First
                 </Button>
-              ) : hasMembership ? (
-                <Button
-                  type="button"
-                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform w-full"
-                  onClick={() => navigate("/dashboard")}
-                >
-                  Go to Dashboard
-                </Button>
               ) : (
                 <Button
                   type="submit"
@@ -347,6 +360,51 @@ export default function ClubForm() {
         </div>
       </div>
       <Footer />
+      {showMembershipModal && membershipInfo && (
+        <Modal onClose={() => setShowMembershipModal(false)}>
+          <div className="p-6 text-center">
+            <h3 className="text-xl font-bold text-blue-700 mb-2">
+              You have an active membership!
+            </h3>
+            <div className="mb-4 text-gray-700">
+              Your membership expires on{" "}
+              <span className="font-semibold text-pink-600">
+                {membershipInfo.end_date
+                  ? new Date(membershipInfo.end_date).toLocaleDateString()
+                  : "-"}
+              </span>{" "}
+              <span>
+                for student{" "}
+                <span className="font-bold text-blue-400">
+                  {membershipInfo.full_name}
+                </span>
+              </span>
+            </div>
+            <div className="flex gap-4 justify-center mt-6 flex-col">
+              <Button
+                type="button"
+                className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform"
+                onClick={() => {
+                  setShowMembershipModal(false);
+                  navigate("/dashboard");
+                }}
+              >
+                Go to Dashboard
+              </Button>
+              <Button
+                type="button"
+                className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform"
+                onClick={() => {
+                  setShowMembershipModal(false);
+                  navigate("/joinacademy");
+                }}
+              >
+                Join for another student
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }

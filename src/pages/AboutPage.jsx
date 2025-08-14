@@ -19,30 +19,22 @@ const team = [
   {
     id: 1,
     name: "Suraj Ashok Shinde",
-    role: "International Coach",
-    bio: "",
+    role: "President",
+    bio: "International Coach and Referee",
+    image: "/placeholder.svg",
+  },
+  {
+    id: 2,
+    name: "Parveen Suraj Shinde",
+    role: "Secretary",
+    bio: "National Referee",
     image: "/placeholder.svg",
   },
 ];
 
 const achievements = [
   {
-    year: "2024",
-    title: "Record-breaking National Event",
-    description:
-      "Hosted the largest skating event in India with 800+ participants from 25 states.",
-  },
-  {
-    year: "2023",
-    title: "Digital Transformation",
-    description:
-      "Launched a fully online registration and scoring platform, reducing paperwork by 90%.",
-  },
-  {
-    year: "2022",
-    title: "Youth Outreach",
-    description:
-      "Started a program for underprivileged youth, supporting 300+ new skaters.",
+    title: "To be updated Soon",
   },
 ];
 
@@ -98,7 +90,7 @@ export default function AboutPage() {
             className="flex justify-center"
           >
             <img
-              src="/logo-header.png"
+              src="/logo.jpg"
               alt="Sangli Miraj Kupwad Roller Skating Association"
               className="rounded-xl shadow-lg w-full max-w-md lg:max-w-lg object-cover border border-blue-100"
             />
@@ -114,17 +106,13 @@ export default function AboutPage() {
               Our Mission
             </h2>
             <p className="text-gray-700 mb-4">
-              The Website is created to make sports event management effortless
-              and accessible. We believe every skater deserves a fair, fun, and
-              memorable competition experience.
-            </p>
-            <p className="text-gray-700 mb-4">
-              Our platform is built for the community, by the community —
-              constantly evolving with your feedback and needs.
-            </p>
-            <p className="text-gray-700">
-              Join us as we continue to innovate, inspire, and grow the sport of
-              skating together.
+              Our mission is to promote skating in Sangli by keeping parents,
+              skaters, and the local community informed about upcoming events,
+              sharing achievements of our athletes, and celebrating the spirit
+              of our association. Through timely updates, event announcements,
+              and highlights of past successes, we aim to inspire participation,
+              nurture talent, and strengthen the bonds within our skating
+              family.
             </p>
           </motion.div>
         </div>
@@ -141,7 +129,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold mb-8 text-center">
               Meet the Team
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
               {team.map((member, i) => (
                 <motion.div
                   key={member.id}

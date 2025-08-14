@@ -35,8 +35,11 @@ export default function GalleryPage() {
     setLoading(true);
     apiFetch("/api/gallery/all")
       .then((res) => {
-        setGalleryImages(res || []);
-        setFilteredImages(res || []);
+        const galleryFiltered = res.filter(
+          (item) => item.image_location === "gallery"
+        );
+        setGalleryImages(galleryFiltered);
+        setFilteredImages(galleryFiltered);
       })
       .catch(() => setGalleryImages([]))
       .finally(() => setLoading(false));
@@ -88,10 +91,8 @@ export default function GalleryPage() {
   const years = [
     ...new Set(
       galleryImages
-        .map((img) =>
-          img.uploaded_at
-            ? new Date(img.uploaded_at).getFullYear().toString()
-            : null
+        .map(
+          (img) => img.uploaded_at && new Date(img.uploaded_at).getFullYear()
         )
         .filter(Boolean)
     ),

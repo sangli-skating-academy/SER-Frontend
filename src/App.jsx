@@ -21,7 +21,7 @@ import AllEvents from "./components/admin/Pages/AllEvents";
 import AllContactMessage from "./components/admin/Pages/AllContactMessage";
 import AllGallery from "./components/admin/Pages/AllGallery";
 import AboutPage from "./pages/AboutPage";
-import Profile from "./components/admin/Pages/Profile";
+import AllClassRegistrations from "./components/admin/Pages/AllClassRegistrations";
 
 function App() {
   return (
@@ -86,10 +86,10 @@ function App() {
           }
         />
         <Route
-          path="/admin/profile"
+          path="/admin/class-registrations"
           element={
             <AdminRoute>
-              <Profile />
+              <AllClassRegistrations />
             </AdminRoute>
           }
         />
