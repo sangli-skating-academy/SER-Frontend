@@ -62,7 +62,7 @@ export default function ClubForm() {
     if (!user?.id) return;
     apiFetch(`/api/club/membership/${user.id}`)
       .then((res) => {
-        if (res && res.status === "success") {
+        if (res) {
           setHasMembership(true);
           setMembershipInfo(res);
           setShowMembershipModal(true);
