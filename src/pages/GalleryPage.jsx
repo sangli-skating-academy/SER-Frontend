@@ -67,8 +67,8 @@ export default function GalleryPage() {
     if (yearFilter !== "all") {
       filtered = filtered.filter(
         (image) =>
-          image.uploaded_at &&
-          new Date(image.uploaded_at).getFullYear().toString() === yearFilter
+          new Date(image.date).getFullYear().toString() ===
+          yearFilter.toString()
       );
     }
     setFilteredImages(filtered);
@@ -91,9 +91,7 @@ export default function GalleryPage() {
   const years = [
     ...new Set(
       galleryImages
-        .map(
-          (img) => img.uploaded_at && new Date(img.uploaded_at).getFullYear()
-        )
+        .map((img) => img.date && new Date(img.date).getFullYear())
         .filter(Boolean)
     ),
   ];

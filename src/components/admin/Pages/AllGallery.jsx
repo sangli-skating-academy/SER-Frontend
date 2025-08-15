@@ -93,6 +93,7 @@ export default function AllGallery() {
     (g) => g.image_location === "home_screen"
   );
   const galleryItems = gallery.filter((g) => g.image_location === "gallery");
+  const notAssigned = gallery.filter((g) => g.image_location === "");
 
   return (
     <AdminLayout>
@@ -222,6 +223,14 @@ export default function AllGallery() {
                 </h2>
                 <GalleryTable
                   data={galleryItems}
+                  rowLimit={null}
+                  onRefresh={refreshData}
+                />
+                <h2 className="text-xl font-semibold mt-8 mb-4">
+                  Not Assigned Items
+                </h2>
+                <GalleryTable
+                  data={notAssigned}
                   rowLimit={null}
                   onRefresh={refreshData}
                 />

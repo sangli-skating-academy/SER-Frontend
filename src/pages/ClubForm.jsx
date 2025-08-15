@@ -360,51 +360,61 @@ export default function ClubForm() {
         </div>
       </div>
       <Footer />
-      {showMembershipModal && membershipInfo && (
-        <Modal onClose={() => setShowMembershipModal(false)}>
-          <div className="p-6 text-center">
-            <h3 className="text-xl font-bold text-blue-700 mb-2">
-              You have an active membership!
-            </h3>
-            <div className="mb-4 text-gray-700">
-              Your membership expires on{" "}
-              <span className="font-semibold text-pink-600">
-                {membershipInfo.end_date
-                  ? new Date(membershipInfo.end_date).toLocaleDateString()
-                  : "-"}
-              </span>{" "}
-              <span>
-                for student{" "}
-                <span className="font-bold text-blue-400">
-                  {membershipInfo.full_name}
-                </span>
-              </span>
+      {showMembershipModal &&
+        membershipInfo &&
+        Array.isArray(membershipInfo) && (
+          <Modal onClose={() => setShowMembershipModal(false)}>
+            <div className="p-6 text-center">
+              <h3 className="text-xl font-bold text-blue-700 mb-2">
+                You have active memberships!
+              </h3>
+              <div className="mb-4 text-gray-700">
+                {membershipInfo
+                  .sort((a, b) => new Date(b.end_date) - new Date(a.end_date)) // Sort by end_date
+                  .map((membership, index) => (
+                    <div key={index} className="mb-4">
+                      <p>
+                        Membership for{" "}
+                        <span className="font-bold text-blue-400">
+                          {membership.full_name}
+                        </span>
+                      </p>
+                      <p>
+                        Expires on:{" "}
+                        <span className="font-semibold text-pink-600">
+                          {membership.end_date
+                            ? new Date(membership.end_date).toLocaleDateString()
+                            : "-"}
+                        </span>
+                      </p>
+                    </div>
+                  ))}
+              </div>
+              <div className="flex gap-4 justify-center mt-6 flex-col">
+                <Button
+                  type="button"
+                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform"
+                  onClick={() => {
+                    setShowMembershipModal(false);
+                    navigate("/dashboard");
+                  }}
+                >
+                  Go to Dashboard
+                </Button>
+                <Button
+                  type="button"
+                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform"
+                  onClick={() => {
+                    setShowMembershipModal(false);
+                    navigate("/joinacademy");
+                  }}
+                >
+                  Enroll another student
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-4 justify-center mt-6 flex-col">
-              <Button
-                type="button"
-                className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform"
-                onClick={() => {
-                  setShowMembershipModal(false);
-                  navigate("/dashboard");
-                }}
-              >
-                Go to Dashboard
-              </Button>
-              <Button
-                type="button"
-                className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform"
-                onClick={() => {
-                  setShowMembershipModal(false);
-                  navigate("/joinacademy");
-                }}
-              >
-                Join for another student
-              </Button>
-            </div>
-          </div>
-        </Modal>
-      )}
+          </Modal>
+        )}
     </>
   );
 }

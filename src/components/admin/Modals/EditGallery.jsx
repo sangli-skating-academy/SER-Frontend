@@ -59,7 +59,7 @@ export default function EditGallery({ open, onClose, gallery, onSave }) {
       await onSave(formData, gallery.id);
       onClose();
     } catch (err) {
-      setError("Failed to update gallery item");
+      setError(err.message);
     } finally {
       setSaving(false);
     }
