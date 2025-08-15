@@ -206,8 +206,18 @@ const EventDetailPage = () => {
           >
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="w-full justify-start border-b rounded-none mb-6 overflow-x-auto flex-nowrap">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="location">Location</TabsTrigger>
+                <TabsTrigger
+                  value="overview"
+                  className="bg-gray-200 text-gray-700 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
+                >
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger
+                  value="location"
+                  className="bg-gray-200 text-gray-700 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
+                >
+                  Location
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="overview">
                 <div className="space-y-8">
