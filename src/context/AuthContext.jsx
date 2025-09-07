@@ -34,8 +34,12 @@ const AuthProvider = ({ children }) => {
     setAuth({ user: null, loading: false });
   };
 
+  const updateAuth = (user) => {
+    setAuth({ user, loading: false });
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, logout }}>
+    <AuthContext.Provider value={{ auth, setAuth: updateAuth, logout }}>
       {children}
     </AuthContext.Provider>
   );

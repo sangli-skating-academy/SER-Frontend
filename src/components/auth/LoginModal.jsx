@@ -124,11 +124,11 @@ const LoginModal = ({ onClose }) => {
       }
       const { token, user } = await res.json();
 
-      // Store token in localStorage
+      // Store token in localStorage for fallback
       localStorage.setItem("auth_token", token);
-      // Update auth context
-      setAuth({ user, loading: false });
-      window.location.reload(); // Reload to update auth state everywhere
+      // Update auth context immediately
+      setAuth(user);
+      // Close modal
       onClose();
     } catch {
       setError("Login failed. Please try again.");
@@ -163,8 +163,10 @@ const LoginModal = ({ onClose }) => {
         setIsLoading(false);
         return;
       }
-      // No need to extract token or call login(token) since auth is now cookie-based
-      window.location.reload(); // Reload to update auth state everywhere
+      const { user } = await res.json();
+      // Update auth context with registered user
+      setAuth(user);
+      // Close modal
       onClose();
     } catch (error) {
       setError("Registration failed. Please try again.");
