@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
@@ -28,11 +28,21 @@ const AadhaarPreviewModal = ({ aadhaarPreview, setAadhaarPreview }) => {
         className="bg-white rounded-lg p-4 shadow-lg max-w-lg w-full flex flex-col items-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <img
-          src={aadhaarPreview}
-          alt="Aadhaar Preview"
-          className="max-h-[70vh] max-w-full rounded mb-4"
-        />
+        {aadhaarPreview ? (
+          <img
+            src={aadhaarPreview}
+            alt="Aadhaar Preview"
+            className="max-h-[70vh] max-w-full rounded mb-4"
+            onError={(e) => {
+              console.error("Failed to load image:", e);
+              e.target.style.display = "none";
+            }}
+          />
+        ) : (
+          <div className="w-full h-32 bg-gray-100 rounded mb-4 flex items-center justify-center">
+            <span className="text-gray-500">Loading...</span>
+          </div>
+        )}
         <Button variant="outline" onClick={() => setAadhaarPreview(null)}>
           Close
         </Button>
@@ -77,7 +87,9 @@ const UserDetailsGrid = ({
             skateOpts = res.skate_category;
           }
           setSkateCategoryOptions(skateOpts);
-        } catch {}
+        } catch (error) {
+          console.error("Failed to fetch event options:", error);
+        }
       }
     }
     if (
@@ -89,6 +101,15 @@ const UserDetailsGrid = ({
       fetchEventOptions();
     }
   }, [userDetails]);
+
+  // Cleanup blob URLs when component unmounts or aadhaarPreview changes
+  useEffect(() => {
+    return () => {
+      if (aadhaarPreview && aadhaarPreview.startsWith("blob:")) {
+        URL.revokeObjectURL(aadhaarPreview);
+      }
+    };
+  }, [aadhaarPreview]);
 
   const handleEditDetailsChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -241,9 +262,42 @@ const UserDetailsGrid = ({
     }
   };
 
-  const handleAadhaarPreview = (url) => {
-    setLocalAadhaarPreview(url);
-    if (setAadhaarPreview) setAadhaarPreview(url); // for backward compatibility
+  const handleAadhaarPreview = async (url) => {
+    try {
+      // If it's already a blob URL or data URL, use it directly
+      if (url.startsWith("blob:") || url.startsWith("data:")) {
+        setLocalAadhaarPreview(url);
+        if (setAadhaarPreview) setAadhaarPreview(url);
+        return;
+      }
+
+      // For secure file URLs, fetch with authentication
+      if (
+        url.includes("/api/secure-file/") ||
+        url.includes("/api/admin/secure-file/")
+      ) {
+        const token = localStorage.getItem("auth_token");
+        const response = await fetch(url, {
+          credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          setLocalAadhaarPreview(blobUrl);
+          if (setAadhaarPreview) setAadhaarPreview(blobUrl);
+        } else {
+          console.error("Failed to fetch secure image:", response.status);
+        }
+      } else {
+        // For regular URLs, use directly
+        setLocalAadhaarPreview(url);
+        if (setAadhaarPreview) setAadhaarPreview(url);
+      }
+    } catch (error) {
+      console.error("Error loading image:", error);
+    }
   };
 
   return (

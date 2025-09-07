@@ -1,19 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog } from "../../ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 
 export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
-  if (!open || !selectedReg) return null;
+  const [blobImageUrl, setBlobImageUrl] = useState("");
+
   const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-  const aadhaarImageUrl = selectedReg.aadhaar_image
+  const aadhaarImageUrl = selectedReg?.aadhaar_image
     ? selectedReg.aadhaar_image.startsWith("http")
       ? selectedReg.aadhaar_image
       : `${backendUrl}/api/admin/secure-file/${selectedReg.aadhaar_image
           .split("/")
           .pop()}`
     : null;
+
+  // Function to fetch secure image with authentication
+  const fetchSecureImage = async (url) => {
+    try {
+      if (url.startsWith("blob:") || url.startsWith("data:")) {
+        setBlobImageUrl(url);
+        return;
+      }
+
+      if (
+        url.includes("/api/admin/secure-file/") ||
+        url.includes("/api/secure-file/")
+      ) {
+        const token = localStorage.getItem("auth_token");
+        const response = await fetch(url, {
+          credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          setBlobImageUrl(blobUrl);
+        } else {
+          console.error("Failed to fetch secure image:", response.status);
+        }
+      } else {
+        setBlobImageUrl(url);
+      }
+    } catch (error) {
+      console.error("Error loading image:", error);
+    }
+  };
+
+  // Cleanup blob URLs
+  useEffect(() => {
+    return () => {
+      if (blobImageUrl && blobImageUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(blobImageUrl);
+      }
+    };
+  }, [blobImageUrl]);
+
+  const handleImageClick = () => {
+    fetchSecureImage(aadhaarImageUrl);
+    setImageModalOpen(true);
+  };
+
+  if (!open || !selectedReg) return null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <div className="relative p-4 w-full max-w-lg">
@@ -109,10 +158,7 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
                 {aadhaarImageUrl ? (
                   <button
                     className="inline-block ml-2 text-blue-600 underline cursor-pointer"
-                    onClick={() => {
-                      setImageUrl(aadhaarImageUrl);
-                      setImageModalOpen(true);
-                    }}
+                    onClick={handleImageClick}
                     type="button"
                   >
                     View Image
@@ -201,11 +247,17 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
               &times;
             </button>
             <h3 className="text-lg font-semibold mb-2">Aadhaar Image</h3>
-            <img
-              src={imageUrl}
-              alt="Aadhaar"
-              className="w-full max-h-[32rem] object-contain rounded border shadow"
-            />
+            {blobImageUrl ? (
+              <img
+                src={blobImageUrl}
+                alt="Aadhaar"
+                className="w-full max-h-[32rem] object-contain rounded border shadow"
+              />
+            ) : (
+              <div className="w-full h-32 bg-gray-100 rounded border shadow flex items-center justify-center">
+                <span className="text-gray-500">Loading...</span>
+              </div>
+            )}
           </div>
         </div>
       )}
