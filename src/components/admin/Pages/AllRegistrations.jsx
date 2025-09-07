@@ -106,21 +106,69 @@ export default function AllRegistrations() {
   function exportToCSV() {
     const data = filteredRef.current;
     if (!data.length) return;
-    // Get all unique keys from all objects (for wide tables)
+
+    // Fields to exclude from export
+    const excludeFields = [
+      "user_id",
+      "team_id",
+      "event_id",
+      "user_details_id",
+      "event_location",
+      "event_start_date",
+      "event_hashtags",
+      "live",
+    ];
+
+    // Get all unique keys from all objects and exclude unwanted fields
     const allKeys = Array.from(
       data.reduce((set, row) => {
-        Object.keys(row).forEach((k) => set.add(k));
+        Object.keys(row).forEach((k) => {
+          if (!excludeFields.includes(k)) {
+            set.add(k);
+          }
+        });
         return set;
       }, new Set())
     );
+
     // CSV header
     const header = allKeys.join(",");
+
     // CSV rows
     const rows = data.map((row) =>
       allKeys
         .map((k) => {
           let val = row[k];
           if (val === null || val === undefined) return "";
+
+          // Handle team members array properly
+          if (k === "team_members" && Array.isArray(val)) {
+            val = val
+              .map((member) => {
+                if (typeof member === "object" && member !== null) {
+                  // Extract meaningful fields from team member object
+                  return (
+                    `${member.first_name || ""} ${
+                      member.last_name || ""
+                    }`.trim() ||
+                    member.username ||
+                    member.email ||
+                    "Unknown Member"
+                  );
+                }
+                return String(member);
+              })
+              .join("; ");
+          }
+          // Handle other arrays
+          else if (Array.isArray(val)) {
+            val = val.join("; ");
+          }
+          // Handle objects
+          else if (typeof val === "object" && val !== null) {
+            val = JSON.stringify(val);
+          }
+
           val = String(val).replace(/"/g, '""');
           if (val.includes(",") || val.includes("\n") || val.includes('"')) {
             return `"${val}"`;
@@ -129,6 +177,7 @@ export default function AllRegistrations() {
         })
         .join(",")
     );
+
     const csv = [header, ...rows].join("\n");
     // Download
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
