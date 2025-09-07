@@ -117,6 +117,7 @@ export default function AllRegistrations() {
       "event_start_date",
       "event_hashtags",
       "live",
+      "user_role",
     ];
 
     // Get all unique keys from all objects and exclude unwanted fields
@@ -144,16 +145,32 @@ export default function AllRegistrations() {
           // Handle team members array properly
           if (k === "team_members" && Array.isArray(val)) {
             val = val
-              .map((member) => {
+              .map((member, index) => {
                 if (typeof member === "object" && member !== null) {
-                  // Extract meaningful fields from team member object
+                  // Debug: Log the member structure (remove this in production)
+                  if (index === 0) {
+                    console.log("Team member structure:", Object.keys(member));
+                    console.log("Sample member:", member);
+                  }
+
+                  // Try different possible field combinations
+                  const name = `${
+                    member.first_name || member.firstName || ""
+                  } ${member.last_name || member.lastName || ""}`.trim();
+
+                  const username = member.username || member.user_name || "";
+                  const email = member.email || "";
+                  const fullName = member.full_name || member.fullName || "";
+                  const memberName = member.name || "";
+
+                  // Return the first available meaningful value
                   return (
-                    `${member.first_name || ""} ${
-                      member.last_name || ""
-                    }`.trim() ||
-                    member.username ||
-                    member.email ||
-                    "Unknown Member"
+                    name ||
+                    fullName ||
+                    memberName ||
+                    username ||
+                    email ||
+                    `Member ${member.id || member.user_id || index + 1}`
                   );
                 }
                 return String(member);
