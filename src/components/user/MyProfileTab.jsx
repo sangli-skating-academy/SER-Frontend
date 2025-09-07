@@ -137,6 +137,19 @@ const MyProfileTab = ({
                 </p>
               </div>
             </div>
+
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon
+                icon={faUser}
+                className="text-blue-400 text-xl"
+              />
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide mr-1">
+                Role:
+              </span>
+              <Badge className="capitalize bg-blue-300 text-blue-900 px-3 py-1 text-sm animate-fade-in-up">
+                {user.role || "N/A"}
+              </Badge>
+            </div>
           </div>
         )}
       </div>

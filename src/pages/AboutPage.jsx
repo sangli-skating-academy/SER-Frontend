@@ -120,18 +120,8 @@ export default function AboutPage() {
         {/* Tabs */}
         <Tabs defaultValue="team" className="mb-16">
           <TabsList className="grid grid-cols-2 w-full mb-8 bg-blue-100/70">
-            <TabsTrigger
-              value="team"
-              className="bg-gray-200 text-gray-700 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
-            >
-              Team
-            </TabsTrigger>
-            <TabsTrigger
-              value="achievements"
-              className="bg-gray-200 text-gray-700 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
-            >
-              Achievements
-            </TabsTrigger>
+            <TabsTrigger value="team">Team</TabsTrigger>
+            <TabsTrigger value="achievements">Achievements</TabsTrigger>
           </TabsList>
 
           {/* Team Tab */}
