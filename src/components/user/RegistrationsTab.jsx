@@ -321,100 +321,177 @@ const RegistrationCard = ({
       </div>
       {showTicketModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 animate-fade-in px-2"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in px-4"
           onClick={() => setShowTicketModal(false)}
         >
           <div
-            className="relative bg-gradient-to-br from-green-50 via-white to-blue-100 rounded-3xl p-0 shadow-2xl w-full max-w-md flex flex-col items-center border-0 ticket-modal overflow-hidden sm:min-w-[350px] min-w-0"
+            className="relative w-full max-w-lg transform transition-all duration-300 scale-100 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
-            style={{ width: "100%", maxWidth: 400 }}
           >
-            {/* Ticket content */}
-            <div className="w-full flex flex-col items-center px-3 sm:px-8 py-6">
-              <FontAwesomeIcon
-                icon={faCheckCircle}
-                className="text-green-500 text-4xl sm:text-5xl mb-2 animate-bounce-in drop-shadow-lg"
-              />
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-green-700 mb-1 tracking-tight text-center">
-                Event Ticket
-              </h2>
-              <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-green-400 via-blue-400 to-pink-400 rounded-full mb-4" />
-              {ticketLoading ? (
-                <div className="py-8 text-center text-blue-500 text-base sm:text-lg font-semibold">
-                  Loading ticket details...
+            {/* Ticket Header with decorative elements */}
+            <div className="relative bg-white mx-6 my-6 rounded-2xl overflow-hidden shadow-lg">
+              {/* Decorative top border */}
+              <div className="h-2 bg-gradient-to-r from-green-400 via-blue-500 to-purple-600"></div>
+
+              {/* Perforated edges effect */}
+              <div className="absolute left-0 top-8 w-4 h-4 bg-gray-100 rounded-full transform -translate-x-2"></div>
+              <div className="absolute right-0 top-8 w-4 h-4 bg-gray-100 rounded-full transform translate-x-2"></div>
+
+              {/* Header Section */}
+              <div className="px-6 py-8 bg-gradient-to-br from-green-50 to-blue-50">
+                <div className="text-center">
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    className="text-green-500 text-5xl mb-3 animate-pulse drop-shadow-lg"
+                  />
+                  <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600 mb-2">
+                    🎟️ EVENT TICKET
+                  </h2>
+                  <div className="w-20 h-1 bg-gradient-to-r from-green-400 to-blue-500 rounded-full mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-600 font-semibold tracking-wide uppercase">
+                    Sangli Skating Academy
+                  </p>
                 </div>
-              ) : ticketError ? (
-                <div className="py-8 text-center text-red-500 text-base sm:text-lg font-semibold">
-                  {ticketError}
+              </div>
+
+              {/* Ticket Content */}
+              <div className="px-6 py-6 bg-white">
+                {ticketLoading ? (
+                  <div className="py-12 text-center">
+                    <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <p className="text-blue-600 font-semibold">
+                      Loading ticket details...
+                    </p>
+                  </div>
+                ) : ticketError ? (
+                  <div className="py-12 text-center">
+                    <FontAwesomeIcon
+                      icon={faExclamationCircle}
+                      className="text-red-500 text-4xl mb-4"
+                    />
+                    <p className="text-red-600 font-semibold">{ticketError}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Participant Name - Featured */}
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border-l-4 border-blue-500">
+                      <div className="text-sm text-gray-600 font-medium mb-1">
+                        🏷️ PARTICIPANT
+                      </div>
+                      <div className="text-xl font-bold text-gray-800">
+                        {(
+                          ticketUserDetails.first_name +
+                          " " +
+                          (ticketUserDetails.middle_name || "") +
+                          " " +
+                          ticketUserDetails.last_name
+                        ).trim() || "N/A"}
+                      </div>
+                    </div>
+
+                    {/* Event Details Grid */}
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <FontAwesomeIcon
+                            icon={faCalendarAlt}
+                            className="text-blue-500"
+                          />
+                          <span className="font-medium text-gray-700">
+                            Event
+                          </span>
+                        </div>
+                        <span className="font-bold text-gray-800 text-right max-w-[60%] break-words">
+                          {getEventName(registration.event_id)}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="p-3 bg-green-50 rounded-lg">
+                          <div className="text-xs text-green-600 font-medium mb-1">
+                            📅 DATE
+                          </div>
+                          <div className="font-bold text-green-800">
+                            {event.start_date
+                              ? new Date(event.start_date).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  }
+                                )
+                              : "TBD"}
+                          </div>
+                        </div>
+                        <div className="p-3 bg-purple-50 rounded-lg">
+                          <div className="text-xs text-purple-600 font-medium mb-1">
+                            ⏰ TIME
+                          </div>
+                          <div className="font-bold text-purple-800">
+                            {event.start_time || "TBD"}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-orange-50 rounded-lg">
+                        <div className="text-xs text-orange-600 font-medium mb-1">
+                          📍 LOCATION
+                        </div>
+                        <div className="font-bold text-orange-800">
+                          {event.location || "TBD"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Information */}
+                    <div className="border-t-2 border-dashed border-gray-300 pt-4 mt-6">
+                      <div className="text-xs text-gray-500 font-medium mb-3 text-center uppercase tracking-wide">
+                        Payment Details
+                      </div>
+                      <div className="grid grid-cols-1 gap-2 text-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Payment ID:</span>
+                          <span className="font-mono text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                            {ticketPaymentDetails.razorpay_payment_id}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">Payment ID:</span>
+                          <span className="font-mono text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                            {ticketPaymentDetails.amount}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">
+                            Registration ID:
+                          </span>
+                          <span className="font-mono text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+                            #{ticketPaymentDetails.registration_id}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Ticket Footer */}
+              <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                  <span>Valid for event entry</span>
+                  <span>www.sangliskating.com</span>
                 </div>
-              ) : (
-                <div className="w-full flex flex-col gap-3 mb-4 text-base sm:text-lg">
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-700">Name:</span>
-                    <span className="text-blue-800 font-bold text-right break-words max-w-[60%]">
-                      {ticketUserDetails.first_name +
-                        " " +
-                        ticketUserDetails.middle_name +
-                        " " +
-                        ticketUserDetails.last_name || "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-700">Event:</span>
-                    <span className="text-blue-800 font-bold text-right break-words max-w-[60%]">
-                      {getEventName(registration.event_id)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-700">Date:</span>
-                    <span className="text-blue-800 font-bold text-right">
-                      {event.start_date
-                        ? new Date(event.start_date).toLocaleDateString()
-                        : "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-700">Time:</span>
-                    <span className="text-blue-800 font-bold text-right">
-                      {event.start_time || "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-700">
-                      Location:
-                    </span>
-                    <span className="text-blue-800 font-bold text-right break-words max-w-[60%]">
-                      {event.location || "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-700">
-                      Payment ID:
-                    </span>
-                    <span className="text-blue-800 font-mono text-right break-words max-w-[60%]">
-                      {ticketPaymentDetails.razorpay_payment_id}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-gray-700">
-                      Registration ID:
-                    </span>
-                    <span className="text-blue-800 font-mono text-right break-words max-w-[60%]">
-                      {ticketPaymentDetails.registration_id}
-                    </span>
-                  </div>
-                </div>
-              )}
-              <Button
-                className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 sm:px-8 py-2 rounded-xl shadow hover:scale-105 transition-transform mt-2 text-base sm:text-lg w-full sm:w-auto"
-                onClick={() => setShowTicketModal(false)}
-              >
-                Close
-              </Button>
-              <span className="absolute top-3 right-4 sm:right-6 text-xs text-gray-400 select-none">
-                Show this ticket at entry
-              </span>
+              </div>
             </div>
+
+            {/* Close button (X) in top right */}
+            <button
+              onClick={() => setShowTicketModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-gray-600 hover:bg-white hover:text-gray-800 transition-colors shadow-lg"
+            >
+              ✕
+            </button>
           </div>
         </div>
       )}

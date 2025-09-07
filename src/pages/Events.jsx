@@ -15,16 +15,27 @@ import {
 } from "../components/ui/select";
 import Button from "../components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilter } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFilter,
+  faSearch,
+  faSortAmountDown,
+  faSortAmountUp,
+  faCalendarAlt,
+  faDollarSign,
+  faUsers,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 
 const EventsPage = () => {
+  const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState({
     hashtag: "all",
     ageGroup: "all",
     gender: "all",
+    search: "",
   });
-  const [events, setEvents] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [sortBy, setSortBy] = useState("date-asc"); // date-asc, date-desc, price-asc, price-desc, name-asc
   const [hashtags, setHashtags] = useState([]);
   const [ageGroups, setAgeGroups] = useState(["all"]);
   const [genders, setGenders] = useState(["all"]);
@@ -122,8 +133,44 @@ const EventsPage = () => {
     return true;
   });
 
+  // Sort filtered events
+  const sortedEvents = [...filteredEvents].sort((a, b) => {
+    switch (sortBy) {
+      case "date-asc":
+        return new Date(a.start_date) - new Date(b.start_date);
+      case "date-desc":
+        return new Date(b.start_date) - new Date(a.start_date);
+      case "price-asc":
+        return (a.price_per_person || 0) - (b.price_per_person || 0);
+      case "price-desc":
+        return (b.price_per_person || 0) - (a.price_per_person || 0);
+      case "name-asc":
+        return (a.title || "").localeCompare(b.title || "");
+      default:
+        return 0;
+    }
+  });
+
   const handleFilterChange = (key, value) => {
     setFilter({ ...filter, [key]: value });
+  };
+
+  const clearAllFilters = () => {
+    setFilter({
+      hashtag: "all",
+      ageGroup: "all",
+      gender: "all",
+      search: "",
+    });
+  };
+
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (filter.hashtag !== "all") count++;
+    if (filter.ageGroup !== "all") count++;
+    if (filter.gender !== "all") count++;
+    if (filter.search) count++;
+    return count;
   };
 
   return (
@@ -160,124 +207,215 @@ const EventsPage = () => {
                 categories, age groups, and skill levels.
               </p>
             </div>
-            {/* Filters */}
-            <div
-              className="mb-8 bg-white/90 p-4 rounded-lg shadow-sm animate-fade-in-up"
-              data-aos="fade-up"
-              data-aos-delay="100"
-            >
-              <div className="flex flex-col md:flex-row md:items-end gap-4">
-                <div className="flex-1 min-w-[140px]">
-                  <label
-                    htmlFor="hashtag"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Hashtag
-                  </label>
-                  <Select
-                    value={filter.hashtag}
-                    onValueChange={(v) => handleFilterChange("hashtag", v)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Hashtags" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-60 overflow-y-auto">
-                      {hashtags.map((tag) => (
-                        <SelectItem
-                          key={tag}
-                          value={tag}
-                          className="overflow-scroll overflow-x-auto"
-                        >
-                          {tag === "all" ? "All Hashtags" : tag}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex-1 min-w-[140px]">
-                  <label
-                    htmlFor="ageGroup"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Age Group
-                  </label>
-                  <Select
-                    value={filter.ageGroup}
-                    onValueChange={(v) => handleFilterChange("ageGroup", v)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Age Groups" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ageGroups.map((group) => (
-                        <SelectItem key={String(group)} value={String(group)}>
-                          {group === "all" ? "All Age Groups" : String(group)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex-1 min-w-[140px]">
-                  <label
-                    htmlFor="gender"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Gender
-                  </label>
-                  <Select
-                    value={filter.gender}
-                    onValueChange={(v) => handleFilterChange("gender", v)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {genders.map((g) => (
-                        <SelectItem key={g} value={g}>
-                          {g === "all"
-                            ? "All"
-                            : g.charAt(0).toUpperCase() + g.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-end">
-                  {/* Change color of filter button when filter are active */}
-                  <Button
-                    variant="outline"
-                    className={`flex items-center gap-2 w-full sm:w-43 h-[40px] ${
-                      filter.hashtag !== "all" ||
-                      filter.ageGroup !== "all" ||
-                      filter.gender !== "all"
-                        ? "border-red-300 bg-red-50 text-red-500"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      setFilter({
-                        hashtag: "all",
-                        ageGroup: "all",
-                        gender: "all",
-                      })
+            {/* Enhanced Filters & Controls */}
+            <div className="mb-8 space-y-4">
+              {/* Search Bar */}
+              <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-blue-100">
+                <div className="relative">
+                  <FontAwesomeIcon
+                    icon={faSearch}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search events by name..."
+                    value={filter.search}
+                    onChange={(e) =>
+                      handleFilterChange("search", e.target.value)
                     }
-                  >
-                    <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />{" "}
-                    Clear Filters
-                  </Button>
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                  {filter.search && (
+                    <button
+                      onClick={() => handleFilterChange("search", "")}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Filter & Sort Controls */}
+              <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-blue-100">
+                <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                  {/* Filter Controls */}
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <FontAwesomeIcon
+                          icon={faUsers}
+                          className="mr-2 text-blue-500"
+                        />
+                        Category
+                      </label>
+                      <Select
+                        value={filter.hashtag}
+                        onValueChange={(v) => handleFilterChange("hashtag", v)}
+                      >
+                        <SelectTrigger className="w-full border-gray-200 focus:ring-2 focus:ring-blue-500">
+                          <SelectValue placeholder="All Categories" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60 overflow-y-auto">
+                          {hashtags.map((tag) => (
+                            <SelectItem key={tag} value={tag}>
+                              {tag === "all" ? "All Categories" : `#${tag}`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <FontAwesomeIcon
+                          icon={faUser}
+                          className="mr-2 text-green-500"
+                        />
+                        Age Group
+                      </label>
+                      <Select
+                        value={filter.ageGroup}
+                        onValueChange={(v) => handleFilterChange("ageGroup", v)}
+                      >
+                        <SelectTrigger className="w-full border-gray-200 focus:ring-2 focus:ring-blue-500">
+                          <SelectValue placeholder="All Ages" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ageGroups.map((group) => (
+                            <SelectItem
+                              key={String(group)}
+                              value={String(group)}
+                            >
+                              {group === "all" ? "All Ages" : `${group} years`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <FontAwesomeIcon
+                          icon={faUsers}
+                          className="mr-2 text-purple-500"
+                        />
+                        Gender
+                      </label>
+                      <Select
+                        value={filter.gender}
+                        onValueChange={(v) => handleFilterChange("gender", v)}
+                      >
+                        <SelectTrigger className="w-full border-gray-200 focus:ring-2 focus:ring-blue-500">
+                          <SelectValue placeholder="All Genders" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {genders.map((g) => (
+                            <SelectItem key={g} value={g}>
+                              {g === "all"
+                                ? "All Genders"
+                                : g.charAt(0).toUpperCase() + g.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Sort & View Controls */}
+                  <div className="flex flex-col sm:flex-row gap-4 lg:flex-col lg:gap-2">
+                    {/* Sort Dropdown */}
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={
+                          sortBy.includes("desc")
+                            ? faSortAmountDown
+                            : faSortAmountUp
+                        }
+                        className="text-gray-500 h-4 w-4"
+                      />
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-40 border-gray-200 focus:ring-2 focus:ring-blue-500">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="date-asc">
+                            <FontAwesomeIcon
+                              icon={faCalendarAlt}
+                              className="mr-2"
+                            />
+                            Date (Earliest)
+                          </SelectItem>
+                          <SelectItem value="date-desc">
+                            <FontAwesomeIcon
+                              icon={faCalendarAlt}
+                              className="mr-2"
+                            />
+                            Date (Latest)
+                          </SelectItem>
+                          <SelectItem value="price-asc">
+                            <FontAwesomeIcon
+                              icon={faDollarSign}
+                              className="mr-2"
+                            />
+                            Price (Low to High)
+                          </SelectItem>
+                          <SelectItem value="price-desc">
+                            <FontAwesomeIcon
+                              icon={faDollarSign}
+                              className="mr-2"
+                            />
+                            Price (High to Low)
+                          </SelectItem>
+                          <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Active Filters & Clear Button */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <span>Showing {sortedEvents.length} events</span>
+                    {getActiveFilterCount() > 0 && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                        {getActiveFilterCount()} filter
+                        {getActiveFilterCount() !== 1 ? "s" : ""} active
+                      </span>
+                    )}
+                  </div>
+
+                  {getActiveFilterCount() > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={clearAllFilters}
+                      className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                    >
+                      <FontAwesomeIcon
+                        icon={faFilter}
+                        className="mr-2 h-3 w-3"
+                      />
+                      Clear All Filters
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
-            {/* Events Grid */}
-            <div className="overflow-x-scroll pb-3 md:p-8 h-viewport md:h-auto rounded-lg">
+            {/* Enhanced Events Display */}
+            <div
+              className="animate-fade-in-up"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
               {isLoading ? (
-                <div className="flex gap-6 min-w-max md:min-w-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8">
-                  {[1, 2, 3].map((i) => (
-                    <Card
-                      key={i}
-                      className="w-72 md:w-auto hover:shadow-xl transition-shadow"
-                    >
+                // Loading Skeleton
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <Card key={i} className="overflow-hidden">
                       <Skeleton className="h-48 w-full" />
-                      <CardContent className="p-5">
+                      <CardContent className="p-6">
                         <div className="flex justify-between mb-3">
                           <Skeleton className="h-6 w-24" />
                           <Skeleton className="h-6 w-20" />
@@ -293,19 +431,45 @@ const EventsPage = () => {
                     </Card>
                   ))}
                 </div>
-              ) : (
-                <div className="flex gap-6 min-w-max md:min-w-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8">
-                  {filteredEvents && filteredEvents.length > 0 ? (
-                    filteredEvents.map((event) => (
-                      <EventCard key={event.id} event={event} />
-                    ))
-                  ) : (
-                    <div className="w-full col-span-3 text-center py-8 animate-fade-in">
-                      <p className="text-gray-500">
-                        No events found for the selected filter.
-                      </p>
+              ) : sortedEvents && sortedEvents.length > 0 ? (
+                // Events Display
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300">
+                  {sortedEvents.map((event, index) => (
+                    <div
+                      key={event.id}
+                      className="animate-fade-in"
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <EventCard event={event} />
                     </div>
-                  )}
+                  ))}
+                </div>
+              ) : (
+                // No Events Found
+                <div className="text-center py-16 animate-fade-in">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FontAwesomeIcon
+                        icon={faSearch}
+                        className="h-8 w-8 text-gray-400"
+                      />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                      No Events Found
+                    </h3>
+                    <p className="text-gray-500 mb-4">
+                      We couldn't find any events matching your current filters.
+                    </p>
+                    {getActiveFilterCount() > 0 && (
+                      <Button
+                        onClick={clearAllFilters}
+                        variant="outline"
+                        className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                      >
+                        Clear All Filters
+                      </Button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

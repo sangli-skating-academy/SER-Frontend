@@ -141,7 +141,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-black-800 mt-10 pt-8 text-center text-gray-400 animate-fade-in-up delay-500">
-          <p>Sports Club Event Registration System</p>
+          <p>Made by Rakesh Yadav & Prabhu Badkar</p>
         </div>
       </div>
     </footer>

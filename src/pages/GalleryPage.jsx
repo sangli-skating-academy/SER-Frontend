@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import Button from "../components/ui/button";
 import {
   Tabs,
@@ -11,7 +10,16 @@ import Input from "../components/ui/input";
 import Header from "../components/layouts/Header";
 import Footer from "../components/layouts/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faFilter, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSearch,
+  faFilter,
+  faTimes,
+  faSortAmountDown,
+  faSortAmountUp,
+  faCalendarAlt,
+  faImages,
+  faEye,
+} from "@fortawesome/free-solid-svg-icons";
 import { Helmet } from "react-helmet-async";
 import { apiFetch } from "../services/api";
 import {
@@ -26,6 +34,7 @@ export default function GalleryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("date-desc"); // date-desc, date-asc, name-asc
   const [galleryImages, setGalleryImages] = useState([]);
   const [filteredImages, setFilteredImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -48,7 +57,7 @@ export default function GalleryPage() {
   useEffect(() => {
     filterMedia();
     // eslint-disable-next-line
-  }, [searchTerm, categoryFilter, yearFilter, galleryImages]);
+  }, [searchTerm, categoryFilter, yearFilter, sortBy, galleryImages]);
 
   const filterMedia = () => {
     let filtered = galleryImages;
@@ -71,7 +80,38 @@ export default function GalleryPage() {
           yearFilter.toString()
       );
     }
+
+    // Sort filtered images
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "date-desc":
+          return new Date(b.date) - new Date(a.date);
+        case "date-asc":
+          return new Date(a.date) - new Date(b.date);
+        case "name-asc":
+          return (a.title || a.event_name || "").localeCompare(
+            b.title || b.event_name || ""
+          );
+        default:
+          return 0;
+      }
+    });
+
     setFilteredImages(filtered);
+  };
+
+  const clearAllFilters = () => {
+    setSearchTerm("");
+    setCategoryFilter("all");
+    setYearFilter("all");
+  };
+
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (searchTerm !== "") count++;
+    if (categoryFilter !== "all") count++;
+    if (yearFilter !== "all") count++;
+    return count;
   };
 
   const openLightbox = (image) => {
@@ -124,98 +164,155 @@ export default function GalleryPage() {
               </p>
             </div>
 
-            {/* Filters */}
-            <div
-              className="mb-8 bg-white/90 p-4 rounded-lg shadow-sm animate-fade-in-up"
-              data-aos="fade-up"
-              data-aos-delay="100"
-            >
-              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end w-full">
-                <div className="flex-1 min-w-[160px]">
-                  <label
-                    htmlFor="search"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Search
-                  </label>
-                  <div className="relative">
-                    <Input
-                      id="search"
-                      placeholder="Search gallery..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 h-[40px]"
-                    />
-                    <FontAwesomeIcon
-                      icon={faSearch}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-300"
-                    />
+            {/* Enhanced Filters & Controls */}
+            <div className="mb-8 space-y-4">
+              {/* Search Bar */}
+              <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-blue-100">
+                <div className="relative">
+                  <FontAwesomeIcon
+                    icon={faSearch}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search gallery by title..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Filter & Sort Controls */}
+              <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-blue-100">
+                <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                  {/* Filter Controls */}
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <FontAwesomeIcon
+                          icon={faImages}
+                          className="mr-2 text-blue-500"
+                        />
+                        Event
+                      </label>
+                      <Select
+                        value={categoryFilter}
+                        onValueChange={setCategoryFilter}
+                      >
+                        <SelectTrigger className="w-full border-gray-200 focus:ring-2 focus:ring-blue-500">
+                          <SelectValue placeholder="All Events" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Events</SelectItem>
+                          {eventTitles.map((title) => (
+                            <SelectItem key={title} value={title}>
+                              {title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <FontAwesomeIcon
+                          icon={faCalendarAlt}
+                          className="mr-2 text-green-500"
+                        />
+                        Year
+                      </label>
+                      <Select value={yearFilter} onValueChange={setYearFilter}>
+                        <SelectTrigger className="w-full border-gray-200 focus:ring-2 focus:ring-blue-500">
+                          <SelectValue placeholder="All Years" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Years</SelectItem>
+                          {years.map((year) => (
+                            <SelectItem key={year} value={year}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Sort Controls */}
+                  <div className="flex flex-col sm:flex-row gap-4 lg:flex-col lg:gap-2">
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={
+                          sortBy.includes("desc")
+                            ? faSortAmountDown
+                            : faSortAmountUp
+                        }
+                        className="text-gray-500 h-4 w-4"
+                      />
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-40 border-gray-200 focus:ring-2 focus:ring-blue-500">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="date-desc">
+                            <FontAwesomeIcon
+                              icon={faCalendarAlt}
+                              className="mr-2"
+                            />
+                            Newest First
+                          </SelectItem>
+                          <SelectItem value="date-asc">
+                            <FontAwesomeIcon
+                              icon={faCalendarAlt}
+                              className="mr-2"
+                            />
+                            Oldest First
+                          </SelectItem>
+                          <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
-                <div className="flex-1 min-w-[140px]">
-                  <label
-                    htmlFor="category"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Event
-                  </label>
-                  <Select
-                    value={categoryFilter}
-                    onValueChange={setCategoryFilter}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Events" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Events</SelectItem>
-                      {eventTitles.map((title) => (
-                        <SelectItem key={title} value={title}>
-                          {title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex-1 min-w-[110px]">
-                  <label
-                    htmlFor="year"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Year
-                  </label>
-                  <Select value={yearFilter} onValueChange={setYearFilter}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Years" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Years</SelectItem>
-                      {years.map((year) => (
-                        <SelectItem key={year} value={year}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-end w-full sm:w-auto">
-                  <Button
-                    variant="outline"
-                    className={`flex items-center gap-2 w-full sm:w-43 h-[40px] ${
-                      searchTerm !== "" ||
-                      categoryFilter !== "all" ||
-                      yearFilter !== "all"
-                        ? "border-red-300 bg-red-50 text-red-500"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      setSearchTerm("");
-                      setCategoryFilter("all");
-                      setYearFilter("all");
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />{" "}
-                    Clear Filters
-                  </Button>
+
+                {/* Active Filters & Clear Button */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <FontAwesomeIcon icon={faEye} className="text-blue-500" />
+                    <span>
+                      Showing {filteredImages.length} image
+                      {filteredImages.length !== 1 ? "s" : ""}
+                    </span>
+                    {getActiveFilterCount() > 0 && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                        {getActiveFilterCount()} filter
+                        {getActiveFilterCount() !== 1 ? "s" : ""} active
+                      </span>
+                    )}
+                  </div>
+
+                  {getActiveFilterCount() > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={clearAllFilters}
+                      className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                    >
+                      <FontAwesomeIcon
+                        icon={faFilter}
+                        className="mr-2 h-3 w-3"
+                      />
+                      Clear All Filters
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -232,32 +329,48 @@ export default function GalleryPage() {
 
               <TabsContent value="photos">
                 {loading ? (
-                  <div className="text-center py-12">
-                    <h3 className="text-xl font-semibold mb-2">Loading...</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                      <div
+                        key={i}
+                        className="aspect-square bg-gray-200 rounded-lg animate-pulse"
+                      />
+                    ))}
                   </div>
                 ) : filteredImages.length === 0 ? (
-                  <div className="text-center py-12">
-                    <h3 className="text-xl font-semibold mb-2">
-                      No images found
-                    </h3>
-                    <p className="text-gray-500">
-                      Try adjusting your filters or search term
-                    </p>
+                  <div className="text-center py-16 animate-fade-in">
+                    <div className="max-w-md mx-auto">
+                      <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <FontAwesomeIcon
+                          icon={faImages}
+                          className="h-8 w-8 text-gray-400"
+                        />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                        No Images Found
+                      </h3>
+                      <p className="text-gray-500 mb-4">
+                        We couldn't find any images matching your current
+                        filters.
+                      </p>
+                      {getActiveFilterCount() > 0 && (
+                        <Button
+                          onClick={clearAllFilters}
+                          variant="outline"
+                          className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                        >
+                          Clear All Filters
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                  >
-                    {filteredImages.map((image) => (
-                      <motion.div
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in">
+                    {filteredImages.map((image, index) => (
+                      <div
                         key={image.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative overflow-hidden rounded-lg aspect-square group cursor-pointer shadow-lg hover:shadow-2xl transition-shadow"
+                        className="relative overflow-hidden rounded-xl aspect-square group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border border-blue-100 animate-fade-in"
+                        style={{ animationDelay: `${index * 0.05}s` }}
                         onClick={() => openLightbox(image)}
                       >
                         <img
@@ -275,22 +388,41 @@ export default function GalleryPage() {
                           alt={
                             image.title || image.event_name || "Gallery image"
                           }
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                          <div>
-                            <span className="text-white font-medium block">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4">
+                          <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                            <span className="text-white font-semibold block text-sm mb-1">
                               {image.title || image.event_name}
                             </span>
-                            <span className="text-gray-300 text-sm">
-                              {image.event_name} •{" "}
-                              {new Date(image.date).toLocaleDateString()}
-                            </span>
+                            <div className="flex items-center gap-2 text-gray-200 text-xs">
+                              <FontAwesomeIcon
+                                icon={faCalendarAlt}
+                                className="h-3 w-3"
+                              />
+                              <span>
+                                {new Date(image.date).toLocaleDateString()}
+                              </span>
+                              {image.event_name && image.title && (
+                                <>
+                                  <span>•</span>
+                                  <span>{image.event_name}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                              <FontAwesomeIcon
+                                icon={faEye}
+                                className="h-4 w-4 text-white"
+                              />
+                            </div>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
-                  </motion.div>
+                  </div>
                 )}
               </TabsContent>
             </Tabs>
