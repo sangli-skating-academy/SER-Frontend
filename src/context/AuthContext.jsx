@@ -6,11 +6,13 @@ const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({ user: null, loading: true });
 
   useEffect(() => {
+    const token = localStorage.getItem("auth_token");
     // Fetch user info from backend using the httpOnly cookie
     fetch(
       `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/users/me`,
       {
-        credentials: "include",
+        credentials: "include", // Use cookies if available
+        headers: token ? { Authorization: `Bearer ${token}` } : {}, // Fallback to token
       }
     )
       .then((res) => (res.ok ? res.json() : null))
@@ -20,12 +22,15 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await fetch(
-      `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/users/logout`,
+      `${
+        import.meta.env.VITE_API_URL || "http://localhost:3000"
+      }/api/users/logout`,
       {
         method: "POST",
         credentials: "include",
       }
     );
+    localStorage.removeItem("auth_token"); // Clear token from localStorage
     setAuth({ user: null, loading: false });
   };
 

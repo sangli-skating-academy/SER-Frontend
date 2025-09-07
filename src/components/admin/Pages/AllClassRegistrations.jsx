@@ -43,29 +43,31 @@ export default function AllClassRegistrations() {
   const exportToCSV = () => {
     const data = filteredRef.current;
     if (!data.length) return;
+    // Get all unique keys from all objects (for wide tables)
     const allKeys = Array.from(
       data.reduce((set, row) => {
         Object.keys(row).forEach((k) => set.add(k));
         return set;
       }, new Set())
     );
+    // CSV header
     const header = allKeys.join(",");
-    const rows = data
-      .map((row) =>
-        allKeys
-          .map((k) => {
-            let val = row[k];
-            if (val === null || val === undefined) return "";
-            val = String(val).replace(/"/g, '""');
-            if (val.includes(",") || val.includes("\n") || val.includes('"')) {
-              return `"${val}"`;
-            }
-            return val;
-          })
-          .join(",")
-      )
-      .join("\n");
+    // CSV rows
+    const rows = data.map((row) =>
+      allKeys
+        .map((k) => {
+          let val = row[k];
+          if (val === null || val === undefined) return "";
+          val = String(val).replace(/"/g, '""');
+          if (val.includes(",") || val.includes("\n") || val.includes('"')) {
+            return `"${val}"`;
+          }
+          return val;
+        })
+        .join(",")
+    );
     const csv = [header, ...rows].join("\n");
+    // Download
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     saveAs(
       blob,

@@ -4,13 +4,17 @@ import useAuth from "../../hooks/useAuth";
 
 export default function AdminRoute({ children }) {
   const { auth } = useAuth();
+  const token = localStorage.getItem("auth_token");
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!auth.loading && (!auth.user || auth.user.role !== "admin")) {
+    if (
+      (!auth.loading && (!auth.user || auth.user.role !== "admin")) ||
+      !token
+    ) {
       navigate("/", { replace: true });
     }
-  }, [auth, navigate]);
+  }, [auth, token, navigate]);
 
   if (auth.loading) {
     return (

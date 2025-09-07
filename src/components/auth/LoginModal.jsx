@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-// import useAuth from "../../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 import Button from "../ui/button";
 import Input from "../ui/input";
 import {
@@ -34,7 +34,8 @@ const LoginModal = ({ onClose }) => {
   const [error, setError] = useState("");
   const [showRegPassword, setShowRegPassword] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
-  // const { login } = useAuth();
+
+  const { setAuth } = useAuth();
 
   // Reset loading and error state when modal is closed
   const handleClose = () => {
@@ -121,7 +122,12 @@ const LoginModal = ({ onClose }) => {
         setIsLoading(false);
         return;
       }
-      // No need to extract token or call login(token) since auth is now cookie-based
+      const { token, user } = await res.json();
+
+      // Store token in localStorage
+      localStorage.setItem("auth_token", token);
+      // Update auth context
+      setAuth({ user, loading: false });
       window.location.reload(); // Reload to update auth state everywhere
       onClose();
     } catch {
