@@ -61,6 +61,7 @@ const UserDetailsGrid = ({
   setUserDetails,
 }) => {
   const [aadhaarPreview, setLocalAadhaarPreview] = useState(null);
+  const [aadhaarLoading, setAadhaarLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editDetails, setEditDetails] = useState(userDetails);
   const [saving, setSaving] = useState(false);
@@ -264,6 +265,8 @@ const UserDetailsGrid = ({
 
   const handleAadhaarPreview = async (url) => {
     try {
+      setAadhaarLoading(true);
+
       // If it's already a blob URL or data URL, use it directly
       if (url.startsWith("blob:") || url.startsWith("data:")) {
         setLocalAadhaarPreview(url);
@@ -297,6 +300,8 @@ const UserDetailsGrid = ({
       }
     } catch (error) {
       console.error("Error loading image:", error);
+    } finally {
+      setAadhaarLoading(false);
     }
   };
 
@@ -535,12 +540,17 @@ const UserDetailsGrid = ({
                   <div className="mt-1 text-xs text-gray-500">
                     Current:{" "}
                     <span
-                      className="text-blue-600 underline cursor-pointer"
+                      className={`text-blue-600 underline ${
+                        aadhaarLoading
+                          ? "cursor-not-allowed opacity-60"
+                          : "cursor-pointer"
+                      }`}
                       onClick={() =>
+                        !aadhaarLoading &&
                         handleAadhaarPreview(editDetails.aadhaar_image)
                       }
                     >
-                      View
+                      {aadhaarLoading ? "Loading..." : "View"}
                     </span>
                   </div>
                 )}
@@ -687,8 +697,13 @@ const UserDetailsGrid = ({
                 {userDetails.aadhaar_image ? (
                   user.role === "admin" || user.role === "superadmin" ? (
                     <span
-                      className="text-blue-600 underline cursor-pointer"
+                      className={`text-blue-600 underline ${
+                        aadhaarLoading
+                          ? "cursor-not-allowed opacity-60"
+                          : "cursor-pointer"
+                      }`}
                       onClick={() =>
+                        !aadhaarLoading &&
                         handleAadhaarPreview(
                           `${backendUrl}/api/secure-file/${userDetails.aadhaar_image
                             .split("/")
@@ -696,12 +711,17 @@ const UserDetailsGrid = ({
                         )
                       }
                     >
-                      View
+                      {aadhaarLoading ? "Loading..." : "View"}
                     </span>
                   ) : userDetails.user_id === user.id ? (
                     <span
-                      className="text-blue-600 underline cursor-pointer"
+                      className={`text-blue-600 underline ${
+                        aadhaarLoading
+                          ? "cursor-not-allowed opacity-60"
+                          : "cursor-pointer"
+                      }`}
                       onClick={() =>
+                        !aadhaarLoading &&
                         handleAadhaarPreview(
                           `${backendUrl}/api/secure-file/${userDetails.aadhaar_image
                             .split("/")
@@ -709,7 +729,7 @@ const UserDetailsGrid = ({
                         )
                       }
                     >
-                      View
+                      {aadhaarLoading ? "Loading..." : "View"}
                     </span>
                   ) : (
                     "N/A"
