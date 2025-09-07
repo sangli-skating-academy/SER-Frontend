@@ -147,8 +147,8 @@ export default function AllRegistrations() {
             val = val
               .map((member, index) => {
                 if (typeof member === "object" && member !== null) {
-                  // Debug: Log the member structure (remove this in production)
-                  if (index === 0) {
+                  // Only log in development mode
+                  if (import.meta.env.DEV && index === 0) {
                     console.log("Team member structure:", Object.keys(member));
                     console.log("Sample member:", member);
                   }
