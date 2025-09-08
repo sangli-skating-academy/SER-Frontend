@@ -62,7 +62,8 @@ export default function ClubForm() {
     if (!user?.id) return;
     apiFetch(`/api/club/membership/${user.id}`)
       .then((res) => {
-        if (res) {
+        // Check if res is an array with length > 0
+        if (res && Array.isArray(res) && res.length > 0) {
           setHasMembership(true);
           setMembershipInfo(res);
           setShowMembershipModal(true);
@@ -180,41 +181,6 @@ export default function ClubForm() {
     }
   };
 
-  const handleSubmit = async (razorpay_order_id, razorpay_payment_id) => {
-    setSubmitting(true);
-    setError("");
-    try {
-      // Calculate issue and end date
-      const issue_date = new Date().toISOString().slice(0, 10);
-      const end_date = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .slice(0, 10);
-      const payload = {
-        ...form,
-        user_id: user?.id,
-        razorpay_order_id,
-        razorpay_payment_id,
-        status: "success",
-        issue_date,
-        end_date,
-      };
-      const res = await apiFetch("/api/club/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (res.registration) {
-        setSuccess(true);
-      } else {
-        setError("Registration failed. Please try again.");
-      }
-    } catch (err) {
-      setError(err.message || "Registration failed. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   // Show login modal if needed
   {
     showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />;
@@ -230,170 +196,336 @@ export default function ClubForm() {
   return (
     <>
       <Header />
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-pink-50 to-blue-50 animate-fade-in">
-        <div className="max-w-lg w-full bg-white rounded-xl shadow-xl p-8 mt-8">
-          <div className="mb-4">
-            <button
-              type="button"
-              className="flex items-center gap-2 text-blue-600 hover:underline"
-              onClick={() => navigate(-1)}
-            >
-              <svg
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+        {/* Background Decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 -left-10 w-32 h-32 bg-gradient-to-br from-pink-400/20 to-orange-400/20 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-10 right-1/3 w-36 h-36 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative flex flex-col items-center justify-center p-4">
+          <div className="w-full max-w-md">
+            {/* Back Button */}
+            <div className="mb-6">
+              <button
+                type="button"
+                className="group flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors duration-200 font-medium"
+                onClick={() => navigate(-1)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Back
-            </button>
-          </div>
-          <h2 className="text-2xl font-bold mb-6 text-blue-700 text-center">
-            Join Academy / Classes
-          </h2>
-          {error && (
-            <div className="text-red-600 mb-4 text-center">{error}</div>
-          )}
-          {success ? (
-            <div className="text-green-700 text-center font-bold text-lg">
-              Registration successful!
-              <br />
-              Payment ID: {paymentId}
+                <div className="p-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm group-hover:shadow-md transition-all duration-200">
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    className="transition-transform group-hover:-translate-x-0.5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </div>
+                Back
+              </button>
             </div>
-          ) : (
-            <form className="space-y-6" onSubmit={handlePayment}>
-              <Input
-                label="Full Name*"
-                name="full_name"
-                value={form.full_name}
-                onChange={handleChange}
-                required
-                placeholder="Enter Student full name"
-              />
-              <Input
-                label="Phone Number*"
-                name="phone_number"
-                value={form.phone_number}
-                onChange={handleChange}
-                required
-                placeholder="Enter your phone number"
-                type="tel"
-                pattern="[0-9]{10,}"
-              />
-              <Input
-                label="Email*"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                placeholder="Enter your email"
-                type="email"
-              />
-              <Input
-                label="Age*"
-                name="age"
-                value={form.age}
-                onChange={handleChange}
-                required
-                placeholder="Enter your age"
-                type="number"
-                min={1}
-              />
-              <div>
-                <label className="block text-sm font-semibold mb-1 text-black">
-                  Gender*
-                </label>
-                <Select
-                  name="gender"
-                  value={form.gender}
-                  onValueChange={(val) =>
-                    setForm((f) => ({ ...f, gender: val }))
-                  }
-                  required
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+
+            {/* Main Form Card */}
+            <div className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8 relative">
+              {/* Header */}
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                  Join Academy
+                </h2>
+                <p className="text-slate-600">
+                  Start your skating journey with us
+                </p>
               </div>
-              <Input
-                label="Fees (₹)"
-                name="amount"
-                value={form.amount}
-                onChange={handleChange}
-                required
-                type="number"
-                min={0}
-                disabled
-              />
-              {!isLoggedIn ? (
-                <Button
-                  type="button"
-                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform w-full"
-                  onClick={() => setShowLoginModal(true)}
-                >
-                  Login First
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform w-full"
-                  disabled={submitting || paymentSuccess}
-                >
-                  {submitting ? "Processing..." : "Pay & Register"}
-                </Button>
+
+              {/* Error Message */}
+              {error && (
+                <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm border border-red-200 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 text-red-500">
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-red-700 font-medium">{error}</span>
+                  </div>
+                </div>
               )}
-            </form>
-          )}
+
+              {/* Success State */}
+              {success ? (
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full mb-6 shadow-lg">
+                    <svg
+                      className="w-10 h-10 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-green-700 mb-2">
+                    Registration Successful!
+                  </h3>
+                  <div className="space-y-2">
+                    <p className="text-slate-600">Welcome to the academy!</p>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-200 rounded-lg">
+                      <span className="text-sm text-green-600">
+                        Payment ID:
+                      </span>
+                      <span className="text-sm font-mono text-green-700">
+                        {paymentId}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Registration Form */
+                <form className="space-y-6" onSubmit={handlePayment}>
+                  {/* Form Fields */}
+                  <div className="space-y-5">
+                    <Input
+                      label="Full Name*"
+                      name="full_name"
+                      value={form.full_name}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter student's full name"
+                      className="bg-white/50 backdrop-blur-sm border-slate-200 focus:border-blue-400 focus:ring-blue-400/20"
+                    />
+
+                    <Input
+                      label="Phone Number*"
+                      name="phone_number"
+                      value={form.phone_number}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter your phone number"
+                      type="tel"
+                      pattern="[0-9]{10,}"
+                      className="bg-white/50 backdrop-blur-sm border-slate-200 focus:border-blue-400 focus:ring-blue-400/20"
+                    />
+
+                    <Input
+                      label="Email*"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter your email"
+                      type="email"
+                      className="bg-white/50 backdrop-blur-sm border-slate-200 focus:border-blue-400 focus:ring-blue-400/20"
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        label="Age*"
+                        name="age"
+                        value={form.age}
+                        onChange={handleChange}
+                        required
+                        placeholder="Age"
+                        type="number"
+                        min={1}
+                        className="bg-white/50 backdrop-blur-sm border-slate-200 focus:border-blue-400 focus:ring-blue-400/20"
+                      />
+
+                      <div>
+                        <label className="block text-sm font-semibold mb-2 text-slate-700">
+                          Gender*
+                        </label>
+                        <Select
+                          name="gender"
+                          value={form.gender}
+                          onValueChange={(val) =>
+                            setForm((f) => ({ ...f, gender: val }))
+                          }
+                          required
+                        >
+                          <SelectTrigger className="bg-white/50 backdrop-blur-sm border-slate-200 focus:border-blue-400 focus:ring-blue-400/20">
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="male">Male</SelectItem>
+                            <SelectItem value="female">Female</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Fees Display */}
+                    <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700 mb-1">
+                            Registration Fees
+                          </label>
+                          <p className="text-xs text-slate-500">
+                            Monthly subscription
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
+                            ₹{form.amount}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="pt-4">
+                    {!isLoggedIn ? (
+                      <Button
+                        type="button"
+                        className="w-full bg-gradient-to-r from-pink-400 to-blue-400 hover:from-blue-500 hover:to-pink-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+                        onClick={() => setShowLoginModal(true)}
+                      >
+                        <svg
+                          className="w-5 h-5 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                          />
+                        </svg>
+                        Login to Continue
+                      </Button>
+                    ) : (
+                      <Button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-pink-400 to-blue-400 hover:from-blue-500 hover:to-pink-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        disabled={submitting || paymentSuccess}
+                      >
+                        {submitting ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            Processing...
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-2">
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                              />
+                            </svg>
+                            Pay & Register
+                          </div>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <Footer />
+
+      {/* Enhanced Membership Modal */}
       {showMembershipModal &&
         membershipInfo &&
         Array.isArray(membershipInfo) && (
           <Modal onClose={() => setShowMembershipModal(false)}>
-            <div className="p-6 text-center">
-              <h3 className="text-xl font-bold text-blue-700 mb-2">
-                You have active memberships!
+            <div className="p-8 text-center">
+              {/* Modal Header */}
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-lg">
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">
+                Active Memberships Found!
               </h3>
-              <div className="mb-4 text-gray-700">
+              <p className="text-slate-600 mb-6">
+                You already have active memberships
+              </p>
+
+              {/* Membership Cards */}
+              <div className="space-y-4 mb-8">
                 {membershipInfo
-                  .sort((a, b) => new Date(b.end_date) - new Date(a.end_date)) // Sort by end_date
+                  .sort((a, b) => new Date(b.end_date) - new Date(a.end_date))
                   .map((membership, index) => (
-                    <div key={index} className="mb-4">
-                      <p>
-                        Membership for{" "}
-                        <span className="font-bold text-blue-400">
-                          {membership.full_name}
-                        </span>
-                      </p>
-                      <p>
-                        Expires on:{" "}
-                        <span className="font-semibold text-pink-600">
-                          {membership.end_date
-                            ? new Date(membership.end_date).toLocaleDateString()
-                            : "-"}
-                        </span>
-                      </p>
+                    <div
+                      key={index}
+                      className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-left">
+                          <p className="font-semibold text-slate-800">
+                            {membership.full_name}
+                          </p>
+                          <p className="text-sm text-slate-600">
+                            Expires:{" "}
+                            {membership.end_date
+                              ? new Date(
+                                  membership.end_date
+                                ).toLocaleDateString()
+                              : "-"}
+                          </p>
+                        </div>
+                        <div className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                          Active
+                        </div>
+                      </div>
                     </div>
                   ))}
               </div>
-              <div className="flex gap-4 justify-center mt-6 flex-col">
+
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-3">
                 <Button
                   type="button"
-                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform"
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                   onClick={() => {
                     setShowMembershipModal(false);
                     navigate("/dashboard");
@@ -403,13 +535,13 @@ export default function ClubForm() {
                 </Button>
                 <Button
                   type="button"
-                  className="bg-gradient-to-r from-blue-400 to-pink-400 text-white font-bold px-6 py-2 rounded-lg shadow hover:scale-105 transition-transform"
+                  className="w-full bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold py-3 px-6 rounded-xl transition-all duration-200"
                   onClick={() => {
                     setShowMembershipModal(false);
                     navigate("/joinacademy");
                   }}
                 >
-                  Enroll another student
+                  Enroll Another Student
                 </Button>
               </div>
             </div>

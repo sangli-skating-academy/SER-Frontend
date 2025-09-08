@@ -26,8 +26,8 @@ const EventsSection = () => {
     // Age group filter
     if (
       filter !== "all" &&
-      ["Under 10", "Under 18", "Adults"].includes(filter) &&
-      event.age_group !== filter
+      ["Female", "Male", "Mixed"].includes(filter) &&
+      event.gender !== filter
     ) {
       return false;
     }
@@ -57,9 +57,9 @@ const EventsSection = () => {
           >
             {[
               { label: "All Events", value: "all" },
-              { label: "Under 10", value: "Under 10" },
-              { label: "Under 18", value: "Under 18" },
-              { label: "Adults", value: "Adults" },
+              { label: "Male", value: "Male" },
+              { label: "Female", value: "Female" },
+              { label: "Mixed", value: "Mixed" },
             ].map((f) => (
               <Button
                 key={f.value}

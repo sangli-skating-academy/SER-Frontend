@@ -24,7 +24,10 @@ import {
   faDollarSign,
   faUsers,
   faUser,
+  faClock,
+  faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const EventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -209,33 +212,6 @@ const EventsPage = () => {
             </div>
             {/* Enhanced Filters & Controls */}
             <div className="mb-8 space-y-4">
-              {/* Search Bar */}
-              <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-blue-100">
-                <div className="relative">
-                  <FontAwesomeIcon
-                    icon={faSearch}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search events by name..."
-                    value={filter.search}
-                    onChange={(e) =>
-                      handleFilterChange("search", e.target.value)
-                    }
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  />
-                  {filter.search && (
-                    <button
-                      onClick={() => handleFilterChange("search", "")}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              </div>
-
               {/* Filter & Sort Controls */}
               <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-blue-100">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-4">
@@ -402,6 +378,33 @@ const EventsPage = () => {
                   )}
                 </div>
               </div>
+
+              {/* Search Bar */}
+              <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-blue-100">
+                <div className="relative">
+                  <FontAwesomeIcon
+                    icon={faSearch}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search events by name..."
+                    value={filter.search}
+                    onChange={(e) =>
+                      handleFilterChange("search", e.target.value)
+                    }
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                  {filter.search && (
+                    <button
+                      onClick={() => handleFilterChange("search", "")}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
             {/* Enhanced Events Display */}
             <div
@@ -433,17 +436,171 @@ const EventsPage = () => {
                 </div>
               ) : sortedEvents && sortedEvents.length > 0 ? (
                 // Events Display
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300">
-                  {sortedEvents.map((event, index) => (
-                    <div
-                      key={event.id}
-                      className="animate-fade-in"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <EventCard event={event} />
-                    </div>
-                  ))}
-                </div>
+                <>
+                  {/* Desktop/Tablet Grid View */}
+                  <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300">
+                    {sortedEvents.map((event, index) => (
+                      <div
+                        key={event.id}
+                        className="animate-fade-in"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <EventCard event={event} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Mobile List View */}
+                  <div className="md:hidden space-y-4">
+                    {sortedEvents.map((event, index) => (
+                      <div
+                        key={event.id}
+                        className="animate-fade-in"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <div className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300">
+                          {/* Event Header */}
+                          <div className="flex gap-4 mb-4">
+                            <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                              <img
+                                src={
+                                  event.image_url || "/images/default-event.jpg"
+                                }
+                                alt={event.title}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between mb-2">
+                                <h3 className="font-bold text-lg text-slate-800 line-clamp-2 leading-tight">
+                                  {event.title}
+                                </h3>
+                                <div className="ml-2 flex-shrink-0">
+                                  <span className="text-lg font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
+                                    ₹{event.price_per_person || 0}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                <span
+                                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                    event.is_team_event
+                                      ? "bg-orange-100 text-orange-700"
+                                      : "bg-blue-100 text-blue-700"
+                                  }`}
+                                >
+                                  <FontAwesomeIcon
+                                    icon={
+                                      event.is_team_event ? faUsers : faUser
+                                    }
+                                    className="w-3 h-3 mr-1"
+                                  />
+                                  {event.is_team_event ? "Team" : "Solo"}
+                                </span>
+                                {Array.isArray(event.hashtags) &&
+                                  event.hashtags.length > 0 && (
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                                      #{event.hashtags[0]}
+                                    </span>
+                                  )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Event Details */}
+                          <div className="space-y-3">
+                            {/* Date and Time */}
+                            <div className="flex items-center gap-3 text-sm text-slate-600">
+                              <div className="flex items-center gap-2">
+                                <FontAwesomeIcon
+                                  icon={faCalendarAlt}
+                                  className="w-4 h-4 text-blue-500"
+                                />
+                                <span>
+                                  {event.start_date
+                                    ? new Date(
+                                        event.start_date
+                                      ).toLocaleDateString()
+                                    : "TBA"}
+                                </span>
+                              </div>
+                              {event.start_time && (
+                                <div className="flex items-center gap-2">
+                                  <FontAwesomeIcon
+                                    icon={faClock}
+                                    className="w-4 h-4 text-green-500"
+                                  />
+                                  <span>{event.start_time}</span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Location */}
+                            {event.location && (
+                              <div className="flex items-center gap-2 text-sm text-slate-600">
+                                <FontAwesomeIcon
+                                  icon={faMapMarkerAlt}
+                                  className="w-4 h-4 text-red-500"
+                                />
+                                <span className="line-clamp-1">
+                                  {event.location}
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Description */}
+                            {event.description && (
+                              <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                                {event.description}
+                              </p>
+                            )}
+
+                            {/* Event Metadata */}
+                            <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+                              {event.age_group && (
+                                <span className="flex items-center gap-1">
+                                  <FontAwesomeIcon
+                                    icon={faUser}
+                                    className="w-3 h-3"
+                                  />
+                                  Age:{" "}
+                                  {Array.isArray(event.age_group)
+                                    ? event.age_group.join(", ")
+                                    : event.age_group}
+                                </span>
+                              )}
+                              {event.gender && (
+                                <span>Gender: {event.gender}</span>
+                              )}
+                              {event.max_participants && (
+                                <span className="flex items-center gap-1">
+                                  <FontAwesomeIcon
+                                    icon={faUsers}
+                                    className="w-3 h-3"
+                                  />
+                                  Max: {event.max_participants}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Action Button */}
+                            <div className="pt-2 border-t border-slate-200">
+                              <Link
+                                to={`/events/${event.id}`}
+                                className="block"
+                              >
+                                <button className="w-full bg-gradient-to-r from-pink-400 to-blue-400 hover:from-blue-500 hover:to-pink-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg">
+                                  View Details & Register
+                                </button>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
               ) : (
                 // No Events Found
                 <div className="text-center py-16 animate-fade-in">

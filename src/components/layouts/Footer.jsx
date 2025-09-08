@@ -141,7 +141,26 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-black-800 mt-10 pt-8 text-center text-gray-400 animate-fade-in-up delay-500">
-          <p>Made by Rakesh Yadav & Prabhu Badkar</p>
+          <p>
+            Made by {/*link  */}
+            <a
+              href="https://github.com/Rakeshyadav-19"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-blue-400 font-semibold"
+            >
+              Rakesh Yadav
+            </a>
+            <span> & </span>
+            <a
+              href="https://github.com/PrabhuBadkar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-blue-400 font-semibold"
+            >
+              Prabhu Badkar
+            </a>
+          </p>
         </div>
       </div>
     </footer>

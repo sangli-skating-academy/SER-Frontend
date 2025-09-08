@@ -259,22 +259,9 @@ const DashboardPage = () => {
       </Helmet>
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow py-10 bg-gradient-to-br from-blue-50 via-white to-pink-50 animate-fade-in">
-          <div className="container mx-auto px-4">
+        <main className="flex-grow bg-gradient-to-br from-blue-50 via-white to-pink-50 animate-fade-in">
+          <div className="container mx-auto">
             <div className="max-w-5xl mx-auto">
-              <div className="mb-8 text-center animate-fade-in-up">
-                <h1 className="text-4xl md:text-5xl font-extrabold font-montserrat mb-2 text-blue-900 drop-shadow-lg tracking-tight">
-                  <FontAwesomeIcon
-                    icon={faClipboardList}
-                    className="mr-2 text-pink-400 "
-                  />
-                  Your Dashboard
-                </h1>
-                <p className="text-gray-600 text-lg animate-fade-in-up delay-100">
-                  Manage your event registrations, Membership details, and
-                  profile
-                </p>
-              </div>
               <Tabs
                 defaultValue="registrations"
                 className="w-full animate-fade-in-up delay-200"
@@ -344,7 +331,7 @@ const DashboardPage = () => {
                     </span>
                   </TabsTrigger>
                 </TabsList>
-                <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 pb-16 sm:pb-0 overflow-x-auto">
+                <div className="w-full max-w-4xl mx-auto sm:px-4 pb-16 sm:pb-0 mb-30">
                   <TabsContent value="registrations">
                     <RegistrationsTab
                       loading={loading}
