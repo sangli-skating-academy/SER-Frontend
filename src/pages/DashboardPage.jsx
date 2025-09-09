@@ -376,13 +376,13 @@ const DashboardPage = () => {
             onClick={() => setIsDetailsModalOpen(false)}
           >
             <div
-              className="bg-white rounded-lg p-4 sm:p-6 md:p-8 shadow-lg w-full max-w-md sm:max-w-lg md:max-w-2xl animate-fade-in-up overflow-y-auto max-h-[90vh] mx-2"
+              className="bg-white rounded-lg p-2 sm:p-4 md:p-6 shadow-lg w-full max-w-md sm:max-w-lg md:max-w-2xl animate-fade-in-up overflow-y-auto max-h-[90vh] mx-2"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-bold mb-4 text-blue-700 flex items-center gap-2">
+              {/* <h2 className="text-xl font-bold mb-4 text-blue-700 flex items-center gap-2">
                 <FontAwesomeIcon icon={faUser} className="text-pink-400" />
                 Registration Details
-              </h2>
+              </h2> */}
               {detailsLoading ? (
                 <div>Loading...</div>
               ) : userDetails ? (

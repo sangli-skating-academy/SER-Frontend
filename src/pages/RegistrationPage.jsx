@@ -36,6 +36,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Hash } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 
+// DetailRow component for better organization
+const DetailRow = ({ label, value, icon }) => (
+  <motion.div
+    initial={{ opacity: 0, x: -10 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.3 }}
+    className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+  >
+    <span className="text-xl mr-3">{icon}</span>
+    <div className="flex-1">
+      <span className="text-sm font-medium text-gray-500 block">{label}</span>
+      <span className="text-gray-800 font-semibold">{value}</span>
+    </div>
+  </motion.div>
+);
+
 const initialForm = {
   coach_name: "",
   club_name: "",
@@ -245,6 +261,13 @@ const RegistrationPage = () => {
       });
       setShowSuccessModal(true);
       setSuccess(true);
+
+      // Auto-scroll to top when registration is successful
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+
       toast({
         title: "Registration Successful",
         description: "You have registered successfully!",
@@ -307,49 +330,168 @@ const RegistrationPage = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow py-10 bg-gray-50">
+        <main className="flex-grow py-10 bg-gradient-to-br from-green-50 via-blue-50 to-white">
           <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto bg-white border border-green-300 p-8 rounded-lg text-center mt-10 shadow-lg">
-              <h2 className="text-2xl font-bold text-green-700 mb-4">
-                Registration Successful!
-              </h2>
-              <div className="text-left text-gray-700 space-y-2 mb-6">
-                <div>
-                  <b>Player Name:</b> {registeredDetails.first_name}{" "}
-                  {registeredDetails.middle_name} {registeredDetails.last_name}
-                </div>
-                <div>
-                  <b>District:</b> {registeredDetails.district}
-                </div>
-                <div>
-                  <b>State:</b> {registeredDetails.state}
-                </div>
-                <div>
-                  <b>Coach Name:</b> {registeredDetails.coach_name}
-                </div>
-                <div>
-                  <b>Age Group:</b> {registeredDetails.age_group}
-                </div>
-                <div>
-                  <b>Category:</b> {registeredDetails.category}
-                </div>
-                {event.is_team_event && (
-                  <div>
-                    <b>Team Name:</b> {registeredDetails.team_name}
-                  </div>
-                )}
-              </div>
-              <p className="text-gray-600 mb-6">
-                Thank you for registering! Please proceed to payment. If any
-                data is incorrect you can correct it in your dashboard.
-              </p>
-              <Button
-                className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700"
-                onClick={() => navigate("/dashboard")}
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="max-w-4xl mx-auto"
+            >
+              {/* Registration Details Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden mb-8"
               >
-                Continue to Pay
-              </Button>
-            </div>
+                {/* Card Header */}
+                <div className="bg-gradient-to-r from-green-500 to-blue-500 px-8 py-6">
+                  <h2 className="text-2xl font-bold text-white flex items-center">
+                    <FontAwesomeIcon icon={faHashtag} className="mr-3" />
+                    Registration Details
+                  </h2>
+                  <p className="text-green-100 mt-2">
+                    Please review your information below
+                  </p>
+                </div>
+
+                {/* Details Grid */}
+                <div className="p-8">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Player Information */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5, duration: 0.5 }}
+                      className="space-y-4"
+                    >
+                      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                        Player Information
+                      </h3>
+
+                      <div className="space-y-3">
+                        <DetailRow
+                          label="Full Name"
+                          value={`${registeredDetails.first_name} ${registeredDetails.middle_name} ${registeredDetails.last_name}`}
+                          icon="👤"
+                        />
+                        <DetailRow
+                          label="District"
+                          value={registeredDetails.district}
+                          icon="📍"
+                        />
+                        <DetailRow
+                          label="State"
+                          value={registeredDetails.state}
+                          icon="🏛️"
+                        />
+                        <DetailRow
+                          label="Age Group"
+                          value={registeredDetails.age_group}
+                          icon="🎂"
+                        />
+                        <DetailRow
+                          label="Category"
+                          value={registeredDetails.category}
+                          icon="🏆"
+                        />
+                      </div>
+                    </motion.div>
+
+                    {/* Coach & Team Information */}
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.6, duration: 0.5 }}
+                      className="space-y-4"
+                    >
+                      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                        Coach & Team Details
+                      </h3>
+
+                      <div className="space-y-3">
+                        <DetailRow
+                          label="Coach Name"
+                          value={registeredDetails.coach_name}
+                          icon="👨‍🏫"
+                        />
+                        {event.is_team_event && (
+                          <DetailRow
+                            label="Team Name"
+                            value={registeredDetails.team_name}
+                            icon="👥"
+                          />
+                        )}
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Action Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+                className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center"
+              >
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                    What's Next?
+                  </h3>
+                  <p className="text-gray-600 max-w-3xl mx-auto">
+                    Your registration is complete! Please proceed to payment to
+                    secure your spot. You can review and edit your details in
+                    your dashboard if needed.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                      onClick={() => navigate("/dashboard")}
+                    >
+                      <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />
+                      Continue to Payment
+                    </Button>
+                  </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Additional Info */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+                className="mt-8 text-center"
+              >
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                  <h4 className="font-semibold text-blue-800 mb-2">
+                    💡 Important Notes
+                  </h4>
+                  <ul className="text-blue-700 space-y-1 text-sm">
+                    <li>
+                      • Payment must be completed within 24 hours to secure your
+                      registration
+                    </li>
+                    <li>
+                      • You can modify your details in the dashboard before
+                      payment
+                    </li>
+                    <li>
+                      • Contact support if you face any issues during payment
+                    </li>
+                  </ul>
+                </div>
+              </motion.div>
+            </motion.div>
           </div>
         </main>
         <Footer />

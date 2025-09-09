@@ -92,7 +92,7 @@ const MembershipTab = ({ userId }) => {
           </div>
         </div>
 
-        <div className="relative p-6">
+        <div className="relative p-2">
           <div className="space-y-4">
             {[1, 2].map((i) => (
               <div
@@ -143,7 +143,7 @@ const MembershipTab = ({ userId }) => {
           </div>
         </div>
 
-        <div className="relative p-6">
+        <div className="relative p-2">
           <div className="text-center py-12">
             <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
               <FontAwesomeIcon
@@ -185,7 +185,7 @@ const MembershipTab = ({ userId }) => {
           </div>
         </div>
 
-        <div className="relative p-6">
+        <div className="relative p-2">
           <div className="text-center py-12">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
               <FontAwesomeIcon
@@ -238,7 +238,7 @@ const MembershipTab = ({ userId }) => {
       </div>
 
       {/* Content Section */}
-      <div className="relative p-6">
+      <div className="relative p-2">
         <div className="grid gap-6 max-w-4xl mx-auto">
           {memberships.map((membership, index) => (
             <MembershipCard
