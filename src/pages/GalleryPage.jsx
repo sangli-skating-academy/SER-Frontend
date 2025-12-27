@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Button from "../components/ui/button";
+import { API_BASE_URL } from "../utils/apiConfig";
 import {
   Tabs,
   TabsContent,
@@ -376,12 +377,9 @@ export default function GalleryPage() {
                           src={
                             image.image_url &&
                             !image.image_url.startsWith("http")
-                              ? `${
-                                  import.meta.env.VITE_API_URL ||
-                                  "http://localhost:3000"
-                                }${image.image_url.startsWith("/") ? "" : "/"}${
-                                  image.image_url
-                                }`
+                              ? `${API_BASE_URL}${
+                                  image.image_url.startsWith("/") ? "" : "/"
+                                }${image.image_url}`
                               : image.image_url || "/placeholder.svg"
                           }
                           alt={
@@ -439,10 +437,7 @@ export default function GalleryPage() {
                       src={
                         selectedImage.image_url &&
                         !selectedImage.image_url.startsWith("http")
-                          ? `${
-                              import.meta.env.VITE_API_URL ||
-                              "http://localhost:3000"
-                            }${
+                          ? `${API_BASE_URL}${
                               selectedImage.image_url.startsWith("/") ? "" : "/"
                             }${selectedImage.image_url}`
                           : selectedImage.image_url || "/placeholder.svg"

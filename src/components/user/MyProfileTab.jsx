@@ -9,6 +9,7 @@ import {
   faTimes,
   faUserCircle,
   faCheck,
+  faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
 import Badge from "../ui/badge";
 import Button from "../ui/button";
@@ -18,6 +19,7 @@ const MyProfileTab = ({
   profileEditMode,
   profileEdit,
   profileLoading,
+  profileError,
   handleProfileEditClick,
   handleProfileEditChange,
   handleProfileSave,
@@ -92,6 +94,31 @@ const MyProfileTab = ({
               Update your personal information
             </p>
           </div>
+          {/* Error Alert */}
+          {profileError && (
+            <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 mb-6 animate-fade-in">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <FontAwesomeIcon
+                    icon={faExclamationTriangle}
+                    className="text-red-500 text-xl"
+                  />
+                </div>
+                <div className="ml-3 flex-1">
+                  <h3 className="text-sm font-semibold text-red-800 mb-1">
+                    {profileError.includes("email") ||
+                    profileError.includes("Email")
+                      ? "Email Already Exists"
+                      : profileError.includes("username") ||
+                        profileError.includes("Username")
+                      ? "Username Already Taken"
+                      : "Update Failed"}
+                  </h3>
+                  <p className="text-sm text-red-700">{profileError}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-6">
             {/* Username Field */}
@@ -133,17 +160,37 @@ const MyProfileTab = ({
                   type="email"
                   value={profileEdit.email}
                   onChange={handleProfileEditChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white/80 backdrop-blur-sm"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 transition-all duration-300 bg-white/80 backdrop-blur-sm ${
+                    profileError &&
+                    (profileError.includes("email") ||
+                      profileError.includes("Email"))
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                      : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+                  }`}
                   placeholder="Enter your email address"
                   required
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                   <FontAwesomeIcon
                     icon={faEnvelope}
-                    className="text-gray-400"
+                    className={
+                      profileError &&
+                      (profileError.includes("email") ||
+                        profileError.includes("Email"))
+                        ? "text-red-400"
+                        : "text-gray-400"
+                    }
                   />
                 </div>
               </div>
+              {profileError &&
+                (profileError.includes("email") ||
+                  profileError.includes("Email")) && (
+                  <p className="text-xs text-red-600 mt-1 ml-1 animate-fade-in">
+                    This email address is already registered. Please use a
+                    different email.
+                  </p>
+                )}
             </div>
 
             {/* Phone Field */}
@@ -158,16 +205,37 @@ const MyProfileTab = ({
               <div className="relative">
                 <input
                   name="phone"
+                  type="tel"
                   value={profileEdit.phone}
                   onChange={handleProfileEditChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white/80 backdrop-blur-sm"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 transition-all duration-300 bg-white/80 backdrop-blur-sm ${
+                    profileError &&
+                    (profileError.includes("phone") ||
+                      profileError.includes("Phone"))
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                      : "border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+                  }`}
                   placeholder="Enter your phone number"
+                  pattern="[0-9]{10}"
+                  maxLength="10"
                   required
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <FontAwesomeIcon icon={faPhone} className="text-gray-400" />
+                  <FontAwesomeIcon
+                    icon={faPhone}
+                    className={
+                      profileError &&
+                      (profileError.includes("phone") ||
+                        profileError.includes("Phone"))
+                        ? "text-red-400"
+                        : "text-gray-400"
+                    }
+                  />
                 </div>
               </div>
+              <p className="text-xs text-gray-500 mt-1 ml-1">
+                Enter 10-digit phone number
+              </p>
             </div>
           </div>
 

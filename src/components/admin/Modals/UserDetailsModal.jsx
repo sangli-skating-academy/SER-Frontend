@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { Dialog } from "../../ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
+import { API_BASE_URL } from "../../../utils/apiConfig";
 
 export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [blobImageUrl, setBlobImageUrl] = useState("");
 
-  const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
   const aadhaarImageUrl = selectedReg?.aadhaar_image
     ? selectedReg.aadhaar_image.startsWith("http")
       ? selectedReg.aadhaar_image
-      : `${backendUrl}/api/admin/secure-file/${selectedReg.aadhaar_image
+      : `${API_BASE_URL}/api/admin/secure-file/${selectedReg.aadhaar_image
           .split("/")
           .pop()}`
     : null;
@@ -65,7 +65,7 @@ export default function UserDetailsModal({ open, onOpenChange, selectedReg }) {
   if (!open || !selectedReg) return null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <div className="relative p-4 w-full max-w-lg">
+      <div className="relative p-4 w-full max-w-lg mb-22">
         {/* Cross button */}
         <button
           aria-label="Close"

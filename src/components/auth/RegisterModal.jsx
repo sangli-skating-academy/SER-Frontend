@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../../hooks/useAuth";
+import { API_BASE_URL } from "../../utils/apiConfig";
 import Dialog, {
   DialogHeader,
   DialogTitle,
@@ -51,25 +52,20 @@ const RegisterModal = ({ isOpen, onClose }) => {
     }
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:3000"
-        }/api/users/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: data.username,
-            full_name: data.fullName,
-            email: data.email,
-            password: data.password,
-            phone: data.phone,
-            date_of_birth: data.date_of_birth,
-            gender: data.gender,
-            role: data.role,
-          }),
-        }
-      );
+      const res = await fetch(`${API_BASE_URL}/api/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: data.username,
+          full_name: data.fullName,
+          email: data.email,
+          password: data.password,
+          phone: data.phone,
+          date_of_birth: data.date_of_birth,
+          gender: data.gender,
+          role: data.role,
+        }),
+      });
       if (!res.ok) {
         const err = await res.json();
         setError(err.message || "Registration failed");

@@ -5,6 +5,7 @@ import * as yup from "yup";
 import useAuth from "../../hooks/useAuth";
 import Button from "../ui/button";
 import Input from "../ui/input";
+import { API_BASE_URL } from "../../utils/apiConfig";
 import {
   Select,
   SelectTrigger,
@@ -102,20 +103,15 @@ const LoginModal = ({ onClose }) => {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:3000"
-        }/api/users/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include", // Ensure cookies are sent
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
-        }
-      );
+      const res = await fetch(`${API_BASE_URL}/api/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // Ensure cookies are sent
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
       if (!res.ok) {
         const err = await res.json();
         setError(err.message || "Login failed");
@@ -140,23 +136,18 @@ const LoginModal = ({ onClose }) => {
   const onRegisterSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:3000"
-        }/api/users/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include", // Ensure cookies are sent
-          body: JSON.stringify({
-            username: data.username,
-            email: data.email,
-            phone: data.phone,
-            password: data.password,
-            role: data.role,
-          }),
-        }
-      );
+      const res = await fetch(`${API_BASE_URL}/api/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // Ensure cookies are sent
+        body: JSON.stringify({
+          username: data.username,
+          email: data.email,
+          phone: data.phone,
+          password: data.password,
+          role: data.role,
+        }),
+      });
       if (!res.ok) {
         const err = await res.json();
         setError(err.message || "Registration failed");

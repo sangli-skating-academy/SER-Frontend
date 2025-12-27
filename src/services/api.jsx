@@ -1,20 +1,23 @@
-// Example: central API handler
+import { API_BASE_URL } from "../utils/apiConfig";
+import { getAuthToken } from "../utils/authHelpers";
+
+// Centralized API handler with proper auth and error handling
 export async function apiFetch(endpoint, options = {}) {
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-  const token = localStorage.getItem("auth_token");
+  const token = getAuthToken();
   const opts = {
     credentials: "include",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}), // Add Authorization header if token exists
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
     ...options,
   };
   // If body is FormData, remove Content-Type so browser sets it correctly
   if (opts.body instanceof FormData) {
-    if (opts.headers) {
-      delete opts.headers["Content-Type"];
-      delete opts.headers["content-type"];
-    }
+    delete opts.headers["Content-Type"];
+    delete opts.headers["content-type"];
   }
-  const res = await fetch(`${baseUrl}${endpoint}`, opts);
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, opts);
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }

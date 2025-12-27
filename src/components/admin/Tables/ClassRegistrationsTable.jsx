@@ -43,6 +43,9 @@ export default function ClassRegistrationsTable({ data, loading, onRowClick }) {
                 <td className="px-4 py-4 whitespace-nowrap">
                   <Skeleton className="h-6 w-20" />
                 </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <Skeleton className="h-6 w-20" />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -60,13 +63,16 @@ export default function ClassRegistrationsTable({ data, loading, onRowClick }) {
               ID
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-              User
+              Student Name
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
               Phone
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
               Email
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+              Amount
             </th>
             <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
               Status
@@ -77,16 +83,39 @@ export default function ClassRegistrationsTable({ data, loading, onRowClick }) {
           {data.map((reg) => (
             <tr
               key={reg.id}
-              className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-pink-50 transition-colors duration-200 cursor-pointer"
+              className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-pink-50 transition-all duration-200 cursor-pointer hover:shadow-md"
               onClick={() => onRowClick && onRowClick(reg)}
             >
-              <td className="px-4 py-4 whitespace-nowrap">{reg.id}</td>
-              <td className="px-4 py-4 whitespace-nowrap">{reg.user_name}</td>
+              <td className="px-4 py-4 whitespace-nowrap font-medium">
+                {reg.id}
+              </td>
+              <td className="px-4 py-4 whitespace-nowrap">
+                <span className="font-semibold text-blue-700">
+                  {reg.full_name}
+                </span>
+              </td>
               <td className="px-4 py-4 whitespace-nowrap">
                 {reg.phone_number}
               </td>
-              <td className="px-4 py-4 whitespace-nowrap">{reg.email}</td>
-              <td className="px-4 py-4 whitespace-nowrap">{reg.status}</td>
+              <td className="px-4 py-4 whitespace-nowrap text-gray-600">
+                {reg.email}
+              </td>
+              <td className="px-4 py-4 whitespace-nowrap font-semibold text-green-600">
+                ₹{reg.amount}
+              </td>
+              <td className="px-4 py-4 whitespace-nowrap">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold ${
+                    reg.status === "success"
+                      ? "bg-green-100 text-green-800"
+                      : reg.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {reg.status}
+                </span>
+              </td>
             </tr>
           ))}
         </tbody>

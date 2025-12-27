@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardContent,
   CardTitle,
-  CardDescription,
 } from "../components/ui/card";
 import Button from "../components/ui/button";
 import {
@@ -43,7 +42,6 @@ import {
   faSkating,
   faTrophy,
   faMoneyCheck,
-  faGenderless,
   faUser,
   faInbox,
 } from "@fortawesome/free-solid-svg-icons";

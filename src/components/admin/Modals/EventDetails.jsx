@@ -13,7 +13,7 @@ export default function EventDetails({ event, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-2 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-2 backdrop-blur-sm mb-22"
       style={{ paddingTop: "4vh", paddingBottom: "4vh" }}
     >
       <div

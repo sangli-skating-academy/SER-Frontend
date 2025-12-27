@@ -360,7 +360,6 @@ const UserDetailsGrid = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-gradient-to-br from-white to-blue-50/30 rounded-2xl p-2 border border-blue-100 shadow-xl"
         >
           <div className="flex items-center mb-6">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center mr-4 shadow-lg">
@@ -752,7 +751,6 @@ const UserDetailsGrid = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="bg-gradient-to-br from-white to-gray-50/30 rounded-2xl p-2 border border-gray-200 shadow-lg"
         >
           <div className="flex items-center mb-6">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-4 shadow-lg">

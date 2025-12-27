@@ -6,14 +6,11 @@ import {
   faSave,
   faTimes,
   faSpinner,
-  faUserFriends,
   faVenusMars,
   faBirthdayCake,
-  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import Button from "../../ui/button";
 import { apiFetch } from "../../../services/api";
 
 const TeamDetails = ({
@@ -84,7 +81,7 @@ const TeamDetails = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="mb-8 bg-gradient-to-br from-white to-blue-50/30 rounded-2xl p-2 border border-blue-200 shadow-lg"
+      className="mb-8 "
     >
       <div className="flex items-center mb-6">
         <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-4 shadow-lg">
@@ -100,7 +97,9 @@ const TeamDetails = ({
         <div className="flex items-center gap-3 justify-center">
           <div>
             <p className="text-lg font-medium text-gray-700">Team Name</p>
-            <p className="text-xl font-bold text-gray-800">{team.name}</p>
+            <p className="text-xl font-bold text-gray-800 text-center">
+              {team.name}
+            </p>
           </div>
         </div>
       </div>
@@ -187,7 +186,7 @@ const TeamDetails = ({
                             onChange={(e) =>
                               handleMemberChange(idx, "age", e.target.value)
                             }
-                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm text-center"
+                            className="w-20 px-3 py-2 transition-all duration-200 bg-white shadow-sm text-center"
                             placeholder="Age"
                             min="1"
                             max="99"

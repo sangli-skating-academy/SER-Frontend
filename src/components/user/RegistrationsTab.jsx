@@ -451,7 +451,7 @@ const RegistrationCard = ({
 
   return (
     <div
-      className="relative overflow-hidden bg-white/70 backdrop-blur-sm rounded-2xl border border-2 border-black/20 transition-all duration-300 hover:scale-[1.02] animate-fade-in-up"
+      className="relative overflow-hidden bg-white/70 backdrop-blur-sm rounded-2xl border-2 border-black/20 transition-all duration-300 hover:scale-[1.02] animate-fade-in-up"
       style={{ animationDelay: `${idx * 60}ms` }}
     >
       {/* Gradient border effect */}

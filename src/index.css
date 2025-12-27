@@ -73,6 +73,16 @@ body {
   overflow: hidden;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
 :root {
   --background: 220 100% 99%; /* light blue background */
   --foreground: 220 60% 18%; /* deep blue text */

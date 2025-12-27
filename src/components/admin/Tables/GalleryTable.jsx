@@ -2,6 +2,7 @@ import { useState } from "react";
 import Button from "../../ui/button";
 import EditGallery from "../Modals/EditGallery";
 import { apiFetch } from "../../../services/api";
+import { API_BASE_URL } from "../../../utils/apiConfig";
 
 export default function GalleryTable({
   data = [],
@@ -81,10 +82,9 @@ export default function GalleryTable({
                   <a
                     href={
                       item.image_url && !item.image_url.startsWith("http")
-                        ? `$
-                            {import.meta.env.VITE_API_URL || "http://localhost:3000"}${
-                              item.image_url.startsWith("/") ? "" : "/"
-                            }${item.image_url}`
+                        ? `${API_BASE_URL}${
+                            item.image_url.startsWith("/") ? "" : "/"
+                          }${item.image_url}`
                         : item.image_url
                     }
                     target="_blank"
@@ -93,10 +93,9 @@ export default function GalleryTable({
                     <img
                       src={
                         item.image_url && !item.image_url.startsWith("http")
-                          ? `$
-                              {import.meta.env.VITE_API_URL || "http://localhost:3000"}${
-                                item.image_url.startsWith("/") ? "" : "/"
-                              }${item.image_url}`
+                          ? `${API_BASE_URL}${
+                              item.image_url.startsWith("/") ? "" : "/"
+                            }${item.image_url}`
                           : item.image_url
                       }
                       alt={item.title}

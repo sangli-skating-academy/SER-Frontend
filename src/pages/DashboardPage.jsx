@@ -26,12 +26,11 @@ import PaymentModal from "../components/user/Pay/PaymentModal";
 import RegistrationsTab from "../components/user/RegistrationsTab";
 import MyProfileTab from "../components/user/MyProfileTab";
 import MembershipTab from "../components/user/MembershipTab";
-
-const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_BASE_URL } from "../utils/apiConfig";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
-  const { auth, setUser } = useAuth();
+  const { auth } = useAuth();
   const user = auth.user;
   const { toast } = useToast();
   const [registrations, setRegistrations] = useState([]);
@@ -42,7 +41,6 @@ const DashboardPage = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
-  const [editDetails, setEditDetails] = useState({});
   const [confirmModal, setConfirmModal] = useState({
     open: false,
     registrationId: null,
@@ -51,6 +49,7 @@ const DashboardPage = () => {
   const [profileEditMode, setProfileEditMode] = useState(false);
   const [profileEdit, setProfileEdit] = useState(user);
   const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState(null);
 
   useEffect(() => {
     document.title = "Dashboard | SSAS";
@@ -73,12 +72,6 @@ const DashboardPage = () => {
     };
     fetchData();
   }, [user, navigate, toast]);
-
-  const fetchUser = async () => {
-    const data = await apiFetch("/api/users/me", { credentials: "include" });
-    setUser(data.user);
-    setProfileEdit(data.user); // Optionally update edit state too
-  };
 
   const handlePaymentClick = (registration) => {
     const event = events.find((e) => e.id === registration.event_id);
@@ -134,64 +127,8 @@ const DashboardPage = () => {
       // Use the registration id to fetch user details by registration
       const details = await apiFetch(`/api/user-details/${registration.id}`);
       setUserDetails(details);
-      setEditDetails(details);
-    } catch (err) {
+    } catch {
       setUserDetails(null);
-    } finally {
-      setDetailsLoading(false);
-    }
-  };
-
-  const handleSaveDetails = async () => {
-    setDetailsLoading(true);
-    try {
-      let body, headers, method, url;
-      if (
-        editDetails.aadhaar_image &&
-        editDetails.aadhaar_image instanceof File
-      ) {
-        body = new FormData();
-        Object.entries(editDetails).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            body.append(key, value);
-          }
-        });
-        // Always include registration_id for POST
-        if (!userDetails?.id && selectedRegistration?.id) {
-          body.append("registration_id", selectedRegistration.id);
-        }
-        headers = undefined; // Let browser set multipart/form-data
-      } else {
-        body = JSON.stringify({
-          ...editDetails,
-          // Always include registration_id for POST
-          ...(userDetails?.id
-            ? {}
-            : { registration_id: selectedRegistration?.id }),
-        });
-        headers = { "Content-Type": "application/json" };
-      }
-      if (userDetails?.id) {
-        method = "PATCH";
-        // Use the registration id for PATCH by registration
-        url = `/api/user-details/by-registration/${selectedRegistration.id}`;
-      } else {
-        method = "POST";
-        url = "/api/user-details";
-      }
-      const updated = await apiFetch(url, {
-        method,
-        headers,
-        body,
-      });
-      setUserDetails(updated);
-      toast({ title: "Details Updated", variant: "success" });
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: err.message,
-        variant: "destructive",
-      });
     } finally {
       setDetailsLoading(false);
     }
@@ -206,16 +143,20 @@ const DashboardPage = () => {
       date_of_birth: user.date_of_birth ? user.date_of_birth.slice(0, 10) : "",
       gender: user.gender || "",
     });
+    setProfileError(null); // Clear previous errors
     setProfileEditMode(true);
   };
 
   const handleProfileEditChange = (e) => {
     setProfileEdit({ ...profileEdit, [e.target.name]: e.target.value });
+    // Clear error when user starts typing
+    if (profileError) setProfileError(null);
   };
 
   const handleProfileSave = async (e) => {
     e && e.preventDefault();
     setProfileLoading(true);
+    setProfileError(null); // Clear previous errors
     try {
       const updated = await apiFetch("/api/users/me", {
         method: "PATCH",
@@ -227,9 +168,15 @@ const DashboardPage = () => {
       setProfileEditMode(false);
       window.location.reload(); // Reload the page after successful save
     } catch (err) {
+      // Set error message for display in component
+      const errorMessage =
+        err.message || "Failed to update profile. Please try again.";
+      setProfileError(errorMessage);
+
+      // Also show toast
       toast({
         title: "Error",
-        description: err.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -280,11 +227,12 @@ const DashboardPage = () => {
                     value="registrations"
                     className="group flex flex-col items-center justify-center gap-2 px-2 py-1 sm:px-4 sm:py-2 
                rounded-xl transition-all duration-300 relative
-               data-[state=active]:text-blue-600 text-gray-600 hover:text-blue-500"
+               data-[state=active]:text-blue-600 data-[state=active]:font-bold text-gray-600 hover:text-blue-500"
                   >
                     <div
                       className="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300
                  data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-110
+                 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600
                  bg-gray-100 group-hover:bg-blue-100"
                     >
                       <FontAwesomeIcon
@@ -292,7 +240,7 @@ const DashboardPage = () => {
                         className="w-5 h-5"
                       />
                     </div>
-                    <span className="text-[12px] sm:text-sm font-medium transition-all duration-300">
+                    <span className="text-[12px] sm:text-sm font-medium data-[state=active]:font-bold transition-all duration-300">
                       My Registrations
                     </span>
                   </TabsTrigger>
@@ -300,16 +248,17 @@ const DashboardPage = () => {
                     value="memberships"
                     className="group flex flex-col items-center justify-center gap-2 px-2 py-1 sm:px-4 sm:py-2 
                rounded-xl transition-all duration-300 relative
-               data-[state=active]:text-pink-600 text-gray-600 hover:text-pink-500"
+               data-[state=active]:text-pink-600 data-[state=active]:font-bold text-gray-600 hover:text-pink-500"
                   >
                     <div
                       className="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300
                  data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-110
+                 data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-pink-600
                  bg-gray-100 group-hover:bg-pink-100"
                     >
                       <FontAwesomeIcon icon={faIdCard} className="w-5 h-5" />
                     </div>
-                    <span className="text-[12px] sm:text-sm font-medium transition-all duration-300">
+                    <span className="text-[12px] sm:text-sm font-medium data-[state=active]:font-bold transition-all duration-300">
                       My Memberships
                     </span>
                   </TabsTrigger>
@@ -317,16 +266,17 @@ const DashboardPage = () => {
                     value="profile"
                     className="group flex flex-col items-center justify-center gap-2 px-2 py-1 sm:px-4 sm:py-2 
                rounded-xl transition-all duration-300 relative
-               data-[state=active]:text-purple-600 text-gray-600 hover:text-purple-500"
+               data-[state=active]:text-purple-600 data-[state=active]:font-bold text-gray-600 hover:text-purple-500"
                   >
                     <div
                       className="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300
                  data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-110
+                 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600
                  bg-gray-100 group-hover:bg-purple-100"
                     >
                       <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
                     </div>
-                    <span className="text-[12px] sm:text-sm font-medium transition-all duration-300">
+                    <span className="text-[12px] sm:text-sm font-medium data-[state=active]:font-bold transition-all duration-300">
                       My Profile
                     </span>
                   </TabsTrigger>
@@ -350,6 +300,7 @@ const DashboardPage = () => {
                       profileEditMode={profileEditMode}
                       profileEdit={profileEdit}
                       profileLoading={profileLoading}
+                      profileError={profileError}
                       handleProfileEditClick={handleProfileEditClick}
                       handleProfileEditChange={handleProfileEditChange}
                       handleProfileSave={handleProfileSave}
@@ -392,7 +343,7 @@ const DashboardPage = () => {
                     user={user}
                     setIsDetailsModalOpen={setIsDetailsModalOpen}
                     setEditMode={() => {}}
-                    backendUrl={backendUrl}
+                    backendUrl={API_BASE_URL}
                     selectedRegistration={selectedRegistration}
                     setUserDetails={setUserDetails}
                   />

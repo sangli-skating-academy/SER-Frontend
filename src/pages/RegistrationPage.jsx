@@ -255,7 +255,8 @@ const RegistrationPage = () => {
         district: form.district,
         state: form.state,
         date_of_birth: form.date_of_birth,
-        category: form.category,
+        event_category: form.event_category_select,
+        skate_category: form.skate_category,
         aadhaar_number: form.aadhaar_number,
         team_name: form.team_name,
       });
@@ -393,9 +394,14 @@ const RegistrationPage = () => {
                           icon="🎂"
                         />
                         <DetailRow
-                          label="Category"
-                          value={registeredDetails.category}
+                          label="Event Category"
+                          value={registeredDetails.event_category}
                           icon="🏆"
+                        />
+                        <DetailRow
+                          label="Skate Category"
+                          value={registeredDetails.skate_category}
+                          icon="⛸️"
                         />
                       </div>
                     </motion.div>
