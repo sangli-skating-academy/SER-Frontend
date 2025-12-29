@@ -18,6 +18,27 @@ export async function apiFetch(endpoint, options = {}) {
     delete opts.headers["content-type"];
   }
   const res = await fetch(`${API_BASE_URL}${endpoint}`, opts);
-  if (!res.ok) throw new Error(await res.text());
+
+  if (!res.ok) {
+    // Try to parse error response as JSON
+    let errorData;
+    try {
+      errorData = await res.json();
+    } catch {
+      // If not JSON, use text
+      errorData = { error: await res.text() };
+    }
+
+    // Create error object with response data
+    const error = new Error(
+      errorData.message || errorData.error || "Request failed"
+    );
+    error.response = {
+      status: res.status,
+      data: errorData,
+    };
+    throw error;
+  }
+
   return res.json();
 }

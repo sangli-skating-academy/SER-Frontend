@@ -20,7 +20,6 @@ import {
   faSyncAlt,
   faPlusCircle,
   faMessage,
-  faImage,
 } from "@fortawesome/free-solid-svg-icons";
 import { apiFetch } from "../services/api";
 import { fetchEvents } from "../services/eventApi";
@@ -71,6 +70,7 @@ const AdminDasboardPage = () => {
       setGalleryItems(galleryRes || []);
     } catch (error) {
       // Optionally show toast
+      console.error("Failed to load dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -117,7 +117,6 @@ const AdminDasboardPage = () => {
 
   // Calculate stats
   const totalUsers = users.length;
-  const playerCount = users.filter((u) => u.role === "player").length;
   const coachCount = users.filter((u) => u.role === "coach").length;
   const adminCount = users.filter((u) => u.role === "admin").length;
   // Only count live events for stats
@@ -128,12 +127,6 @@ const AdminDasboardPage = () => {
   const totalRegistrations = registrations.filter((r) =>
     liveEventIds.has(r.event_id)
   ).length;
-  const totalRevenue = payments
-    .filter((p) => liveEventIds.has(p.event_id))
-    .reduce(
-      (sum, p) => (p.status === "success" ? sum + Number(p.amount) : sum),
-      0
-    );
   const activeEvents = liveEvents.filter(
     (e) => !e.is_archived && new Date(e.start_date) >= new Date()
   ).length;
@@ -155,7 +148,6 @@ const AdminDasboardPage = () => {
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 5)
     .map((r) => {
-      const event = events.find((e) => e.id === r.event_id);
       return {
         id: r.id,
         userName: r.full_name || r.username || "-",
@@ -172,17 +164,6 @@ const AdminDasboardPage = () => {
         details: r,
       };
     });
-
-  // Upcoming events (latest 5, all event details mapped)
-  const upcomingEvts = events
-    .filter((e) => new Date(e.start_date) >= new Date())
-    .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
-    .slice(0, 5)
-    .map((e) => ({
-      ...e,
-      registrations: registrations.filter((r) => r.event_id === e.id).length,
-      status: new Date(e.start_date) >= new Date() ? "Open" : "Closed",
-    }));
 
   // Show only the latest 5 contact messages in dashboard
   const recentContactMessages = contactMessages.slice(0, 5);

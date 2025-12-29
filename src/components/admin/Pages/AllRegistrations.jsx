@@ -71,11 +71,6 @@ export default function AllRegistrations() {
       ),
     [registrations]
   );
-  const statuses = useMemo(
-    () =>
-      Array.from(new Set(registrations.map((r) => r.status).filter(Boolean))),
-    [registrations]
-  );
 
   // Filtered registrations
   const filteredRegistrations = useMemo(() => {

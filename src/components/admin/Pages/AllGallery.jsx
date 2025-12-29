@@ -77,18 +77,6 @@ export default function AllGallery() {
     )
   ).sort((a, b) => b - a);
 
-  // Filtered gallery
-  const filteredGallery = gallery.filter((g) => {
-    const matchesEvent = eventFilter === "all" || g.event_name === eventFilter;
-    let itemYear =
-      g.event_year ||
-      (g.created_at && new Date(g.created_at).getFullYear()) ||
-      (g.date && new Date(g.date).getFullYear());
-    const matchesYear =
-      yearFilter === "all" || String(itemYear) === String(yearFilter);
-    return matchesEvent && matchesYear;
-  });
-
   const homeScreenGallery = gallery.filter(
     (g) => g.image_location === "home_screen"
   );

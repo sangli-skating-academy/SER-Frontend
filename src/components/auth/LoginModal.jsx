@@ -167,9 +167,6 @@ const LoginModal = ({ onClose }) => {
     }
   };
 
-  // Helper for all inputs to suppress browser validation
-  const suppressInvalid = (e) => e.preventDefault();
-
   // Helper for error display
   const renderFieldError = (errorMsg) =>
     errorMsg ? (

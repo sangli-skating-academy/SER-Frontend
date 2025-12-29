@@ -179,7 +179,9 @@ export default function AddEvent() {
       if (catObj && typeof catObj === "string") {
         try {
           catObj = JSON.parse(catObj);
-        } catch {}
+        } catch {
+          catObj = { 1: [""] };
+        }
       }
       if (
         catObj &&
@@ -196,15 +198,6 @@ export default function AddEvent() {
       }
     }
   }, [eventToEdit]);
-
-  // Automatically calculate team fee when price_per_person or max_team_size changes
-  const updateTeamFee = (person, teamSize) => {
-    const fee =
-      !isNaN(Number(person)) && !isNaN(Number(teamSize)) && teamSize > 0
-        ? (Number(person) * Number(teamSize)).toFixed(2)
-        : "";
-    setForm((prev) => ({ ...prev, price_per_team: fee }));
-  };
 
   // Capitalize first letter of every input value (except for checkboxes, files, and arrays)
   const handleChange = (e) => {
@@ -324,12 +317,6 @@ export default function AddEvent() {
       eq.length > 1 ? eq.filter((_, i) => i !== idx) : eq
     );
 
-  // Hashtags multi-select handler
-  const handleHashtagsChange = (e) => {
-    const options = Array.from(e.target.selectedOptions).map((o) => o.value);
-    setForm((f) => ({ ...f, hashtags: options }));
-  };
-
   // Hashtag add handler
   const handleCustomHashtagKeyDown = (e) => {
     if (e.key === "Enter" || e.key === ",") {
@@ -405,6 +392,7 @@ export default function AddEvent() {
       }
       navigate("/admin/events");
     } catch (err) {
+      console.error(err);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",

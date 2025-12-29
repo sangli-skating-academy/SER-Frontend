@@ -44,7 +44,7 @@ export default function AllContactMessage() {
       const res = await apiFetch("/api/admin/contact/all");
       setMessages(res.messages || res || []);
     } catch (err) {
-      setMessages([]);
+      setMessages([err.message]);
       setError("Failed to load contact messages");
     } finally {
       setLoading(false);

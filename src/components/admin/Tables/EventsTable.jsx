@@ -66,6 +66,7 @@ export default function EventsTable({
       // Optionally, trigger a refresh or callback
       if (typeof onEditEvent === "function") onEditEvent();
     } catch (err) {
+      console.error(err);
       setDeleteConfirm({ show: false, event: null });
       alert("Failed to delete event.");
     }

@@ -6,7 +6,6 @@ import {
   faChevronRight,
   faPlay,
   faPause,
-  faExpand,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function Carousel() {

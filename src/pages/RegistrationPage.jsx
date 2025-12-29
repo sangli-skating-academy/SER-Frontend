@@ -82,6 +82,7 @@ const RegistrationPage = () => {
   const [ageGroupOptions, setAgeGroupOptions] = useState([]);
   const [eventCategoryOptions, setEventCategoryOptions] = useState([]);
   const [aadhaarImage, setAadhaarImage] = useState(null);
+  const [aadhaarImageError, setAadhaarImageError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -146,7 +147,7 @@ const RegistrationPage = () => {
 
   // Handle input changes
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, checked } = e.target;
     if (name === "event_categories") {
       setForm((f) => {
         let updated = f.event_categories;
@@ -162,9 +163,30 @@ const RegistrationPage = () => {
     }
   };
 
-  // Handle Aadhaar image
+  // Handle Aadhaar image with size validation
   const handleAadhaarChange = (e) => {
     const file = e.target.files[0];
+    if (!file) {
+      setAadhaarImage(null);
+      setAadhaarImageError("");
+      return;
+    }
+
+    // Check file size (5MB = 5 * 1024 * 1024 bytes)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setAadhaarImageError(
+        `File is too large (${(file.size / (1024 * 1024)).toFixed(
+          2
+        )}MB). Maximum size is 5MB.`
+      );
+      setAadhaarImage(null);
+      e.target.value = ""; // Clear the file input
+      return;
+    }
+
+    // File is valid
+    setAadhaarImageError("");
     setAadhaarImage(file);
   };
 
@@ -181,6 +203,17 @@ const RegistrationPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submitting) return; // Prevent double submit
+
+    // Check if Aadhaar image has validation error
+    if (aadhaarImageError) {
+      toast({
+        title: "Invalid File",
+        description: aadhaarImageError,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSubmitting(true);
     setError("");
     // Team event: validate all team members
@@ -275,11 +308,31 @@ const RegistrationPage = () => {
         variant: "default",
       });
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error);
-      } else {
-        setError("Registration failed. Please try again later.");
+      // Handle error - show user-friendly message
+      let errorMessage = "Registration failed. Please try again later.";
+
+      if (err.response && err.response.data) {
+        // Use the message field first, then error field
+        errorMessage =
+          err.response.data.message || err.response.data.error || errorMessage;
+      } else if (err.message) {
+        errorMessage = err.message;
       }
+
+      setError(errorMessage);
+
+      // Also show toast for visibility
+      toast({
+        title: "Registration Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+
+      // Scroll to top to show error message
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -849,21 +902,38 @@ const RegistrationPage = () => {
                       />
                       <div>
                         <label className="block font-medium mb-1">
-                          Aadhaar Image*
+                          Aadhaar Image* (Max 5MB)
                         </label>
                         <input
                           type="file"
                           accept="image/*"
                           onChange={handleAadhaarChange}
                           required
-                          className="block w-full border-1 border-gray-300 rounded-md p-2 text-sm file:cursor-pointer file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                          className={`block w-full border-1 rounded-md p-2 text-sm file:cursor-pointer file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
+                            aadhaarImageError
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300"
+                          }`}
                         />
-                        {aadhaarImage && (
-                          <img
-                            src={URL.createObjectURL(aadhaarImage)}
-                            alt="Aadhaar Preview"
-                            className="mt-2 h-20 rounded shadow"
-                          />
+                        {aadhaarImageError && (
+                          <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                            <span>⚠️</span>
+                            {aadhaarImageError}
+                          </p>
+                        )}
+                        {aadhaarImage && !aadhaarImageError && (
+                          <div className="mt-2">
+                            <img
+                              src={URL.createObjectURL(aadhaarImage)}
+                              alt="Aadhaar Preview"
+                              className="h-20 rounded shadow"
+                            />
+                            <p className="text-green-600 text-sm mt-1 flex items-center gap-1">
+                              <span>✓</span>
+                              File size:{" "}
+                              {(aadhaarImage.size / (1024 * 1024)).toFixed(2)}MB
+                            </p>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -963,8 +1033,8 @@ const RegistrationPage = () => {
                     )}
                     <Button
                       type="submit"
-                      className="w-full py-3 bg-primary text-blue-400 border-2 rounded-lg hover:bg-opacity-90 transition-colors font-medium text-center cursor-pointer hover:text-blue-600 hover:shadow-lg hover:scale-105 flex items-center justify-center gap-2 mt-4"
-                      disabled={submitting}
+                      className="w-full py-3 bg-primary text-blue-400 border-2 rounded-lg hover:bg-opacity-90 transition-colors font-medium text-center cursor-pointer hover:text-blue-600 hover:shadow-lg hover:scale-105 flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      disabled={submitting || aadhaarImageError}
                     >
                       {submitting ? (
                         <>
