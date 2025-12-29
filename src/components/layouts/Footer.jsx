@@ -161,6 +161,15 @@ export default function Footer() {
               Prabhu Badkar
             </a>
           </p>
+          ❤️
+          <a
+            href="https://github.com/The-Tech-Tentacles/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white hover:text-blue-400 font-semibold"
+          >
+            The Tech Tentacles
+          </a>
         </div>
       </div>
     </footer>
