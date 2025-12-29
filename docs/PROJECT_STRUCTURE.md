@@ -6,19 +6,6 @@
 
 ---
 
-## 📋 Table of Contents
-
-1. [Overview](#overview)
-2. [Architecture Philosophy](#architecture-philosophy)
-3. [Folder Structure](#folder-structure)
-4. [Core Components](#core-components)
-5. [Best Practices](#best-practices)
-6. [Getting Started](#getting-started)
-7. [Common Patterns](#common-patterns)
-8. [Troubleshooting](#troubleshooting)
-
----
-
 ## 🎯 Overview
 
 This is a **production-grade React frontend** built with modern tools and best practices. The application provides a responsive, user-friendly interface for event registration, user authentication, admin dashboard, and payment processing.
@@ -90,14 +77,7 @@ client/
 │   ├── robots.txt               # SEO crawler instructions
 │   └── sitemap.xml              # SEO sitemap
 │
-├── api/                         # 🔌 Vercel serverless functions
-│
-├── pages/                       # 📄 Next.js style page routing (if used)
-│   └── api/                     # API routes for Vercel
-│
 ├── src/                         # 📦 Main source code
-│   ├── assets/                  # 🎨 Static resources (images, fonts, icons)
-│   │
 │   ├── components/              # 🧩 Reusable UI components
 │   │   ├── admin/               # Admin-specific components
 │   │   │   ├── AdminRoute.jsx   # Protected admin route wrapper
@@ -128,23 +108,25 @@ client/
 │   │   │   ├── Footer.jsx       # Page footer
 │   │   │   └── ScrollToTop.jsx  # Auto-scroll on route change
 │   │   │
-│   │   ├── payment/             # Payment-related components
-│   │   │
 │   │   ├── ui/                  # Reusable UI primitives
+│   │   │   ├── avatar.jsx       # User avatar
+│   │   │   ├── badge.jsx        # Status badges
 │   │   │   ├── button.jsx       # Custom button component
 │   │   │   ├── card.jsx         # Card container
-│   │   │   ├── input.jsx        # Input field
-│   │   │   ├── modal.jsx        # Modal dialog
-│   │   │   ├── select.jsx       # Dropdown select
-│   │   │   ├── badge.jsx        # Status badges
-│   │   │   ├── avatar.jsx       # User avatar
 │   │   │   ├── dialog.jsx       # Dialog component
-│   │   │   ├── tabs.jsx         # Tab navigation
+│   │   │   ├── EventCard.jsx    # Event display card
+│   │   │   ├── input.jsx        # Input field
+│   │   │   ├── Modal.jsx        # Modal dialog
+│   │   │   ├── select.jsx       # Dropdown select
 │   │   │   ├── skeleton.jsx     # Loading skeleton
-│   │   │   ├── seperator.jsx    # Visual separator
-│   │   │   └── EventCard.jsx    # Event display card
+│   │   │   └── tabs.jsx         # Tab navigation
 │   │   │
 │   │   └── user/                # User-specific components
+│   │       ├── MembershipTab.jsx
+│   │       ├── MyProfileTab.jsx
+│   │       ├── RegistrationsTab.jsx
+│   │       ├── Pay/             # Payment components
+│   │       └── userDetailModal/ # User detail modal components
 │   │
 │   ├── context/                 # 🌍 React Context providers
 │   │   └── AuthContext.jsx      # Authentication state management
@@ -154,27 +136,29 @@ client/
 │   │   └── use-toasts.jsx       # Toast notification hook
 │   │
 │   ├── pages/                   # 📄 Page components
-│   │   ├── HomePage.jsx         # Landing page
-│   │   ├── Events.jsx           # Events listing page
-│   │   ├── EventDetailPage.jsx  # Single event details
-│   │   ├── RegistrationPage.jsx # Event registration form
-│   │   ├── DashboardPage.jsx    # User dashboard
-│   │   ├── AdminDasboardPage.jsx # Admin dashboard
-│   │   ├── GalleryPage.jsx      # Photo gallery
-│   │   ├── ContactPage.jsx      # Contact form
 │   │   ├── AboutPage.jsx        # About us page
+│   │   ├── AdminDasboardPage.jsx # Admin dashboard
 │   │   ├── ClubForm.jsx         # Class membership form
-│   │   └── NotFound.jsx         # 404 error page
+│   │   ├── ContactPage.jsx      # Contact form
+│   │   ├── DashboardPage.jsx    # User dashboard
+│   │   ├── EventDetailPage.jsx  # Single event details
+│   │   ├── Events.jsx           # Events listing page
+│   │   ├── GalleryPage.jsx      # Photo gallery
+│   │   ├── HomePage.jsx         # Landing page
+│   │   ├── NotFound.jsx         # 404 error page
+│   │   └── RegistrationPage.jsx # Event registration form
 │   │
 │   ├── services/                # 🔧 API communication layer
 │   │   ├── api.jsx              # Central API fetch wrapper
-│   │   ├── eventApi.jsx         # Event-related API calls
-│   │   └── contactApi.jsx       # Contact form API calls
+│   │   ├── contactApi.jsx       # Contact form API calls
+│   │   └── eventApi.jsx         # Event-related API calls
 │   │
 │   ├── lib/                     # 📚 Third-party library utilities
 │   │   └── utils.jsx            # Utility functions (cn, etc.)
 │   │
 │   ├── utils/                   # 🛠️ Helper functions
+│   │   ├── apiConfig.js         # API URL and fetch options config
+│   │   ├── authHelpers.js       # Authentication token helpers
 │   │   └── formatDate.js        # Date formatting utilities
 │   │
 │   ├── styles/                  # 💅 Global styles
@@ -189,12 +173,14 @@ client/
 │
 ├── index.html                   # 📄 HTML template
 ├── package.json                 # 📦 Dependencies & scripts
+├── package-lock.json            # 📦 Dependency lock file
 ├── vite.config.js               # ⚙️ Vite configuration
 ├── eslint.config.js             # 🔍 ESLint rules
 ├── vercel.json                  # 🚀 Vercel deployment config
 ├── .env                         # 🔐 Environment variables (local)
 ├── .env.production.template     # 📋 Production env template
 ├── .gitignore                   # 🚫 Git ignore rules
+├── .git/                        # 🔧 Git repository data
 └── node_modules/                # 📚 Installed packages
 
 ```
@@ -202,80 +188,6 @@ client/
 ---
 
 ## 🔧 Core Components
-
-### 1. **main.jsx** - Application Entry Point
-
-**Purpose:** Bootstrap the React application with providers
-
-```jsx
-import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
-import "./index.css";
-import { AuthProvider } from "./context/AuthContext.jsx";
-import { HelmetProvider } from "react-helmet-async";
-
-createRoot(document.getElementById("root")).render(
-  <HelmetProvider>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </HelmetProvider>
-);
-```
-
-**Key Features:**
-
-- ✅ Wraps app with context providers
-- ✅ Configures SEO with HelmetProvider
-- ✅ Manages authentication state globally
-- ✅ Imports global styles
-
-**Best Practices:**
-
-- Keep providers in order (outermost to innermost)
-- Only include essential global providers here
-- Avoid heavy computations at root level
-
----
-
-### 2. **App.jsx** - Main Application & Routing
-
-**Purpose:** Defines application routes and structure
-
-```jsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ScrollToTop from "./components/layouts/ScrollToTop";
-
-function App() {
-  return (
-    <Router>
-      <ScrollToTop />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/events" element={<EventsPage />} />
-        <Route path="/events/:id" element={<EventDetailPage />} />
-
-        {/* Protected Routes */}
-        <Route path="/dashboard" element={<DashboardPage />} />
-
-        {/* Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminDashboardPage />
-            </AdminRoute>
-          }
-        />
-
-        {/* 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
-  );
-}
-```
 
 **Route Categories:**
 
@@ -303,17 +215,9 @@ function App() {
 - `/admin/allcontactmessages` - View messages
 - `/admin/class-registrations` - View memberships
 
-**Best Practices:**
-
-- ✅ Group routes by access level
-- ✅ Use route parameters for dynamic pages
-- ✅ Include ScrollToTop for better UX
-- ✅ Always have a 404 catch-all route
-- ✅ Lazy load heavy pages with React.lazy()
-
 ---
 
-### 3. **context/AuthContext.jsx** - Authentication State
+### 1. **context/AuthContext.jsx** - Authentication State
 
 **Purpose:** Global authentication state management
 
@@ -379,20 +283,11 @@ function MyComponent() {
 }
 ```
 
-**Best Practices:**
-
-- ✅ Always check loading state
-- ✅ Use httpOnly cookies when possible
-- ✅ Clear tokens on logout
-- ✅ Handle network errors gracefully
-
 ---
 
-### 4. **hooks/** - Custom React Hooks
+### 2. **hooks/** - Custom React Hooks
 
 #### **useAuth.jsx**
-
-**Purpose:** Convenient access to auth context
 
 ```jsx
 import { useContext } from "react";
@@ -409,16 +304,9 @@ export default function useAuth() {
 const { auth, logout, setAuth } = useAuth();
 ```
 
-**Best Practices:**
-
-- ✅ Create custom hooks for all contexts
-- ✅ Keep hooks focused on single concern
-- ✅ Return object for extensibility
-- ✅ Add type safety with TypeScript (future)
-
 ---
 
-### 5. **services/** - API Communication Layer
+### 3. **services/** - API Communication Layer
 
 #### **api.jsx** - Central API Handler
 
@@ -448,14 +336,6 @@ export async function apiFetch(endpoint, options = {}) {
   return res.json();
 }
 ```
-
-**Key Features:**
-
-- ✅ Centralized base URL configuration
-- ✅ Automatic token injection
-- ✅ Credential handling (cookies)
-- ✅ FormData support
-- ✅ Error handling
 
 ---
 
@@ -487,17 +367,9 @@ export async function fetchEventById(id) {
 }
 ```
 
-**Best Practices:**
-
-- ✅ One file per resource/domain
-- ✅ Export named functions
-- ✅ Use query parameters for filtering
-- ✅ Handle errors appropriately
-- ✅ Use environment variables for URLs
-
 ---
 
-### 6. **components/** - UI Components
+### 4. **components/** - UI Components
 
 #### **Component Categories:**
 
@@ -509,18 +381,25 @@ export async function fetchEventById(id) {
 
 **2. UI Primitives** (`components/ui/`)
 
-- **button.jsx** - Reusable button with variants
-- **input.jsx** - Form input fields
-- **card.jsx** - Content containers
-- **modal.jsx** - Dialog boxes
+- **avatar.jsx** - User avatar component
 - **badge.jsx** - Status indicators
-- **tabs.jsx** - Tabbed navigation
+- **button.jsx** - Reusable button with variants
+- **card.jsx** - Content containers
+- **dialog.jsx** - Dialog component
+- **EventCard.jsx** - Event display card
+- **input.jsx** - Form input fields
+- **Modal.jsx** - Modal dialog boxes
+- **select.jsx** - Dropdown select
 - **skeleton.jsx** - Loading placeholders
+- **tabs.jsx** - Tabbed navigation
 
 **3. Feature Components** (`components/home/`, `components/auth/`)
 
 - **Hero.jsx** - Landing hero section
 - **EventSection.jsx** - Featured events display
+- **ContactSection.jsx** - Contact section
+- **TimelineSection.jsx** - Timeline display
+- **curosal.jsx** - Hero carousel
 - **LoginModal.jsx** - Login form
 - **RegisterModal.jsx** - Registration form
 
@@ -529,7 +408,18 @@ export async function fetchEventById(id) {
 - **AdminRoute.jsx** - Protected route wrapper
 - **AllEvents.jsx** - Admin event management
 - **AllRegistrations.jsx** - Registration overview
-- **ManageEvent.jsx** - Event CRUD operations
+- **AllGallery.jsx** - Gallery management
+- **AllContactMessage.jsx** - Contact messages management
+- **AllClassRegistrations.jsx** - Class registrations management
+- **ManageEvent.jsx** - Event CRUD operations (in services/)
+
+**5. User Components** (`components/user/`)
+
+- **MembershipTab.jsx** - User membership tab
+- **MyProfileTab.jsx** - User profile tab
+- **RegistrationsTab.jsx** - User registrations tab
+- **Pay/** - Payment components
+- **userDetailModal/** - User detail modal components
 
 ---
 
@@ -574,77 +464,9 @@ export default function Button({
 }
 ```
 
-**Best Practices:**
-
-- ✅ Use composition over inheritance
-- ✅ Accept className for extensibility
-- ✅ Spread remaining props (...props)
-- ✅ Use cn() utility for class merging
-- ✅ Define variants for reusability
-- ✅ Keep components focused and small
-
 ---
 
-### 7. **pages/** - Page Components
-
-**Purpose:** Full page components that compose smaller components
-
-**Pattern:**
-
-```jsx
-import { useEffect } from "react";
-import { Helmet } from "react-helmet-async";
-import Header from "../components/layouts/Header";
-import Footer from "../components/layouts/Footer";
-
-const HomePage = () => {
-  useEffect(() => {
-    document.title = "Sangli Skating";
-  }, []);
-
-  return (
-    <>
-      <Helmet>
-        <title>Sangli Skating</title>
-        <meta name="description" content="..." />
-        <meta property="og:title" content="Sangli Skating" />
-      </Helmet>
-
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow">{/* Page content */}</main>
-        <Footer />
-      </div>
-    </>
-  );
-};
-
-export default HomePage;
-```
-
-**Key Pages:**
-
-- **HomePage** - Landing page with hero, events, timeline
-- **Events** - Event listing with filters
-- **EventDetailPage** - Single event details
-- **RegistrationPage** - Event registration form
-- **DashboardPage** - User dashboard with registrations
-- **AdminDashboardPage** - Admin control panel
-- **GalleryPage** - Photo gallery
-- **ContactPage** - Contact form
-
-**Best Practices:**
-
-- ✅ Use React Helmet for SEO
-- ✅ Set page title on mount
-- ✅ Include Open Graph meta tags
-- ✅ Use semantic HTML
-- ✅ Ensure responsive design
-- ✅ Add loading states
-
----
-
-### 8. **lib/utils.jsx** - Utility Functions
+### 5. **lib/utils.jsx** - Utility Functions
 
 **Purpose:** Helper functions for common tasks
 
@@ -668,18 +490,11 @@ export function cn(...inputs) {
 )}>
 ```
 
-**Best Practices:**
-
-- ✅ Use for class name merging
-- ✅ Prevents Tailwind class conflicts
-- ✅ Supports conditional classes
-- ✅ Maintains class precedence
-
 ---
 
-### 9. **utils/** - Helper Functions ✨ UPDATED
+### 6. **utils/** - Helper Functions
 
-#### **apiConfig.js** - Centralized API Configuration ✨ NEW
+#### **apiConfig.js** - Centralized API Configuration
 
 **Purpose:** Single source of truth for API base URL and common fetch options
 
@@ -754,40 +569,9 @@ const response = await fetch(
 );
 ```
 
-**Benefits:**
-
-- ✅ No more hardcoded URLs across 18+ files
-- ✅ Automatic token injection
-- ✅ Consistent credential handling
-- ✅ Easy to switch environments
-- ✅ Centralized header management
-
-**Before (duplicated in every file):**
-
-```javascript
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const token = localStorage.getItem("auth_token");
-
-fetch(`${API_URL}/api/events`, {
-  credentials: "include",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  },
-});
-```
-
-**After (centralized):**
-
-```javascript
-import { getApiUrl, getFetchOptions } from "../utils/apiConfig.js";
-
-fetch(getApiUrl("/api/events"), getFetchOptions());
-```
-
 ---
 
-#### **authHelpers.js** - Authentication Utilities ✨ NEW
+#### **authHelpers.js** - Authentication Utilities
 
 **Purpose:** Centralized authentication token management
 
@@ -845,33 +629,6 @@ if (!isAuthenticated()) {
 const token = getAuthToken();
 ```
 
-**Benefits:**
-
-- ✅ No more duplicate `localStorage.getItem("auth_token")` calls
-- ✅ Consistent token key across app
-- ✅ Easy to switch storage mechanism (cookies, sessionStorage)
-- ✅ Centralized token management
-
-**Files Updated to Use Centralized Helpers:**
-
-1. `src/context/AuthContext.jsx`
-2. `src/components/auth/LoginModal.jsx`
-3. `src/components/auth/RegisterModal.jsx`
-4. `src/pages/RegistrationPage.jsx`
-5. `src/pages/DashboardPage.jsx`
-6. `src/pages/ClubForm.jsx`
-7. `src/components/admin/AdminRoute.jsx`
-8. `src/components/admin/Pages/AllEvents.jsx`
-9. `src/components/admin/Pages/AllGallery.jsx`
-10. `src/components/admin/Pages/AllRegistrations.jsx`
-11. `src/components/admin/Pages/AllContactMessage.jsx`
-12. `src/components/admin/Pages/AllClassRegistrations.jsx`
-13. `src/components/admin/services/ManageEvent.jsx`
-14. `src/services/api.jsx`
-15. `src/services/eventApi.jsx`
-16. `src/services/contactApi.jsx`
-17. And more...
-
 ---
 
 #### **formatDate.js**
@@ -894,7 +651,7 @@ export const formatDateTime = (date) => {
 
 ---
 
-### 10. **components/admin/AdminRoute.jsx** - Protected Routes
+### 7. **components/admin/AdminRoute.jsx** - Protected Routes
 
 **Purpose:** Restrict access to admin-only pages
 
@@ -925,13 +682,6 @@ export default function AdminRoute({ children }) {
 }
 ```
 
-**Features:**
-
-- ✅ Checks authentication state
-- ✅ Verifies admin role
-- ✅ Redirects unauthorized users
-- ✅ Shows loading state
-
 **Usage:**
 
 ```jsx
@@ -943,219 +693,6 @@ export default function AdminRoute({ children }) {
     </AdminRoute>
   }
 />
-```
-
----
-
-## 🎯 Best Practices
-
-### 1. **Component Design**
-
-```jsx
-// ✅ DO: Functional components with hooks
-function MyComponent({ title, onAction }) {
-  const [state, setState] = useState(false);
-
-  return (
-    <div>
-      <h1>{title}</h1>
-      <button onClick={onAction}>Click</button>
-    </div>
-  );
-}
-
-// ❌ DON'T: Class components
-class MyComponent extends React.Component {
-  // Outdated pattern
-}
-
-// ✅ DO: Destructure props
-function Button({ label, onClick, variant = "primary" }) {}
-
-// ❌ DON'T: Access props object
-function Button(props) {
-  return <button>{props.label}</button>;
-}
-```
-
----
-
-### 2. **State Management**
-
-```jsx
-// ✅ DO: Use Context for global state
-const { auth } = useAuth();
-
-// ✅ DO: Use useState for local state
-const [isOpen, setIsOpen] = useState(false);
-
-// ❌ DON'T: Prop drilling through many layers
-<Parent user={user}>
-  <Child user={user}>
-    <GrandChild user={user} />
-  </Child>
-</Parent>;
-
-// ✅ DO: Lift state to nearest common ancestor
-function Parent() {
-  const [value, setValue] = useState("");
-  return (
-    <>
-      <ComponentA value={value} onChange={setValue} />
-      <ComponentB value={value} />
-    </>
-  );
-}
-```
-
----
-
-### 3. **API Calls**
-
-```jsx
-// ✅ DO: Handle loading and error states
-function EventList() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchEvents()
-      .then((data) => setEvents(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <Skeleton />;
-  if (error) return <Error message={error} />;
-  return <EventGrid events={events} />;
-}
-
-// ❌ DON'T: Ignore error states
-function EventList() {
-  const [events, setEvents] = useState([]);
-  useEffect(() => {
-    fetchEvents().then(setEvents);
-  }, []);
-  return <EventGrid events={events} />;
-}
-```
-
----
-
-### 4. **Performance**
-
-```jsx
-// ✅ DO: Memoize expensive computations
-const sortedEvents = useMemo(() => {
-  return events.sort((a, b) => new Date(a.date) - new Date(b.date));
-}, [events]);
-
-// ✅ DO: Use callback memoization
-const handleClick = useCallback(() => {
-  doSomething(value);
-}, [value]);
-
-// ✅ DO: Lazy load heavy components
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-
-// ❌ DON'T: Create functions in render
-function Component() {
-  return <button onClick={() => console.log("clicked")}>Click</button>;
-}
-```
-
----
-
-### 5. **Forms**
-
-```jsx
-// ✅ DO: Use React Hook Form for complex forms
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-
-const schema = yup.object({
-  email: yup.string().email().required(),
-  password: yup.string().min(8).required(),
-});
-
-function LoginForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  const onSubmit = (data) => {
-    // Submit form
-  };
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input {...register("email")} />
-      {errors.email && <span>{errors.email.message}</span>}
-
-      <input type="password" {...register("password")} />
-      {errors.password && <span>{errors.password.message}</span>}
-
-      <button type="submit">Login</button>
-    </form>
-  );
-}
-```
-
----
-
-### 6. **Styling**
-
-```jsx
-// ✅ DO: Use Tailwind utility classes
-<div className="flex items-center justify-between p-4 bg-white rounded-lg shadow">
-
-// ✅ DO: Use cn() utility for conditional classes
-<button className={cn(
-  "px-4 py-2 rounded",
-  isActive && "bg-blue-600 text-white",
-  isDisabled && "opacity-50 cursor-not-allowed"
-)}>
-
-// ✅ DO: Extract repeated styles to components
-<Button variant="primary" size="lg">Click Me</Button>
-
-// ❌ DON'T: Use inline styles excessively
-<div style={{ padding: "16px", margin: "8px" }}>
-```
-
----
-
-### 7. **SEO Optimization**
-
-```jsx
-// ✅ DO: Use React Helmet for meta tags
-import { Helmet } from "react-helmet-async";
-
-function EventPage({ event }) {
-  return (
-    <>
-      <Helmet>
-        <title>{event.title} | Sangli Skating</title>
-        <meta name="description" content={event.description} />
-        <meta property="og:title" content={event.title} />
-        <meta property="og:image" content={event.image} />
-      </Helmet>
-      {/* Page content */}
-    </>
-  );
-}
-
-// ✅ DO: Use semantic HTML
-<header>, <main>, <nav>, <article>, <section>, <footer>
-
-// ✅ DO: Add alt text to images
-<img src={src} alt="Skating event at Mumbai" />
 ```
 
 ---
@@ -1218,210 +755,6 @@ npm run preview
 
 ---
 
-## 🔍 Common Patterns
-
-### Adding a New Page
-
-**Example: Add "Certificates" page**
-
-1. **Create Page Component** (`src/pages/CertificatesPage.jsx`)
-
-```jsx
-import { Helmet } from "react-helmet-async";
-import Header from "../components/layouts/Header";
-import Footer from "../components/layouts/Footer";
-
-export default function CertificatesPage() {
-  return (
-    <>
-      <Helmet>
-        <title>Certificates | Sangli Skating</title>
-        <meta name="description" content="Download your skating certificates" />
-      </Helmet>
-
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 py-8">
-          <h1>My Certificates</h1>
-          {/* Content */}
-        </main>
-        <Footer />
-      </div>
-    </>
-  );
-}
-```
-
-2. **Add Route** (`src/App.jsx`)
-
-```jsx
-import CertificatesPage from "./pages/CertificatesPage";
-
-// In Routes
-<Route path="/certificates" element={<CertificatesPage />} />;
-```
-
-3. **Add Navigation Link** (`src/components/layouts/Header.jsx`)
-
-```jsx
-<Link to="/certificates">Certificates</Link>
-```
-
----
-
-### Creating a Reusable Component
-
-**Example: Create "Alert" component**
-
-1. **Create Component** (`src/components/ui/alert.jsx`)
-
-```jsx
-import { cn } from "../../lib/utils";
-
-export default function Alert({ children, variant = "info", className }) {
-  const variants = {
-    info: "bg-blue-50 border-blue-200 text-blue-800",
-    success: "bg-green-50 border-green-200 text-green-800",
-    warning: "bg-yellow-50 border-yellow-200 text-yellow-800",
-    error: "bg-red-50 border-red-200 text-red-800",
-  };
-
-  return (
-    <div className={cn("p-4 rounded border", variants[variant], className)}>
-      {children}
-    </div>
-  );
-}
-```
-
-2. **Use Component**
-
-```jsx
-import Alert from "./components/ui/alert";
-
-<Alert variant="success">Registration successful!</Alert>;
-```
-
----
-
-### Making API Calls
-
-**Example: Fetch user registrations**
-
-1. **Create Service Function** (`src/services/registrationApi.jsx`)
-
-```jsx
-const API_URL = import.meta.env.VITE_API_URL;
-
-export async function fetchUserRegistrations() {
-  const token = localStorage.getItem("auth_token");
-  const res = await fetch(`${API_URL}/api/registrations`, {
-    credentials: "include",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Failed to fetch registrations");
-  return res.json();
-}
-```
-
-2. **Use in Component**
-
-```jsx
-import { useState, useEffect } from "react";
-import { fetchUserRegistrations } from "../services/registrationApi";
-
-function MyRegistrations() {
-  const [registrations, setRegistrations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchUserRegistrations()
-      .then((data) => setRegistrations(data))
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
-
-  return (
-    <div>
-      {registrations.map((reg) => (
-        <div key={reg.id}>{reg.event_name}</div>
-      ))}
-    </div>
-  );
-}
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**1. CORS Errors**
-
-```
-Access to fetch has been blocked by CORS policy
-```
-
-**Solution:**
-
-- Backend must include your frontend URL in CORS whitelist
-- Use `credentials: "include"` in fetch calls
-- Check backend CORS configuration
-
-**2. Environment Variables Not Working**
-
-```
-VITE_API_URL is undefined
-```
-
-**Solution:**
-
-- Prefix with `VITE_` (required by Vite)
-- Restart dev server after changing .env
-- Use `import.meta.env.VITE_API_URL` (not process.env)
-
-**3. Routes Not Working After Refresh**
-
-```
-Cannot GET /events
-```
-
-**Solution:**
-
-- Configure server to serve index.html for all routes
-- Vercel: Use `vercel.json` with rewrites
-- Nginx: Configure try_files
-
-**4. Tailwind Classes Not Applied**
-
-```
-Classes not working in production
-```
-
-**Solution:**
-
-- Check `content` paths in tailwind.config.js
-- Ensure all component files are included
-- Avoid dynamic class names (use cn() utility)
-
-**5. Build Fails**
-
-```
-Module not found or syntax error
-```
-
-**Solution:**
-
-- Check import paths (case-sensitive)
-- Verify all dependencies are installed
-- Clear node_modules and reinstall
-- Check for TypeScript errors
-
----
-
 ## 📦 Key Dependencies
 
 **Core:**
@@ -1475,89 +808,6 @@ Module not found or syntax error
 - Frontend Structure: `docs/PROJECT_STRUCTURE.md` (this file)
 - Backend Structure: `server/docs/PROJECT_STRUCTURE.md`
 - Database Schema: `server/docs/DB_SCHEMA.md`
-
-**Contributing:**
-
-1. Create feature branch
-2. Follow React best practices
-3. Use Tailwind for styling
-4. Test responsiveness
-5. Update documentation
-6. Submit pull request
-
----
-
-## 🎉 Recent Improvements (v2.1)
-
-**December 28, 2025:**
-
-### 🔧 API Configuration Centralization
-
-- ✅ Created `utils/apiConfig.js` - Single source of truth for API URLs
-- ✅ Eliminated 10+ hardcoded API URL instances
-- ✅ Centralized fetch options with credentials
-- ✅ Automatic Authorization header injection
-- ✅ Helpers: `getApiUrl()`, `getFetchOptions()`
-
-### 🔑 Authentication Helpers
-
-- ✅ Created `utils/authHelpers.js` - Centralized token management
-- ✅ Eliminated 8+ duplicate `localStorage.getItem("auth_token")` calls
-- ✅ Functions: `getAuthToken()`, `setAuthToken()`, `removeAuthToken()`, `isAuthenticated()`, `getAuthHeader()`
-- ✅ Consistent token handling across entire app
-
-### 📝 Files Updated (18+ files)
-
-- ✅ `src/context/AuthContext.jsx`
-- ✅ `src/components/auth/LoginModal.jsx`
-- ✅ `src/components/auth/RegisterModal.jsx`
-- ✅ `src/pages/RegistrationPage.jsx`
-- ✅ `src/pages/DashboardPage.jsx`
-- ✅ `src/pages/ClubForm.jsx`
-- ✅ `src/components/admin/AdminRoute.jsx`
-- ✅ All admin page components (AllEvents, AllGallery, AllRegistrations, etc.)
-- ✅ All service files (api.jsx, eventApi.jsx, contactApi.jsx)
-- ✅ Admin service components (ManageEvent, etc.)
-
-### 🚀 Benefits
-
-- ✅ **Maintainability**: Change API URL in one place
-- ✅ **Consistency**: All API calls follow same pattern
-- ✅ **Security**: Centralized token management
-- ✅ **Developer Experience**: Simpler, cleaner code
-- ✅ **Production Ready**: Easy environment switching
-
-### 📊 Code Quality
-
-- ✅ Reduced code duplication by ~200 lines
-- ✅ Improved code maintainability
-- ✅ Better separation of concerns
-- ✅ Consistent error handling
-
-### 🔄 Migration Pattern
-
-**Before:**
-
-```javascript
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const token = localStorage.getItem("auth_token");
-
-fetch(`${API_URL}/api/events`, {
-  credentials: "include",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  },
-});
-```
-
-**After:**
-
-```javascript
-import { getApiUrl, getFetchOptions } from "../utils/apiConfig.js";
-
-fetch(getApiUrl("/api/events"), getFetchOptions());
-```
 
 ---
 
