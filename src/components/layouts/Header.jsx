@@ -10,6 +10,7 @@ import {
   faUserCircle,
   faSignOutAlt,
   faSignInAlt,
+  faUserShield,
 } from "@fortawesome/free-solid-svg-icons";
 import useAuth from "../../hooks/useAuth";
 import LoginModal from "../auth/LoginModal";
@@ -22,6 +23,8 @@ const Header = () => {
   const location = useLocation();
   const { auth, logout } = useAuth();
   const user = auth?.user;
+  console.log("Header auth state:", auth);
+  console.log("Header user state:", user);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -135,7 +138,7 @@ const Header = () => {
           <div className="flex items-center gap-3">
             {/* Dashboard/Login button */}
             {user && (
-              <>
+              <div className="hidden md:flex items-center gap-3">
                 <Link
                   to="/dashboard"
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -148,7 +151,7 @@ const Header = () => {
                 >
                   <Button
                     variant="outline"
-                    className={`px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in "${
+                    className={`px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in ${
                       location.pathname === "/dashboard"
                         ? "border-blue-400 bg-blue-50 text-blue-500"
                         : ""
@@ -157,8 +160,33 @@ const Header = () => {
                     <FontAwesomeIcon icon={faUserCircle} /> Dashboard
                   </Button>
                 </Link>
-              </>
+
+              {/* // if admin show button admin dashboard and take user to /admin/ */}
+              {user?.role === "admin" && (
+                <Link
+                  to="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={
+                    location.pathname === "/admin"
+                      ? "text-pink-400 font-bold"
+                      : ""
+                  }
+                >
+                  <Button
+                    variant="outline"
+                    className={`px-4 py-2 border-primary text-primary hover:bg-primary hover:text-blue-400 flex items-center gap-2 shadow-md hover:scale-105 transition-transform duration-200 animate-fade-in ${
+                      location.pathname === "/admin"
+                        ? "border-blue-400 bg-blue-50 text-blue-500"
+                        : ""
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={faUserShield} /> Admin Dashboard
+                  </Button>
+                </Link>
+              )}
+              </div>
             )}
+            
             {!user && (
               <Button
                 variant="outline"
@@ -303,6 +331,19 @@ const Header = () => {
                 >
                   <FontAwesomeIcon icon={faUserCircle} /> Dashboard
                 </Link>
+                {user?.role === "admin" && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`w-full flex items-center justify-center gap-3 mb-3 font-semibold border-1 rounded-md transition-colors py-2 animate-fade-in drop-shadow-lg ${
+                      location.pathname === "/admin"
+                        ? "text-pink-400 font-bold bg-pink-50"
+                        : "text-primary hover:text-pink-500"
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={faUserShield} /> Admin Dashboard
+                  </Link>
+                )}
                 <Button
                   variant="ghost"
                   className="w-full px-4 py-2 text-gray-600 hover:text-red-400 font-semibold flex items-center justify-center gap-2 hover:scale-105 border-1 transition-colors duration-200 animate-fade-in"
