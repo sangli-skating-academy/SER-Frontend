@@ -23,8 +23,6 @@ const Header = () => {
   const location = useLocation();
   const { auth, logout } = useAuth();
   const user = auth?.user;
-  console.log("Header auth state:", auth);
-  console.log("Header user state:", user);
 
   useEffect(() => {
     const handleScroll = () => {
