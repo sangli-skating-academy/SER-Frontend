@@ -29,6 +29,7 @@ const initialForm = {
     equipment_requirements: [""],
   },
   event_category: { 1: [""] }, // NEW: event categories object
+  skate_category: [], // NEW: skate category array
   is_team_event: false,
   is_featured: false,
   file: null, // for image upload
@@ -116,7 +117,7 @@ export default function AddEvent() {
   const eventToEdit = location.state?.event;
 
   // State
-  const [form, setForm] = useState({ ...initialForm, skate_category: [] });
+  const [form, setForm] = useState(initialForm);
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState("");
   const [generalRules, setGeneralRules] = useState([""]);
@@ -157,6 +158,17 @@ export default function AddEvent() {
                   return JSON.parse(eventToEdit.age_group);
                 } catch {
                   return [eventToEdit.age_group];
+                }
+              })()
+            : [],
+          skate_category: Array.isArray(eventToEdit.skate_category)
+            ? eventToEdit.skate_category
+            : typeof eventToEdit.skate_category === "string"
+            ? (() => {
+                try {
+                  return JSON.parse(eventToEdit.skate_category);
+                } catch {
+                  return [eventToEdit.skate_category];
                 }
               })()
             : [],
@@ -351,8 +363,8 @@ export default function AddEvent() {
       formData.append("is_featured", form.is_featured);
       formData.append("live", form.live);
       if (form.file) formData.append("file", form.file);
-      if (form.hashtags && form.hashtags.length > 0)
-        formData.append("hashtags", JSON.stringify(form.hashtags));
+      formData.append("hashtags", JSON.stringify(form.hashtags || []));
+      formData.append("skate_category", JSON.stringify(form.skate_category || []));
       formData.append(
         "rules_and_guidelines",
         JSON.stringify({
